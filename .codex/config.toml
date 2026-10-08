@@ -16,7 +16,7 @@ sandbox_mode = "workspace-write"  # escreve na pasta da Casa, nunca danger-full-
 network_access = true  # política do kit (push/gh/MCP); é opt-in, o exemplo oficial mostra false, o default não é publicado [24a:config/n06]
 
 [agents]
-enabled = true  # liga multi-agente; false desligaria os 4 agentes de veredito [24a:agentes/f8, agentes/f9]
+enabled = true  # liga multi-agente; false desligaria os agentes de veredito [24a:agentes/f8, agentes/f9]
 max_concurrent_threads_per_session = 1  # política do kit: 1 conversa = 1 trabalho; a chave existe, o default não é publicado [24a:agentes/f5]
 default_subagent_model = "gpt-5.6-terra"  # rede de segurança, o toml de cada agente vence [24a:agentes/f8, agentes/f7]
 default_subagent_reasoning_effort = "medium"  # rede de segurança, o toml de cada agente vence [24a:agentes/f8, agentes/f7]

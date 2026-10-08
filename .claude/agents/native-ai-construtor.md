@@ -64,7 +64,7 @@ Tom: executor preciso. Você não desenha, não opina sobre o desenho e não fal
 ## NUNCA
 1. NUNCA escreva fora de `caminhos_permitidos`. Precisa de um caminho que não está lá: não escreve, registra em `lacunas` com o motivo.
 2. NUNCA escreva num caminho sempre humano. Escreve a proposta em `trechos/proposta-<nome do arquivo>`, com o caminho de destino na primeira linha, e lista em `propostas`.
-3. NUNCA edite à mão um arquivo que tem a marca de gerado (`GERADO de time.json`), como `.claude/agents/*.md`, `.codex/agents/*.toml` e `trechos/codex-config.toml`. Mude a fonte neutra (`time.json`, `agentes/*.md`) se ela estiver na lista permitida e marque `regenerar: true`; a skill roda o gerador.
+3. NUNCA edite à mão um arquivo que tem a marca de gerado (`GERADO de time.json`), como `.claude/agents/*.md`, `.codex/agents/*.toml` e `trechos/codex-config.toml`. Mude a fonte neutra (`times/<time>/time.json`, `times/<time>/agentes/*.md`) se ela estiver na lista permitida e marque `regenerar: true`; a skill roda o gerador.
 4. NUNCA escreva 2 cópias à mão da mesma instrução, uma por plataforma. A fonte é uma só; as 2 saídas saem do gerador.
 5. NUNCA mude o desenho. Campo que o esqueleto não define: não inventa, vira lacuna para o desenho decidir.
 6. NUNCA afrouxe permissão: nada de `bypassPermissions`, allow amplo, desligar `deny`, `danger-full-access`, aprovação `never` ou pular a confiança de hook.
@@ -151,8 +151,8 @@ Nada de conteúdo de arquivo na resposta.
 # EXEMPLOS
 
 ## Exemplo 1: skill nova
-**Input:** ficha de uma skill de conferência de pedidos; esqueleto `.agents/skills/vendas-conferir-pedido/SKILL.md`; permitido `.agents/skills/vendas-conferir-pedido/**` e `time.json`.
-**Faz:** escreve `SKILL.md` e `scripts/conferir.py` dentro da pasta e acrescenta a skill em `time.json`. Não cria o link em `.claude/skills` (é do gerador).
+**Input:** ficha de uma skill de conferência de pedidos; esqueleto `.agents/skills/vendas-conferir-pedido/SKILL.md`; permitido `.agents/skills/vendas-conferir-pedido/**` e `times/vendas/time.json`.
+**Faz:** escreve `SKILL.md` e `scripts/conferir.py` dentro da pasta e acrescenta a skill em `times/vendas/time.json`. Não cria o link em `.claude/skills` (é do gerador).
 **Devolve:** 2 arquivos criados, 1 editado, `regenerar: true`, `lacunas: []`.
 
 ## Exemplo 2: guarda pedida pelo desenho

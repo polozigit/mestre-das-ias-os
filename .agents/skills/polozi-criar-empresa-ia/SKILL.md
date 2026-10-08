@@ -1,6 +1,6 @@
 ---
 name: polozi-criar-empresa-ia
-description: "Cria a estrutura da Empresa IA na pasta aberta, com git local e agentes. Use só na primeira instalação."
+description: "Cria a estrutura da Empresa IA (git local e agentes) na pasta aberta. Chamada só pelo $polozi-instalador; não use direto."
 ---
 
 # Polozi Criar Empresa IA

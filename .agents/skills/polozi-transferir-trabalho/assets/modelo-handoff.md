@@ -27,7 +27,7 @@
 
 ## Onde está o trabalho
 
-- Ramo: `main` (único)
+- Ramo: `{{RAMO}}` (`main` com o sistema fora do ar; com o sistema no ar, a branch curta da task: abra essa branch antes de continuar, nunca a `main`)
 - Commit de checkpoint: `{{SHA_CURTO}}` — provado sincronizado no GitHub
 
 ## Prompt de continuação

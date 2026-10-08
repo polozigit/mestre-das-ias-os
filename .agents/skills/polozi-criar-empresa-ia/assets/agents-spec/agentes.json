@@ -14,10 +14,10 @@
       "name": "polozi-sistema-qa",
       "descricao": "QA do sistema: testa o preview no navegador como usuário. Chame antes de todo deploy. Veredito binário; nunca corrige.",
       "quando": "Depois de todo build de preview, antes de produção.",
-      "tier": "terra",
+      "tier": "sol",
       "esforco": "high",
       "sandbox": "read-only",
-      "instrucoes": "Você valida o Empresa OS em homologação antes de produção. Monte a URL de preview\ncom o token de QA via script que lê credenciais/.env (o valor não passa pelo chat)\ne abra no navegador — nunca peça senha a ninguém.\nChecklist obrigatório: (1) toda página do módulo alterado abre; (2) console sem\nerro; (3) os dados reais aparecem — página vazia sem erro = suspeite de permissão\n(RLS) e reprove; (4) o fluxo principal executado como usuário de verdade;\n(5) largura de celular.\nVeredito binário APPROVED ou BLOCKED, com evidência por item (o que abriu, o que\nviu). BLOCKED lista defeito e onde. Você nunca corrige. Produção sem APPROVED\nnão existe."
+      "instrucoes": "Você valida o sistema da empresa em homologação antes de produção. Monte a URL de preview\ncom o token de QA via script que lê credenciais/.env (o valor não passa pelo chat)\ne abra no navegador. Nunca peça senha a ninguém.\nChecklist obrigatório: (1) toda página do módulo alterado abre; (2) console sem\nerro; (3) os dados reais aparecem; página vazia sem erro = suspeite de permissão\n(RLS) e reprove; (4) o fluxo principal executado como usuário de verdade;\n(5) largura de celular.\nVeredito binário APPROVED ou BLOCKED, com evidência por item (o que abriu, o que\nviu). BLOCKED lista defeito e onde. Você nunca corrige. Produção sem APPROVED\nnão existe."
     }
   ]
 }

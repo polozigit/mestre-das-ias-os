@@ -15,7 +15,7 @@ Dossiê já registrado e o dono pediu "registra o dossiê" sem anexar transcriç
 2. Confirmar que a pasta principal possui `EMPRESA-IA.md`, `MAPA-DA-EMPRESA-IA.md`, `contexto/` e `operacao/`. Caso contrário, orientar o usuário a usar `Polozi Criar Empresa IA`.
 3. Aceitar uma transcrição colada ou um único arquivo `.txt`, `.md`, `.docx` ou `.pdf`. Para texto colado, salvar somente uma cópia temporária fora do projeto e tratá-la como `texto-colado`.
 4. Não aceitar áudio, vídeo, links, vários arquivos ou PDF sem texto extraível. Pedir uma transcrição compatível, sem tentar OCR ou inferir conteúdo.
-5. Localizar `scripts/registrar_dossie.py`. O questionário canônico está em `assets/questionario-dossie-v1.json`.
+5. Localizar `scripts/registrar_dossie.py`. As 71 perguntas, com código e texto, estão em `assets/questionario-dossie-v1.json`; para consultar, rode `python3 scripts/registrar_dossie.py --listar-perguntas`. É a única lista válida de códigos: nunca use numeração de outro roteiro.
 
 ## Fazer a prévia
 
@@ -33,13 +33,20 @@ Para texto colado, apontar `--arquivo` para a cópia temporária e acrescentar `
 
 Mostrar: formato, códigos encontrados, ausentes, duplicados, ambíguos, trechos fora do roteiro, arquivos de destino e eventual arquivo que será arquivado. Não associar resposta a código ausente, inválido ou ambíguo.
 
-Se não houver nenhum código válido, interromper e pedir uma transcrição gravada com `Pergunta 1.1`, `Pergunta 1,1` ou `Pergunta 1 ponto 1`.
+Se a prévia der erro "Nenhuma resposta encaixada", ou mostrar marcadores ambíguos ou muitas ausentes porque a pessoa falou sem o número certo (`Pergunta, ...`, fora de ordem, pergunta lida com outras palavras, várias respostas juntas), faça o encaixe pelas perguntas:
+
+1. Rode `--listar-perguntas` e leia a transcrição inteira.
+2. Monte um JSON fora do projeto (junto da cópia temporária), só com os códigos da lista: `{"1.1": "trecho", "2.3": ["trecho a", "trecho b"]}`. Cada trecho é copiado da transcrição palavra por palavra, sem corrigir, resumir nem completar. Use lista quando a resposta estiver em pedaços; repita o mesmo trecho em dois códigos quando uma fala responder às duas perguntas.
+3. Pergunta sem resposta na fala fica fora do JSON. Nunca invente, nunca deduza número, nunca preencha com outra resposta parecida. Fala que não responde a nenhuma das 71 perguntas também fica fora.
+4. Rode a prévia de novo com `--respostas "CAMINHO_DO_JSON"`. O script recusa código fora da lista e trecho que não esteja na transcrição; corrija o JSON e repita. A prévia mostra a cobertura da transcrição e a lista "Sem resposta".
+
+No dossiê, cada resposta encaixada assim sai com `Encaixe: associada pela IA (revisar)`.
 
 Pedir uma única confirmação antes da escrita.
 
 ## Registrar
 
-Após confirmação explícita, executar o mesmo comando com `--aplicar`. Se já existir `contexto/dossie/dossie-completo.md`, acrescentar também `--confirmar-atualizacao`.
+Após confirmação explícita, executar o mesmo comando (com `--respostas`, se a prévia usou) trocando `--dry-run` por `--aplicar`. Se já existir `contexto/dossie/dossie-completo.md`, acrescentar também `--confirmar-atualizacao`.
 
 ```bash
 python3 scripts/registrar_dossie.py \
@@ -56,7 +63,7 @@ O script preserva a fonte original, cria o dossiê canônico e o relatório. Em 
 1. Confirmar que o Mapa marcou `contexto.dossie` como `fonte` — na tabela `MAPA-DA-EMPRESA-IA.md` e em `operacao/mapa.json` (a fonte de onde a tabela é gerada), quando esse arquivo existir.
 2. Confirmar que o dossiê contém as 71 perguntas e somente respostas transcritas, sem diagnóstico ou resumo.
 3. Confirmar a atualização de `STATUS-ATUAL.md`, `CHANGELOG.md`, `PENDENCIAS.md` (nova linha na tabela) e `PROXIMA-SESSAO.md`.
-4. Informar códigos ausentes, duplicados, ambíguos e trechos não classificados para revisão humana.
+4. Informar ao dono, pelo código e texto da pergunta, as que ficaram sem resposta, mais duplicadas, ambíguas e trechos não classificados, para revisão humana.
 5. Informar que o próximo trabalho é revisar lacunas e validar quais documentos empresariais podem ser derivados.
 
 ## Publicar na tela
@@ -79,7 +86,7 @@ python3 .agents/skills/marketing-persona/scripts/publicar_documento.py \
 
 5. Ler a saída do comando sem `--dry-run`:
    - **0** = publicado. Confirme com `python3 .agents/skills/marketing-persona/scripts/publicar_documento.py --tipo dossie --arquivo "contexto/dossie/dossie-completo.md" --casa "PASTA_ABSOLUTA" --conferir` (precisa dar `EM DIA`) e diga ao dono: "Está em Marca, aba Dossiê, no sistema."
-   - **2 com `FALTA`** = o banco ainda não foi ligado (comum na instalação, antes do sistema no ar). O sim e o dossiê ficam salvos no projeto: diga em 1 linha que a publicação espera o sistema e que depois é só pedir "registra o dossiê" de novo.
+   - **2 com `FALTA`** = o banco ainda não foi ligado (só acontece se o dono pulou o banco e o sistema no ar, que vêm antes na ordem da aula). O sim e o dossiê ficam salvos no projeto: diga em 1 linha que a publicação espera o sistema e que depois é só pedir "registra o dossiê" de novo.
    - **3** = há algo parecido com chave ou segredo na transcrição: mostre ao dono a linha que o script apontou, não publique e não edite a transcrição à mão.
    - **4** = erro de rede ou do banco: repita uma vez; se persistir, conte ao dono sem jargão e anote em `operacao/PENDENCIAS.md` (origem `descoberta-ia`).
    - **5** = o texto mudou depois do sim, ou não há sim: volte ao passo 3.
@@ -87,7 +94,7 @@ python3 .agents/skills/marketing-persona/scripts/publicar_documento.py \
 ## Limites
 
 - Nunca escrever sem prévia e confirmação.
-- Nunca inferir a ordem de respostas sem código.
+- Nunca inferir a ordem de respostas sem código. Sem código, o encaixe é só por `--respostas`, com trecho literal, e fica marcado para revisão.
 - Nunca transformar a transcrição em fato aprovado. O sim de publicar não muda isso: o dossiê continua `fonte`.
 - Nunca publicar o dossiê sem o sim do dono sobre a pergunta de publicar, nem por outro caminho que não o `publicar_documento.py` do time Marketing (sem SQL, sem chave no chat).
 - Nunca sobrescrever fonte ou dossiê anterior sem arquivamento e confirmação explícita.

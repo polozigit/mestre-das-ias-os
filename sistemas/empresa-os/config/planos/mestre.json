@@ -1,6 +1,6 @@
 {
   "chave": "mestre",
-  "versao": 5,
+  "versao": 7,
   "titulo": "Mestre das IAs: 3 dias de curso e 90 dias de trilha",
   "descricao": "O curso monta; a trilha prova. Dia 0 da trilha = fim do D3.",
   "caminho_origem": "config/planos/mestre.json",
@@ -81,16 +81,16 @@
           "ordem": 4,
           "titulo": "Baixar a cópia do sistema",
           "objetivo": "A base do sistema da empresa no seu computador.",
-          "instrucao": "Peça ao Codex para baixar a cópia do sistema do curso pro seu computador, numa pasta nova com o nome da sua empresa, e abri-la como projeto.",
+          "instrucao": "Peça ao Codex para baixar a cópia do sistema do curso (https://github.com/polozigit/mestre-das-ias-os) pro seu computador, numa pasta nova chamada com o primeiro nome da sua empresa mais -os (por exemplo, clima-os), e abri-la como projeto.",
           "por_que": "Sem a pasta da empresa no seu computador a IA não tem onde trabalhar nem onde guardar o que cria.",
           "passos": [
             "Abra um chat novo no Codex.",
             "Cole o comando abaixo e deixe a IA baixar a cópia.",
-            "Escolha a pasta nova, com o nome da sua empresa.",
+            "Dê à pasta o nome do sistema: o primeiro nome da sua empresa, em minúsculas e sem acento, mais -os (por exemplo, clima-os). O instalador confere esse nome depois.",
             "Abra essa pasta como projeto no Codex.",
             "Confira se os arquivos do sistema apareceram dentro dela."
           ],
-          "comando": "Baixe para o meu computador a cópia do repositório do curso (o endereço que o professor passou), numa pasta nova com o nome da minha empresa, e abra essa pasta como projeto. Depois liste o que veio dentro para eu conferir.",
+          "comando": "Baixe para o meu computador a cópia do repositório do curso (https://github.com/polozigit/mestre-das-ias-os), numa pasta nova chamada com o primeiro nome da minha empresa em minúsculas, sem acento, mais -os (por exemplo, clima-os), e abra essa pasta como projeto. Depois liste o que veio dentro para eu conferir.",
           "prova": "A pasta existe no seu computador, aberta como projeto, com os arquivos do sistema dentro.",
           "prazo_dias": 0,
           "executor_padrao": "dupla",
@@ -176,7 +176,7 @@
             "Se a persona ou a marca já estavam aprovadas antes de o banco existir, peça: \"publica a persona e a marca\".",
             "Abra Marca no sistema e confira as três abas: Dossiê, Persona e Identidade e voz."
           ],
-          "comando": "Registre o meu dossiê com $polozi-registrar-dossie (vou anexar a transcrição das 71 perguntas) e publique-o no sistema. Depois use $marketing-persona para criar a persona do meu cliente ideal e $marketing-identidade para criar a minha identidade visual. Se eu tiver um logo, use $marketing-logo para tratá-lo. Publique cada documento no sistema para aparecer em Marca.",
+          "comando": "$polozi-instalador Continue a instalação de onde parou, nas etapas do dossiê e da marca. Registre o meu dossiê com $polozi-registrar-dossie (vou anexar a transcrição das 71 perguntas) e publique-o no sistema. Depois use $marketing-persona para criar a persona do meu cliente ideal e $marketing-identidade para criar a minha identidade visual. Se eu tiver um logo, use $marketing-logo para tratá-lo. Publique cada documento no sistema para aparecer em Marca.",
           "prova": "Em Marca aparecem os 3 documentos: o dossiê (aba Dossiê), a persona do cliente ideal (aba Persona) e a identidade visual com o tom de voz (aba Identidade e voz).",
           "prazo_dias": 0,
           "executor_padrao": "dupla",

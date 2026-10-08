@@ -3,8 +3,12 @@
 sai 1 se alguma falhar (2 se a raiz nao existe ou o argumento e invalido).
 
 Uso:
-  python3 provar.py --raiz <repo> [--tarefa operacao/tasks/TASK-N] [--mutacao <lote.json>]
+  python3 provar.py --raiz <repo> [--fonte <pasta do time>] [--tarefa operacao/tasks/TASK-N] [--mutacao <lote.json>]
                     [--fumaca "<comando>"] [--carga <evidencia.json>] [--w15] [--data AAAA-MM-DD]
+
+--fonte: pasta do time.json (padrao: a raiz). Na Casa o time mora em times/<nome>/ e as saidas,
+skills e links ficam na raiz: --raiz . --fonte times/<nome>. Relativo resolve contra a raiz;
+tem de ficar dentro dela. Vale nas etapas 1 a 3 e no drift do gerar_saidas.py --check.
 
 Etapas (sempre: 1, 2 e 3; as outras so se o argumento vier):
   1. estatica   toml/md/skills/hooks parseiam e tem os campos exigidos; mapa sem rede (C4).
@@ -171,10 +175,19 @@ def descricao_gerada(agente):
     return f"{agente.get('descricao', '')}. {agente.get('quando', '')}"
 
 
-def carregar_time(raiz):
-    caminho = Path(raiz) / "time.json"
+def times_da_casa(raiz):
+    return sorted(p.parent.name for p in (Path(raiz) / "times").glob("*/time.json"))
+
+
+def carregar_time(raiz, fonte=None):
+    fonte = Path(raiz) if fonte is None else Path(fonte)
+    caminho = fonte / "time.json"
     if not caminho.is_file():
-        return None, "time.json ausente na raiz"
+        achados = times_da_casa(raiz) if fonte == Path(raiz) else []
+        if achados:
+            return None, ("time.json ausente na raiz. Na Casa cada time mora em times/<nome>/: "
+                          f"rode com --fonte times/<nome> (times: {', '.join(achados)})")
+        return None, "time.json ausente na raiz" if fonte == Path(raiz) else f"time.json ausente em {_rel(Path(raiz), fonte)}"
     try:
         dados = json.loads(caminho.read_text(encoding="utf-8"))
     except (OSError, ValueError) as erro:
@@ -270,10 +283,10 @@ def familia_modelo(modelo):
 
 
 # ------------------------------------------------------------------ 1. estatica
-def etapa_estatica(raiz):
+def etapa_estatica(raiz, fonte=None):
     raiz = Path(raiz)
     e = Etapa("estatica")
-    tj, _ = carregar_time(raiz)
+    tj, _ = carregar_time(raiz, fonte)
     declarados = {a["name"]: a for a in (tj or {}).get("agentes", [])}
 
     tomls = sorted((raiz / ".codex" / "agents").glob("*.toml"))
@@ -439,12 +452,13 @@ def _checar_c5(e, raiz, fms, tomls):
                f"C5 (Codex): {rel} sem model_reasoning_effort explicito")
 
 
-def _rodar_gerar_saidas(raiz):
+def _rodar_gerar_saidas(raiz, fonte=None):
     script = raiz / SKILL / "scripts" / "gerar_saidas.py"
     if not script.is_file():
         return None, f"{_rel(raiz, script)} ausente (drift nao verificado)"
     base = [sys.executable, str(script), "--check"]
-    rc, saida, expirou = _executar(base + ["--raiz", str(raiz)], raiz, 120)
+    com_fonte = ["--fonte", str(fonte)] if fonte is not None and Path(fonte) != raiz else []
+    rc, saida, expirou = _executar(base + ["--raiz", str(raiz)] + com_fonte, raiz, 120)
     if rc == 2 and "unrecognized arguments" in saida:
         rc, saida, expirou = _executar(base, raiz, 120)
     if expirou:
@@ -454,10 +468,10 @@ def _rodar_gerar_saidas(raiz):
     return True, None
 
 
-def etapa_paridade(raiz):
+def etapa_paridade(raiz, fonte=None):
     raiz = Path(raiz)
     e = Etapa("paridade")
-    tj, erro = carregar_time(raiz)
+    tj, erro = carregar_time(raiz, fonte)
     if not e.verifica(tj, erro):
         return e
 
@@ -541,16 +555,16 @@ def etapa_paridade(raiz):
         esperado = (raiz / ".agents" / "skills" / link.name).resolve()
         e.verifica(alvo == esperado, f"{rel}: aponta para {alvo}, deveria resolver para .agents/skills/{link.name}")
 
-    ok, motivo = _rodar_gerar_saidas(raiz)
+    ok, motivo = _rodar_gerar_saidas(raiz, fonte)
     e.verifica(ok, motivo)
     return e
 
 
 # ------------------------------------------------------------------ 3. contexto (C12)
-def etapa_contexto(raiz):
+def etapa_contexto(raiz, fonte=None):
     raiz = Path(raiz)
     e = Etapa("contexto")
-    tj, _ = carregar_time(raiz)
+    tj, _ = carregar_time(raiz, fonte)
     tetos = dict(TETO_REFERENCIAS_BYTES)
     declarado = ((tj or {}).get("tetos") or {}).get("referencias_bytes")
     if isinstance(declarado, dict):
@@ -562,7 +576,10 @@ def etapa_contexto(raiz):
             continue
         tamanho = caminho.stat().st_size
         e.verifica(tamanho <= teto, f"{_rel(raiz, caminho)}: {tamanho} bytes, acima do teto de {teto} (C12)")
-    for nome in ("AGENTS.md", "CLAUDE.md", "trechos/AGENTS.md"):
+    trechos = ["AGENTS.md", "CLAUDE.md", "trechos/AGENTS.md"]
+    if fonte is not None and Path(fonte) != raiz:
+        trechos.append(_rel(raiz, Path(fonte) / "trechos" / "AGENTS.md"))
+    for nome in trechos:
         arq = raiz / nome
         if arq.is_file():
             casou = IMPORT_ARROBA_RE.search(arq.read_text(encoding="utf-8", errors="replace"))
@@ -850,7 +867,8 @@ def detalhe_w15(e):
 
 def main(argv=None):
     p = argparse.ArgumentParser(description="Prova o que o time Native AI construiu.")
-    p.add_argument("--raiz", required=True, help="raiz do repo (onde esta o time.json)")
+    p.add_argument("--raiz", required=True, help="raiz do repo (onde ficam as saidas e as skills)")
+    p.add_argument("--fonte", help="pasta do time.json (padrao: a raiz; na Casa, times/<nome>)")
     p.add_argument("--tarefa", help="pasta da tarefa (operacao/tasks/TASK-N): confere o criterio "
                                     "congelado (C6) e a cobertura da mutacao (C7a)")
     p.add_argument("--mutacao", help="lote.json de mutantes (exige --tarefa)")
@@ -884,7 +902,23 @@ def main(argv=None):
               "mutante PEGOU, C7a)", file=sys.stderr)
         return 2
 
-    etapas = [etapa_estatica(raiz), etapa_paridade(raiz), etapa_contexto(raiz)]
+    fonte = None
+    if args.fonte:
+        bruta = Path(args.fonte)
+        fonte = (bruta if bruta.is_absolute() else raiz / bruta).resolve()
+        if not fonte.is_dir():
+            print(f"provar: --fonte {args.fonte} nao e uma pasta (relativo resolve contra a raiz)",
+                  file=sys.stderr)
+            return 2
+        try:
+            fonte.relative_to(raiz)
+        except ValueError:
+            print(f"provar: --fonte {args.fonte} fica fora da raiz {raiz}", file=sys.stderr)
+            return 2
+        if fonte == raiz:
+            fonte = None
+
+    etapas = [etapa_estatica(raiz, fonte), etapa_paridade(raiz, fonte), etapa_contexto(raiz, fonte)]
     ids = None
     if args.tarefa:
         e_crit, ids = etapa_criterio(raiz, args.tarefa)

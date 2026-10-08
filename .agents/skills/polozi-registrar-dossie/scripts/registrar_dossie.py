@@ -63,8 +63,20 @@ def argumentos() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Organiza uma transcrição por códigos do dossiê Empresa IA."
     )
-    parser.add_argument("--destino", required=True, help="Pasta Empresa IA já aberta.")
-    parser.add_argument("--arquivo", required=True, help="Transcrição .txt, .md, .docx ou .pdf.")
+    parser.add_argument("--destino", help="Pasta Empresa IA já aberta.")
+    parser.add_argument("--arquivo", help="Transcrição .txt, .md, .docx ou .pdf.")
+    parser.add_argument(
+        "--respostas",
+        help=(
+            "JSON {codigo: trecho literal da transcrição} montado consultando o questionário. "
+            "Usado quando a transcrição não traz Pergunta X.Y em cada resposta."
+        ),
+    )
+    parser.add_argument(
+        "--listar-perguntas",
+        action="store_true",
+        help="Mostra os 71 códigos e o texto de cada pergunta e sai.",
+    )
     parser.add_argument(
         "--registro-em",
         help="Data-hora estável da execução no formato AAAA-MM-DD_HHMMSS.",
@@ -264,6 +276,100 @@ def localizar_marcadores(texto: str) -> list[Marcador]:
     return marcadores
 
 
+def padrao_trecho(trecho: str) -> re.Pattern[str]:
+    # Literal, palavra por palavra; só o espaço entre palavras pode variar
+    # (quebra de linha, espaço duplo). Paráfrase ou resumo não casa.
+    return re.compile(r"\s+".join(re.escape(palavra) for palavra in trecho.split()))
+
+
+def carregar_respostas(caminho: Path, esperados: set[str]) -> dict[str, list[str]]:
+    try:
+        bruto = json.loads(caminho.read_text(encoding="utf-8-sig"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as erro:
+        raise ErroRegistro(f"Arquivo de respostas inválido: {caminho.name}") from erro
+    if isinstance(bruto, dict) and isinstance(bruto.get("respostas"), dict):
+        bruto = bruto["respostas"]
+    if not isinstance(bruto, dict):
+        raise ErroRegistro('O arquivo de respostas deve ser um objeto {"1.1": "trecho", ...}.')
+    desconhecidos = sorted(codigo for codigo in bruto if codigo not in esperados)
+    if desconhecidos:
+        raise ErroRegistro(
+            "Código fora do questionário no arquivo de respostas: "
+            f"{', '.join(desconhecidos)}. Use só os códigos de --listar-perguntas."
+        )
+    respostas: dict[str, list[str]] = {}
+    for codigo, valor in bruto.items():
+        trechos = valor if isinstance(valor, list) else [valor]
+        if not all(isinstance(trecho, str) for trecho in trechos):
+            raise ErroRegistro(f"Resposta de {codigo} deve ser texto ou lista de textos.")
+        trechos = [trecho.strip() for trecho in trechos if trecho and trecho.strip()]
+        if trechos:
+            respostas[codigo] = trechos
+    return respostas
+
+
+def analisar_respostas(
+    texto: str, questionario: dict[str, Any], respostas: dict[str, list[str]]
+) -> dict[str, Any]:
+    fora_do_texto = []
+    itens: dict[str, dict[str, Any]] = {}
+    cobertos: list[tuple[int, int]] = []
+    for secao in questionario["secoes"]:
+        for pergunta in secao["perguntas"]:
+            codigo = pergunta["codigo"]
+            trechos = respostas.get(codigo, [])
+            if not trechos:
+                itens[codigo] = {"estado": "ausente", "ocorrencias": []}
+                continue
+            partes = []
+            linhas = []
+            for trecho in trechos:
+                encontrado = padrao_trecho(trecho).search(texto)
+                if not encontrado:
+                    fora_do_texto.append(codigo)
+                    break
+                partes.append(encontrado.group(0))
+                cobertos.append((encontrado.start(), encontrado.end()))
+                linhas.extend(
+                    [linha_do_offset(texto, encontrado.start()), linha_do_offset(texto, encontrado.end())]
+                )
+            resposta = "\n\n".join(partes)
+            estado = "não sei" if normalizar(resposta).startswith("nao sei") else "respondida"
+            itens[codigo] = {
+                "estado": estado,
+                "ocorrencias": [
+                    {
+                        "resposta": resposta,
+                        "linhas": [min(linhas or [0]), max(linhas or [0])],
+                        "origem": "associada pela IA",
+                    }
+                ],
+            }
+    if fora_do_texto:
+        raise ErroRegistro(
+            "Trecho que não está na transcrição, palavra por palavra, em: "
+            f"{', '.join(sorted(set(fora_do_texto), key=chave_codigo))}. "
+            "Copie o trecho exato da fala; nunca resuma nem complete."
+        )
+    caracteres = len(re.sub(r"\s+", "", texto)) or 1
+    marcados = [False] * len(texto)
+    for inicio, fim in cobertos:
+        for indice in range(inicio, fim):
+            marcados[indice] = True
+    cobertos_sem_espaco = sum(
+        1 for indice, caractere in enumerate(texto) if marcados[indice] and not caractere.isspace()
+    )
+    return {
+        "itens": itens,
+        "invalidos": [],
+        "ambiguos": [],
+        "nao_classificados": [],
+        "marcadores_validos": sum(1 for item in itens.values() if item["ocorrencias"]),
+        "modo": "respostas",
+        "cobertura": round(100 * cobertos_sem_espaco / caracteres),
+    }
+
+
 def limpar_resposta(valor: str) -> str:
     valor = valor.strip(" \t\n:-")
     valor = re.sub(r"(?im)^\s*(?:resposta\s*:?\s*)", "", valor)
@@ -414,6 +520,9 @@ def mostrar_previa(
     print(f"Empresa: {empresa}")
     print(f"Destino: {destino}")
     print(f"Fonte: {arquivo.name} ({extensao})")
+    if analise.get("modo") == "respostas":
+        print("Encaixe: associado pela IA (arquivo de respostas), revisar")
+        print(f"Transcrição coberta pelos trechos: {analise['cobertura']}%")
     print(f"Marcadores válidos: {analise['marcadores_validos']}")
     print(f"Respondidas: {contagem['respondida']}")
     print(f"Não sei: {contagem['não sei']}")
@@ -426,6 +535,8 @@ def mostrar_previa(
     for chave in ("leia_me", "fonte", "texto_extraido", "relatorio", "dossie"):
         if chave in caminhos:
             print(f"  + {caminhos[chave]}")
+    ausentes = [codigo for codigo, item in analise["itens"].items() if item["estado"] == "ausente"]
+    print("Sem resposta: " + (", ".join(sorted(ausentes, key=chave_codigo)) or "nenhuma"))
     if caminhos["dossie"].exists():
         print(f"Arquivo a arquivar antes da atualização: {caminhos['arquivo_antigo']}")
 
@@ -469,7 +580,10 @@ def renderizar_dossie(
                     if len(item["ocorrencias"]) > 1:
                         linhas.extend([f"#### Ocorrência {indice}", ""])
                     inicio, fim = ocorrencia["linhas"]
-                    linhas.extend([f"- Fonte: linhas {inicio}-{fim}", "", "Resposta transcrita:"])
+                    linhas.append(f"- Fonte: linhas {inicio}-{fim}")
+                    if ocorrencia.get("origem"):
+                        linhas.append(f"- Encaixe: {ocorrencia['origem']} (revisar)")
+                    linhas.extend(["", "Resposta transcrita:"])
                     linhas.extend(bloco_citacao(ocorrencia["resposta"]))
                     linhas.append("")
             else:
@@ -489,6 +603,14 @@ def renderizar_relatorio(
         "",
         f"- Registro: {registro_em}",
         f"- Fonte: {arquivo.name}",
+        *(
+            [
+                "- Encaixe: associado pela IA (arquivo de respostas), revisar",
+                f"- Transcrição coberta pelos trechos: {analise['cobertura']}%",
+            ]
+            if analise.get("modo") == "respostas"
+            else []
+        ),
         f"- Marcadores válidos: {analise['marcadores_validos']}",
         f"- Respondidas: {contagem['respondida']}",
         f"- Não sei: {contagem['não sei']}",
@@ -500,7 +622,7 @@ def renderizar_relatorio(
         "",
     ]
     ausentes = [codigo for codigo, item in analise["itens"].items() if item["estado"] == "ausente"]
-    linhas.append("- Códigos ausentes: " + (", ".join(sorted(ausentes, key=chave_codigo)) or "nenhum"))
+    linhas.append("- Perguntas sem resposta (ausentes): " + (", ".join(sorted(ausentes, key=chave_codigo)) or "nenhum"))
     duplicadas = [codigo for codigo, item in analise["itens"].items() if item["estado"] == "duplicada"]
     linhas.append("- Códigos duplicados: " + (", ".join(sorted(duplicadas, key=chave_codigo)) or "nenhum"))
     if analise["invalidos"]:
@@ -668,9 +790,21 @@ def aplicar(
     atualizar_operacao(destino, registro_em)
 
 
+def listar_perguntas(questionario: dict[str, Any]) -> None:
+    for secao in questionario["secoes"]:
+        print(f"## {secao['codigo']}. {secao['titulo']}")
+        for pergunta in secao["perguntas"]:
+            print(f"{pergunta['codigo']} | {pergunta['texto']}")
+
+
 def main() -> int:
     args = argumentos()
     try:
+        if args.listar_perguntas:
+            listar_perguntas(carregar_questionario())
+            return 0
+        if not args.destino or not args.arquivo:
+            raise ErroRegistro("Informe --destino e --arquivo.")
         if args.dry_run == args.aplicar:
             raise ErroRegistro("Use exatamente uma opção: --dry-run ou --aplicar.")
         destino = Path(args.destino).expanduser().resolve()
@@ -680,10 +814,20 @@ def main() -> int:
         validar_empresa(destino)
         texto, extensao = ler_transcricao(arquivo)
         questionario = carregar_questionario()
-        analise = analisar(texto, questionario)
+        if args.respostas:
+            esperados = {
+                pergunta["codigo"]
+                for secao in questionario["secoes"]
+                for pergunta in secao["perguntas"]
+            }
+            respostas = carregar_respostas(Path(args.respostas).expanduser().resolve(), esperados)
+            analise = analisar_respostas(texto, questionario, respostas)
+        else:
+            analise = analisar(texto, questionario)
         if analise["marcadores_validos"] == 0:
             raise ErroRegistro(
-                "Nenhum código válido foi encontrado. Grave usando Pergunta 1.1, Pergunta 1,1 ou Pergunta 1 ponto 1."
+                "Nenhuma resposta encaixada. Monte o arquivo de respostas consultando "
+                "--listar-perguntas e rode de novo com --respostas."
             )
         registro_em = validar_registro_em(args.registro_em)
         empresa = nome_empresa(destino)

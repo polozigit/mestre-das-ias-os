@@ -1,0 +1,9 @@
+# GERADO de time.json - nao edite a mao
+# Proposta para o .codex/config.toml. O dono revisa e cola; o script nunca escreve nele.
+# config_file e relativo a pasta .codex/.
+# AGENTES:INICIO (tecnologia)
+[agents.tecnologia-revisor-seguranca]
+config_file = "agents/tecnologia-revisor-seguranca.toml"
+description = "Revisa a mudança do sistema antes do merge. Use antes de todo merge de mudança em sistemas/ (tela, banco, rota), chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito"
+
+# AGENTES:FIM (tecnologia)

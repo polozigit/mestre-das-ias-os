@@ -8,6 +8,8 @@ import { getOrgPacotePorCargo } from "@/lib/organograma/consultas";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Markdown } from "@/components/ui/Markdown";
 import { TituloSecao } from "./TituloSecao";
+import { AtribuicaoOnet } from "./AtribuicaoOnet";
+import { creditoOnet } from "@/lib/organograma/onet";
 import type { OrgDocumentoResumo, OrgNo, OrgPacote } from "@/lib/organograma/tipos";
 
 /** Dossiê e auditoria do pacote (mesmo `pacote_slug`) — o dossiê, se tiver,
@@ -208,7 +210,7 @@ export function PacoteCargo({
   );
 }
 
-function PacoteConteudo({
+export function PacoteConteudo({
   pacote,
   apqc,
   abertos,
@@ -223,6 +225,7 @@ function PacoteConteudo({
 }) {
   const m = pacote.marcas;
   const auditoriaOk = /^APPROVED/i.test(pacote.auditoria ?? "");
+  const credito = creditoOnet(pacote);
 
   return (
     <>
@@ -282,8 +285,8 @@ function PacoteConteudo({
                 onToggle={(e) => onToggle(pb.slug, e.currentTarget.open)}
                 className="group rounded-md border border-borda-suave"
               >
-                <summary className="grid cursor-pointer list-none grid-cols-[7.5rem_1fr_auto] items-center gap-3 px-3 py-2 text-sm font-semibold text-fg-1">
-                  <span className="justify-self-start">
+                <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-3 py-2 text-sm font-semibold text-fg-1 md:grid-cols-[7.5rem_1fr_auto] md:gap-y-0">
+                  <span className="col-start-1 row-start-1 justify-self-start md:col-auto md:row-auto">
                     {pb.nivel_minimo && (
                       <span
                         className={cn(
@@ -295,17 +298,17 @@ function PacoteConteudo({
                       </span>
                     )}
                   </span>
-                  <span className="min-w-0">{pb.processo}</span>
-                  <span className="flex items-center gap-2">
+                  <span className="col-span-2 row-start-2 min-w-0 md:col-auto md:row-auto">{pb.processo}</span>
+                  <span className="contents md:flex md:items-center md:gap-2">
                     <span
-                      className="max-w-[28rem] truncate text-right font-mono text-[12px] font-normal text-fg-3"
+                      className="col-span-2 row-start-3 min-w-0 break-words font-mono text-[12px] font-normal text-fg-3 md:col-auto md:row-auto md:max-w-[28rem] md:truncate md:text-right"
                       title={meta}
                     >
                       {meta}
                     </span>
                     <ChevronDown
                       size={16}
-                      className="shrink-0 text-fg-3 transition-transform group-open:rotate-180"
+                      className="col-start-2 row-start-1 shrink-0 justify-self-end text-fg-3 transition-transform group-open:rotate-180 md:col-auto md:row-auto"
                     />
                   </span>
                 </summary>
@@ -377,6 +380,8 @@ function PacoteConteudo({
           )}
         </div>
       </div>
+
+      {credito && <AtribuicaoOnet credito={credito} />}
     </>
   );
 }

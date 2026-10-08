@@ -240,7 +240,8 @@ def r02_push_main(tool_name: str, texto: str, contexto: dict) -> str | None:
     # `--all`/`--mirror` sobem todas as branches, main inclusive
     if re.search(r"(^|\s)--(all|mirror)\b", resto):
         return MOTIVOS["r02_push_main"]
-    args = [token for token in resto.split() if not token.startswith("-")]
+    # sem as aspas: o fecho de `bash -lc "git push origin main"` não vira `main"`
+    args = [token for token in (parte.strip("'\"") for parte in resto.split()) if token and not token.startswith("-")]
     principais = ("main", "master")
     refspecs = args[1:]
     # destino de cada refspec: `x:main`, `HEAD:refs/heads/main`, `+main`
@@ -434,6 +435,9 @@ def _remoto_do_push(resto: str) -> str:
     indice = 0
     while indice < len(tokens):
         token = tokens[indice].strip("'\"")
+        if not token:  # aspa solta (o fecho de `bash -lc "git push"`) ou aspas vazias: não é argumento do push
+            indice += 1
+            continue
         if token.startswith("--repo="):
             repo = token.split("=", 1)[1].strip("'\"")
         elif token in OPCOES_PUSH_COM_VALOR:

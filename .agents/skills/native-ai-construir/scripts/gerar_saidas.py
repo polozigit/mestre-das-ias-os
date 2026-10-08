@@ -1,15 +1,24 @@
 #!/usr/bin/env python3
-"""gerar_saidas.py: le <raiz>/time.json e gera as saidas de cada plataforma.
+"""gerar_saidas.py: le <fonte>/time.json e gera as saidas de cada plataforma.
 
 Uso:
-    python3 gerar_saidas.py --raiz <raiz do repo> [--check]
+    python3 gerar_saidas.py --raiz <raiz do repo> [--fonte <pasta do time>] [--check]
+
+Dois papeis: a RAIZ (onde ficam as saidas e as skills) e a FONTE (pasta do time.json).
+Sem --fonte, fonte = raiz (layout do Polozi-Stack: times/<t>/ tem time.json, agentes/ e
+.agents/skills/). Na Casa o time mora em times/<nome>/ e as skills ficam na raiz:
+    python3 gerar_saidas.py --raiz . --fonte times/<nome>
+--fonte relativo resolve contra a raiz (nao contra o cwd) e tem de ficar dentro dela;
+com fonte diferente da raiz, a raiz nao pode ser fonte aninhada (so vale na Casa).
 
 Gera, a partir de time.json (fonte unica) e dos arquivos de instrucoes:
     <raiz>/.claude/agents/<name>.md        subagente do Claude Code
     <raiz>/.codex/agents/<name>.toml       subagente do Codex
-    <raiz>/trechos/codex-config.toml       blocos [agents.<name>] (proposta, o dono cola)
-    <raiz>/trechos/AGENTS.md               regra dos 3 caminhos + tabela (proposta)
+    <fonte>/trechos/codex-config.toml      blocos [agents.<name>] (proposta, o dono cola)
+    <fonte>/trechos/AGENTS.md              regra dos 3 caminhos + tabela (proposta)
     <raiz>/.claude/skills/<skill>          link simbolico para ../../<dir da skill>
+Resolvem contra a fonte: time.json e agentes[].instrucoes. Contra a raiz: skills[].dir,
+os gerados acima e os orfaos (por prefixo da diretoria).
 
 Nunca escreve em AGENTS.md, CLAUDE.md, .claude/settings*.json nem .codex/config.toml:
 esses caminhos sao sempre humanos (condicao C3), so saem como proposta em trechos/.
@@ -105,10 +114,21 @@ def ler_texto(caminho: Path) -> str:
     return caminho.read_text(encoding="utf-8-sig")
 
 
-def carregar_time(raiz: Path) -> dict:
-    arq = raiz / "time.json"
+def times_da_casa(raiz: Path) -> list[str]:
+    """Nomes das pastas times/<nome>/ da raiz que tem time.json."""
+    return sorted(p.parent.name for p in (raiz / "times").glob("*/time.json"))
+
+
+def carregar_time(fonte: Path, raiz: Path | None = None) -> dict:
+    """Le <fonte>/time.json. Com raiz (e sem fonte explicita), o erro ensina o --fonte."""
+    arq = fonte / "time.json"
     if not arq.is_file():
-        raise Erro(f"time.json nao encontrado em {raiz}")
+        msg = f"time.json nao encontrado em {fonte}"
+        achados = times_da_casa(raiz) if raiz is not None else []
+        if achados:
+            msg += ("; na Casa cada time mora em times/<nome>/: use --fonte times/<nome> "
+                    f"(times: {', '.join(achados)})")
+        raise Erro(msg)
     try:
         dados = json.loads(ler_texto(arq))
     except (json.JSONDecodeError, UnicodeDecodeError) as exc:
@@ -141,7 +161,8 @@ def _texto_simples(v) -> bool:
     return isinstance(v, str) and v.strip() != "" and "\n" not in v and "\r" not in v
 
 
-def validar(t: dict, raiz: Path) -> list[str]:
+def validar(t: dict, raiz: Path, fonte: Path | None = None) -> list[str]:
+    fonte = raiz if fonte is None else fonte
     erros: list[str] = []
 
     desconhecidas = set(t) - CHAVES_TOPO
@@ -203,9 +224,10 @@ def validar(t: dict, raiz: Path) -> list[str]:
                          f"(maximo {DESCRICAO_GERADA_MAX})")
 
         rel = ag.get("instrucoes")
-        arq = caminho_relativo_seguro(raiz, rel)
+        arq = caminho_relativo_seguro(fonte, rel)
         if arq is None:
-            erros.append(f"{rot}: instrucoes {rel!r} invalido (precisa ser relativo e ficar dentro da raiz)")
+            erros.append(f"{rot}: instrucoes {rel!r} invalido (precisa ser relativo e ficar dentro da "
+                         f"{'fonte' if fonte != raiz else 'raiz'})")
         elif not arq.is_file():
             erros.append(f"{rot}: arquivo de instrucoes {rel!r} nao existe")
         else:
@@ -473,19 +495,23 @@ def gerar_trecho_agents_md(t: dict) -> str:
     return "\n".join(linhas) + "\n"
 
 
-def gerar(t: dict, raiz: Path) -> dict[str, tuple[str, str]]:
-    """Mapa caminho relativo (posix) -> ('arquivo', texto) ou ('link', alvo).
+def gerar(t: dict, raiz: Path, fonte: Path | None = None) -> dict[str, tuple[str, str]]:
+    """Mapa caminho relativo a raiz (posix) -> ('arquivo', texto) ou ('link', alvo).
 
-    Na fonte aninhada (C13) nada vai pra .claude/."""
+    Na fonte aninhada (C13) nada vai pra .claude/. Os trechos vao em <fonte>/trechos/."""
+    fonte = raiz if fonte is None else fonte
     com_claude = not trava_lote.fonte_aninhada(raiz)
     saidas: dict[str, tuple[str, str]] = {}
+    prefixo_trechos = ""
+    if fonte.resolve() != raiz.resolve():
+        prefixo_trechos = fonte.resolve().relative_to(raiz.resolve()).as_posix() + "/"
     for ag in t["agentes"]:
-        instr = ler_texto(caminho_relativo_seguro(raiz, ag["instrucoes"]))
+        instr = ler_texto(caminho_relativo_seguro(fonte, ag["instrucoes"]))
         if com_claude:
             saidas[f".claude/agents/{ag['name']}.md"] = ("arquivo", gerar_md_claude(ag, instr))
         saidas[f".codex/agents/{ag['name']}.toml"] = ("arquivo", gerar_toml_codex(ag, instr))
-    saidas["trechos/codex-config.toml"] = ("arquivo", gerar_trecho_config(t))
-    saidas["trechos/AGENTS.md"] = ("arquivo", gerar_trecho_agents_md(t))
+    saidas[prefixo_trechos + "trechos/codex-config.toml"] = ("arquivo", gerar_trecho_config(t))
+    saidas[prefixo_trechos + "trechos/AGENTS.md"] = ("arquivo", gerar_trecho_agents_md(t))
     if com_claude:
         for sk in t["skills"]:
             saidas[f".claude/skills/{sk['name']}"] = ("link", "../../" + sk["dir"].replace("\\", "/"))
@@ -590,11 +616,43 @@ def aplicar(saidas: dict, dif: list, raiz: Path) -> tuple[int, int]:
 
 # -------------------------------------------------------------------- CLI
 
+def resolver_fonte(raiz: Path, fonte_arg: str | None) -> Path:
+    """Fonte do time.json. Sem --fonte = raiz. Relativo resolve contra a raiz; fora dela e erro;
+    com fonte != raiz a raiz nao pode ser fonte aninhada (so vale na Casa)."""
+    if fonte_arg is None:
+        return raiz
+    bruta = Path(fonte_arg)
+    fonte = bruta if bruta.is_absolute() else raiz / bruta
+    if not fonte.is_dir():
+        raise Erro(f"--fonte {fonte_arg} nao e uma pasta (relativo resolve contra a raiz {raiz})")
+    try:
+        fonte.resolve().relative_to(raiz.resolve())
+    except ValueError:
+        raise Erro(f"--fonte {fonte_arg} fica fora da raiz {raiz}; o time tem de morar dentro dela")
+    if fonte.resolve() == raiz.resolve():
+        return raiz
+    if trava_lote.fonte_aninhada(raiz):
+        raise Erro("--fonte so vale na Casa (raiz com .git propria); esta raiz e a fonte do time "
+                   "dentro de outro repositorio (C13)")
+    return fonte
+
+
+def dica_raiz_no_time(raiz: Path, erros: list[str]) -> list[str]:
+    """--raiz times/<t> numa Casa: as skills moram na raiz da Casa, entao o erro ensina o comando."""
+    r = raiz.resolve()
+    if r.parent.name == "times" and (r.parent.parent / ".git").exists() \
+            and any(e.startswith("skill ") and "nao existe" in e for e in erros):
+        return [f"na Casa rode da raiz: --raiz . --fonte times/{r.name}"]
+    return []
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         description="Gera .claude/agents, .codex/agents, trechos/ e links de skill a partir de time.json."
     )
-    ap.add_argument("--raiz", required=True, help="raiz do repo (onde esta o time.json)")
+    ap.add_argument("--raiz", required=True, help="raiz do repo (onde ficam as saidas e as skills)")
+    ap.add_argument("--fonte", default=None,
+                    help="pasta do time.json (padrao: a raiz; na Casa, times/<nome>)")
     ap.add_argument("--check", action="store_true", help="nao escreve; sai 1 se algum gerado estiver diferente")
     args = ap.parse_args(argv)
     raiz = Path(args.raiz)
@@ -602,11 +660,12 @@ def main(argv=None) -> int:
     try:
         if not raiz.is_dir():
             raise Erro(f"raiz {raiz} nao e uma pasta")
-        t = carregar_time(raiz)
-        erros = validar(t, raiz)
+        fonte = resolver_fonte(raiz, args.fonte)
+        t = carregar_time(fonte, raiz if args.fonte is None else None)
+        erros = validar(t, raiz, fonte)
         if erros:
-            raise Erro(erros)
-        saidas = gerar(t, raiz)
+            raise Erro(erros + dica_raiz_no_time(raiz, erros))
+        saidas = gerar(t, raiz, fonte)
         dif = comparar(t, saidas, raiz)
 
         if args.check:

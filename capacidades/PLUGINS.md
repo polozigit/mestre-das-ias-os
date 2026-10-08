@@ -1,8 +1,10 @@
-# Plugins instalados na conta
+# Plugins e capacidades da empresa
+
+A fundação Polozi e os times já vêm dentro deste repositório (`.agents/skills/`, `.codex/agents/`): não são plugins da conta e não se instalam. Esta tabela registra a fundação (sempre ativa) e os plugins ou conectores que a pessoa instalar na conta por fora do repositório.
 
 | Plugin | Finalidade | Estado | Verificado em |
 |---|---|---|---|
-| Polozi Fundação | Casa, ciclo de trabalho, GitHub e conexões | ativo | {{DATA_ATUAL}} |
+| Polozi Fundação | Casa, ciclo de trabalho, GitHub e conexões (vem no repositório) | ativo | {{DATA_ATUAL}} |
 
 ## Times da empresa
 

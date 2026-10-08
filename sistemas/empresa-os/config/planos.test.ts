@@ -40,7 +40,10 @@ const d1: Atividade[] = m.etapas.find((e: { fase: string; trilha: string }) => e
 const todas: Atividade[] = m.etapas.flatMap((e: { atividades: Atividade[] }) => e.atividades);
 
 test("a versão do modelo subiu: a 1, a 2 e a 3 já foram carregadas com outro hash e o banco recusa mudar versão carregada", () => {
-  assert.ok(m.versao >= 4);
+  // 6 = o comando do dossiê, persona e marca passou a chamar o instalador e a pasta do clone ganhou o nome do sistema
+  // (2ª rodada da revisão final, 08/10). 7 = o comando do clone cita a URL exata do repositório-modelo (09/10).
+  // Quem muda o conteúdo do plano sobe a versão E este número, junto.
+  assert.ok(m.versao >= 7);
 });
 
 test("os 10 passos da instalação são os 10 primeiros do Dia 1, na ordem do manual", () => {
@@ -66,8 +69,11 @@ test("cada um dos 10 passos tem título curto, instrução de 1 a 2 frases e pro
   }
 });
 
-test("texto do aluno não cita a Polozi (só o nome da habilidade que ele digita, como polozi-instalador)", () => {
-  for (const a of todas) assert.doesNotMatch(JSON.stringify(a).replace(/polozi-[a-z-]+/gi, ""), /polozi/i, a.chave);
+// A única URL que o aluno cola: o repositório-modelo do curso (a conta dona dele tem "polozi" no nome).
+const URL_MODELO = "https://github.com/polozigit/mestre-das-ias-os";
+
+test("texto do aluno não cita a Polozi (só o nome da habilidade que ele digita, como polozi-instalador, e a URL exata do repositório-modelo)", () => {
+  for (const a of todas) assert.doesNotMatch(JSON.stringify(a).split(URL_MODELO).join("").replace(/polozi-[a-z-]+/gi, ""), /polozi/i, a.chave);
 });
 
 test("cada passo depende do anterior (a ordem do manual vira a ordem das dependências)", () => {
@@ -153,6 +159,25 @@ test("banco e sistema no ar chamam o instalador (etapas 7-banco e 8-sistema): é
   assert.match(textoDoAluno(atividade("banco")), /tecnologia-mudar-banco/);
   assert.match(textoDoAluno(atividade("sistema-no-ar")), /tecnologia-publicar/);
   assert.match(atividade("banco").comando!, /Guarde as chaves sem me mostrar\./);
+});
+
+test("dossiê, persona e marca também chamam o instalador (etapas 5-dossie e 6-marca): sem ele elas ficam pendentes em operacao/INSTALACAO.md", () => {
+  assert.match(atividade("dossie-persona-marca").comando!, /^\$polozi-instalador /);
+});
+
+test("clonar a cópia já com o nome do sistema (primeiro nome da empresa mais -os): o instalador não pede pra renomear a pasta", () => {
+  const c = atividade("clonar-repo");
+  assert.match(c.instrucao, /primeiro nome da sua empresa mais -os/);
+  assert.match(c.comando!, /primeiro nome da minha empresa em minúsculas, sem acento, mais -os/);
+  assert.ok(c.passos!.some((p) => /mais -os/.test(p)), "nenhum passo diz o nome da pasta");
+  assert.doesNotMatch(textoDoAluno(c), /com o nome d[ao] (sua|minha) empresa[,.]/, "a pasta não se chama só pelo nome da empresa");
+});
+
+test("clonar a cópia: o comando traz a URL exata do repositório-modelo, não 'o endereço que o professor passou'", () => {
+  const c = atividade("clonar-repo");
+  assert.ok(c.comando!.includes(URL_MODELO), "o comando do clone não cita a URL do repositório-modelo");
+  assert.ok(c.instrucao.includes(URL_MODELO), "a instrução do clone não cita a URL do repositório-modelo");
+  assert.doesNotMatch(textoDoAluno(c), /endereço que o professor/, "sobrou o endereço que o professor passou");
 });
 
 test("instalador: confiar nos hooks é em Configurações, Hooks, Confiar em tudo (o app não tem /hooks)", () => {

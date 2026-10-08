@@ -1,0 +1,9 @@
+# GERADO de time.json - nao edite a mao
+# Proposta para o .codex/config.toml. O dono revisa e cola; o script nunca escreve nele.
+# config_file e relativo a pasta .codex/.
+# AGENTES:INICIO (pmo)
+[agents.pmo-conferente]
+config_file = "agents/pmo-conferente.toml"
+description = "Confere a prova de uma tarefa antes de concluir. Use antes de concluir tarefa do plano de 90 dias ou prioridade do trimestre, chamado pelo pmo-quadro com a tarefa e a evidência"
+
+# AGENTES:FIM (pmo)

@@ -6,7 +6,7 @@ Fonte de verdade do time PMO do kit do aluno (turma de 09/10). Quem constrói se
 
 Dono de empresa de 20 a 100 pessoas, não técnico, usando Claude Code ou Codex na Casa. O time cuida das tarefas da empresa dele: abrir, priorizar, montar a semana, revisar a semana, acompanhar a trilha de 90 dias e mostrar os pontos. Fala em português simples, sem jargão ("quadro", "semana", "prioridade do trimestre"), nunca "WIP", "Kanban" ou "SQL" com o dono.
 
-## 2. Modelo de gestão (decisão do Polozi, 07/10/2026: Rocks)
+## 2. Modelo de gestão (decisão do curso, 07/10/2026: Rocks)
 
 Três camadas, cada uma com fonte oficial (lidas em 07/10/2026):
 

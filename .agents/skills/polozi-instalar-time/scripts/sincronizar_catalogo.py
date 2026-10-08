@@ -8,7 +8,9 @@ com a chave de serviço de `<casa>/credenciais/.env`; `main` é a linha de coman
 
 Lê: `.codex/agents/*.toml` (instalados), as fontes dos plugins e times que o `instalar_time.py`
 acha (disponíveis), skills (`SKILL.md` + scripts), workflows do sistema
-(`sistemas/*/.github/workflows/*.yml`) e as linhas de `capacidades/AUTOMACOES.md`.
+(`sistemas/*/.github/workflows/*.yml`) e as linhas de `capacidades/AUTOMACOES.md`. Só o que é da
+Casa: plugin do cache do Codex (que é da máquina) entra só se a Casa o declarou no marketplace
+local ou o marcou `ativo` no PLUGINS.md (`nomes_da_casa`).
 
 Segredo nunca: arquivo de credencial dentro do catálogo ou conteúdo que bate o padrão dos
 hooks da Casa aborta TUDO (ErroSync, código 3) mostrando só o caminho. Exceção: plugin de
@@ -317,9 +319,25 @@ def nome_time(plugin: str) -> str:
     return plugin
 
 
+def nomes_da_casa(casa: Path) -> set[str]:
+    """Plugins que a Casa declarou: entrada do marketplace local dela ou linha `ativo` na tabela de times
+    do `capacidades/PLUGINS.md` (a marcação que o `--instalar` grava). O cache do Codex é da MÁQUINA
+    (plugin pessoal, de terceiro, de outra Casa): sem uma dessas marcas, nada dele vai pro catálogo.
+    O estado ligado/desligado que o app grava no config.toml não tem chave documentada; não é lido.
+    Linha `ativo` de time da própria Casa (`times/<nome>/time.json`) não puxa plugin homônimo do cache:
+    as skills desse time já estão em `.agents/skills`."""
+    nomes = {e["name"] for e in it._entradas_marketplace(casa) if e.get("name")}
+    times_da_casa = set(it.nomes_dos_times_da_casa(casa))
+    nomes |= set(it.times_instalados(casa / "capacidades" / "PLUGINS.md")) - times_da_casa
+    return nomes
+
+
 def fontes(casa: Path) -> list[tuple[str, Path]]:
     saida = []
+    da_casa = nomes_da_casa(casa)
     for nome in it.nomes_candidatos(casa):
+        if nome not in da_casa:
+            continue
         try:
             saida.append((nome, it.resolver_origem_time(casa, nome)))
         except it.ErroTime:

@@ -1,4 +1,4 @@
-# Empresa OS — instruções técnicas deste sistema
+# O sistema da empresa: instruções técnicas desta pasta
 
 Escopo: SÓ esta pasta (`sistemas/empresa-os/`). As regras da empresa moram no
 AGENTS.md da raiz da Casa. Instalação do zero: `LEIA-ME.md`.

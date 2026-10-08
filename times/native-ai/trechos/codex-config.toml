@@ -1,0 +1,13 @@
+# GERADO de time.json - nao edite a mao
+# Proposta para o .codex/config.toml. O dono revisa e cola; o script nunca escreve nele.
+# config_file e relativo a pasta .codex/.
+# AGENTES:INICIO (native-ai)
+[agents.native-ai-construtor]
+config_file = "agents/native-ai-construtor.toml"
+description = "Escreve os arquivos do desenho nas 2 plataformas. Use só quando a skill native-ai-construir chamar no passo 5 (construção), com a ficha, o plano e os caminhos permitidos"
+
+[agents.native-ai-avaliador]
+config_file = "agents/native-ai-avaliador.toml"
+description = "Avalia o que o time cria, sem ter construído. Use só quando a skill native-ai-construir chamar no passo 1 (critério e casos) ou no passo 8 (veredito)"
+
+# AGENTES:FIM (native-ai)

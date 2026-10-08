@@ -27,6 +27,12 @@ test("na ordem da aula o sistema entra no ar antes da marca: o roteiro não exig
   assert.match(plano, /sem `identidade-visual\.md`, pule este passo/);
 });
 
+test("o AGENTS.md do sistema não chama o sistema de Empresa OS no título (o aluno vê o nome da empresa mais OS)", () => {
+  const titulo = readFileSync(join(RAIZ, "AGENTS.md"), "utf8").split("\n")[0];
+  assert.doesNotMatch(titulo, /Empresa OS/);
+  assert.match(titulo, /^# O sistema da empresa/);
+});
+
 test("o roteiro diz o Node mínimo do sistema, o mesmo que o Next exige no package-lock", () => {
   const lock = JSON.parse(readFileSync(join(RAIZ, "package-lock.json"), "utf8"));
   const exigencia: string = lock.packages["node_modules/next"].engines.node; // ex.: ">=20.9.0"

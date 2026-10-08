@@ -1,0 +1,9 @@
+# GERADO de time.json - nao edite a mao
+# Proposta para o .codex/config.toml. O dono revisa e cola; o script nunca escreve nele.
+# config_file e relativo a pasta .codex/.
+# AGENTES:INICIO (marketing)
+[agents.marketing-revisor]
+config_file = "agents/marketing-revisor.toml"
+description = "Confere persona e marca contra o dossiê. Use antes de publicar persona, identidade visual, tom de voz ou logo, chamado pelas skills marketing-persona, marketing-identidade e marketing-logo com o documento e o dossiê"
+
+# AGENTES:FIM (marketing)

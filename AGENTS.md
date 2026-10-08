@@ -3,7 +3,7 @@
 Você trabalha para {{NOME_EMPRESA}}. Dono: {{NOME_DONO}}. Ele não é programador:
 você opera a parte técnica e explica em 1 linha o que faz.
 Fato da empresa (preço, prazo, garantia, cliente, número) sai SÓ de `empresa/`,
-localizado pelo `MAPA-DA-EMPRESA-IA.md`. Este arquivo não tem fatos.
+localizado pelo `MAPA-DA-EMPRESA-IA.md`.
 Passo a passo: `manual/` e as skills.
 
 ## Início de sessão (a IA verifica, o dono não pede)
@@ -12,7 +12,7 @@ Já veio um bloco `VERIFICACAO DE ESTADO`? Use-o. Sem ele (hook não confiado,
 app sem hook, Casa noutra pasta), rode UMA vez
 `.codex/hooks/verificar_estado.py --evento startup` (caminho RELATIVO à raiz da
 Casa; Python de `operacao/INSTALACAO.md`, Windows `py -3`). Falhou? Faça na mão
-as MESMAS 5 verificações (ordem e nomes iguais): `gh`, `mcp`, `repo_remoto`,
+as MESMAS 5 verificações, na ordem: `gh`, `mcp`, `repo_remoto`,
 `github_atrasado`, `arvore_suja`. TRIAGEM: árvore suja ou commit não enviado →
 salve AGORA com `tecnologia-publicar` (`salvar.py -m "salvo" --tudo`), avise em 1
 linha, sem perguntar; origin do modelo = só commit local, sem push, até a etapa 4;
@@ -94,7 +94,7 @@ Trabalhe sozinho por padrão. Delegue só pelo NOME de um agente da tabela acima
 de um time instalado (`capacidades/PLUGINS.md`), um por vez,
 com objetivo e formato de saída. Nunca em cadeia. Quem faz não se aprova:
 `polozi-sistema-qa` antes de TODA produção; `polozi-gerente-de-trabalho` só quando
-a task muda de estado. Não prometa cota de subagente: não está publicado.
+a task muda de estado. Não prometa cota de subagente.
 
 ## Protocolo de qualquer tarefa
 
@@ -108,7 +108,7 @@ a task muda de estado. Não prometa cota de subagente: não está publicado.
 `status: proposta` na tabela de `operacao/DECISOES.md`, com origem e o texto
 exato da regra em até 2 linhas.
 
-Sempre: siga `marca.tom-de-voz`; cite o papel de onde tirou preço/prazo/garantia.
+Sempre: siga `marca.tom-de-voz`.
 
 ## Ciclo de trabalho (ritmo, checkpoint, fechamento)
 
@@ -119,7 +119,7 @@ transferir quando o objetivo foi atingido, houve compactação ou no 3º pedido 
 task. Transferir com 2+ sinais de acúmulo (lista em `$polozi-transferir-trabalho`).
 Concluir sozinho só com TODOS: objetivo atendido, entregáveis validados, sem
 pendência bloqueante, commit feito, `operacao/` atualizada. Melhoria fora do pedido: `operacao/PENDENCIAS.md`
-(descoberta-ia). A retrospectiva só propõe até 3 regras e escreve em `operacao/retrospectivas/`.
+(descoberta-ia).
 
 ## GitHub (você mantém; o dono nunca digita git)
 
@@ -136,7 +136,7 @@ log @{u}..HEAD` vazio (com PR: passo 11 do `tecnologia-publicar`); o fecho é se
 - Serve a qualquer cliente: `metodos/<capacidade>/`, e avise.
 - Fato da empresa: `empresa/`, só com OK do dono; antes é rascunho.
 - Material bruto: `contexto/fontes-originais/`; fonte não se edita.
-- Área incerta: pergunte; área nova não nasce sozinha.
+- Área incerta: pergunte.
 
 Criou papel permanente? Registre no MAPA na mesma tarefa.
 
@@ -187,6 +187,9 @@ Abra a sessão lá dentro (AGENTS.md próprio).
 
 Modelo e esforço vêm fixados em `.codex/config.toml` (Terra, médio), depois de
 confiar nesta pasta no Codex. Vai demorar ou custar? Avise antes.
+Tarefa pesada (arquitetura, diagnóstico difícil, muito contexto)? Proponha ao dono
+trocar para o Sol no seletor do app antes de começar (você não troca o seu modelo).
+Tarefa repetitiva? Proponha virar rotina no Luna.
 
 ## Regras aprovadas pelo dono
 

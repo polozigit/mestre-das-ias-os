@@ -19,7 +19,7 @@
       "descricao_curta": "Testa o sistema como usuário antes de ir ao ar",
       "descricao": "QA do sistema: testa o preview no navegador como usuário. Chame antes de todo deploy. Veredito binário; nunca corrige.",
       "quando": "Depois de todo build de preview, antes de produção.",
-      "tier": "terra",
+      "tier": "sol",
       "esforco": "high",
       "sandbox": "read-only",
       "skills": [],

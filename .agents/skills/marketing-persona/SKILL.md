@@ -19,7 +19,7 @@ Monta o cliente ideal e a persona da empresa a partir do que o dono já disse no
 - **Python do projeto:** campo `comando_python` do começo de `operacao/INSTALACAO.md` (no Windows costuma ser `py -3`). Abaixo aparece como `<PY>`.
 - **Comandos rodam da raiz do projeto** (a pasta da empresa). Os scripts desta skill moram em `.agents/skills/marketing-persona/scripts/`.
 - **Precisa do dossiê gravado** em `contexto/dossie/dossie-completo.md` (etapa `5-dossie` do instalador, skill `polozi-registrar-dossie`). Sem ele, conte ao dono em 1 frase que o dossiê vem primeiro e pare: não improvise persona.
-- **Banco e chave** só são necessários no passo de publicar. Se o banco ainda não foi ligado (acontece: a etapa de marca do instalador vem antes do banco), a persona fica pronta e aprovada no projeto e a publicação espera.
+- **Banco e chave** só são necessários no passo de publicar. Se o banco ainda não foi ligado, a persona fica pronta e aprovada no projeto e a publicação espera.
 - **Escrever em `empresa/` pede o OK do dono** (regra do `AGENTS.md` do projeto): o pedido dele para montar a persona é esse OK, e o arquivo nasce `rascunho`. `aprovado` só depois do "sim" dele.
 - O modelo do documento é `.agents/skills/marketing-persona/referencias/modelo-persona.md`. Copie e preencha; não invente outra estrutura.
 
