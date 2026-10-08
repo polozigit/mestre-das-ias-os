@@ -1,0 +1,32 @@
+# Log de ADRs que as excecoes podem citar (GA-13). Copia enxuta do log do
+# Arquiteto Corporativo (planta do banco, peca 5 §4): so id e titulo. ADR novo
+# entra aqui na mesma PR que o cita; ADR aceito nao se edita, so se substitui.
+adrs:
+  - id: ADR-001
+    titulo: Uma empresa por banco
+  - id: ADR-002
+    titulo: Permissao por modulo no padrao do Polozi OS
+  - id: ADR-003
+    titulo: Dois projetos, homologacao e producao
+  - id: ADR-004
+    titulo: CI do banco com seed de exemplo e pgTAP como usuario
+  - id: ADR-005
+    titulo: Monolito modular com schema por modulo
+  - id: ADR-006
+    titulo: Integracao entre modulos por outbox
+  - id: ADR-007
+    titulo: Chamada sincrona so pela funcao publica do contrato
+  - id: ADR-010
+    titulo: Retencao por tabela com guarda de CI
+  - id: ADR-012
+    titulo: Extensao do banco sem quebrar a planta
+  - id: ADR-013
+    titulo: FK de modulo para o nucleo
+  - id: ADR-015
+    titulo: Nucleo sem setor e modulos ligaveis
+  - id: ADR-024
+    titulo: Modulo ligavel instala tabela so ao ligar
+  - id: ADR-020
+    titulo: Plano de implantacao como dado em tarefas
+  - id: ADR-025
+    titulo: Conexoes no banco e segredo guardado no Vault pelo script da IA

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Transferir Trabalho"
+  short_description: "Handoff de sessão: preserva o trabalho e entrega o prompt de continuação."
+  default_prompt: "Digite \"$polozi-transferir-trabalho\" pra eu preservar o trabalho desta task e preparar a continuação em outra sessão."
+policy:
+  allow_implicit_invocation: false

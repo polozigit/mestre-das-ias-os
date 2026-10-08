@@ -1,0 +1,61 @@
+# Aplica migrations + dado de exemplo no projeto de HOMOLOGACAO (nunca no de
+# producao). Roda em PR que toca migration ou seed e sob demanda. A homologacao
+# existe pra o preview da Vercel e pra provar a migration com dado antes da
+# main: producao so recebe pelo deploy-db.yml, sem seed (E3-12, ADR-003).
+#
+# Workflow SEPARADO do deploy-db.yml de proposito: nao mexe na guarda dos 3
+# secrets de producao. Usa o MESMO SUPABASE_ACCESS_TOKEN (e da conta) e o par
+# *_HOMOLOG. SUPABASE_PROJECT_ID (producao) entra SO pra comparar: o passo
+# abaixo derruba o job se a homologacao estiver vazia ou for igual a producao.
+name: deploy-db-homologacao
+
+on:
+  pull_request:
+    paths:
+      - "sistemas/empresa-os/supabase/migrations/**"
+      - "sistemas/empresa-os/supabase/seed_exemplo.sql"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# DESVIO DELIBERADO do padrão dos outros workflows: cancel-in-progress FALSE,
+# pelo mesmo motivo do deploy-db.yml. Cancelar um `db push` no meio deixa o
+# schema pela metade — pior do que esperar a fila.
+concurrency:
+  group: deploy-db-homologacao
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: sistemas/empresa-os
+
+jobs:
+  homologar:
+    name: aplica migrations e dado de exemplo na homologação
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: homologacao
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD_HOMOLOG }}
+      SUPABASE_PROJECT_ID_HOMOLOG: ${{ secrets.SUPABASE_PROJECT_ID_HOMOLOG }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: confere que a homologação não é a produção
+        run: |
+          set -euo pipefail
+          if [ -z "$SUPABASE_PROJECT_ID_HOMOLOG" ]; then
+            echo "SUPABASE_PROJECT_ID_HOMOLOG vazio: o projeto de homologação não foi cadastrado."
+            exit 1
+          fi
+          if [ "$SUPABASE_PROJECT_ID_HOMOLOG" = "$SUPABASE_PROJECT_ID" ]; then
+            echo "A homologação aponta para o mesmo projeto da produção. Corrija o secret SUPABASE_PROJECT_ID_HOMOLOG."
+            exit 1
+          fi
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID_HOMOLOG"
+      - run: supabase db push --include-seed

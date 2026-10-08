@@ -1,0 +1,43 @@
+{
+  "name": "polozi-whatsapp-local",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "conectar": "node src/conectar.mjs",
+    "setup": "node src/setup.mjs",
+    "preflight": "node src/preflight.mjs",
+    "bootstrap:agent": "node src/bootstrap-agent.mjs",
+    "start:qr": "node src/start-pairing.mjs",
+    "reset:session": "node src/reset-session.mjs",
+    "status": "node src/status.mjs",
+    "send:test": "node src/send-test.mjs",
+    "send:own-test": "node src/send-own-test.mjs",
+    "start:receive-test": "node src/receive-test.mjs",
+    "start:assistant": "node src/live-assistant.mjs",
+    "stop:assistant": "node src/stop-live-assistant.mjs",
+    "start:background": "node src/start-background.mjs",
+    "autostart:ligar": "node src/autostart.mjs ligar",
+    "autostart:desligar": "node src/autostart.mjs desligar",
+    "autostart:status": "node src/autostart.mjs status",
+    "enviar": "node src/enviar.mjs",
+    "start:mcp": "node src/mcp-server.mjs",
+    "install:codex": "node src/install-mcp.mjs codex",
+    "install:claude": "node src/install-mcp.mjs claude",
+    "retire:waha": "node src/retire-waha.mjs",
+    "retire:evolution": "node src/retire-evolution.mjs",
+    "stop": "node src/stop.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "baileys": "7.0.0-rc14",
+    "pino": "9.14.0",
+    "qrcode": "1.5.4",
+    "ws": "8.21.3",
+    "zod": "4.4.3"
+  }
+}

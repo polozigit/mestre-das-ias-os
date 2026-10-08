@@ -1,0 +1,71 @@
+{
+  "kit": "mestre-das-ias-os",
+  "gerado_em": "2026-10-08T06:25:58Z",
+  "origem_git_sha": "ebf46c99",
+  "fundacao_skills": [
+    "polozi-aplicar-regra",
+    "polozi-arrumar-a-casa",
+    "polozi-buscar-versao-anterior",
+    "polozi-chamar-time",
+    "polozi-concluir-trabalho",
+    "polozi-criar-empresa-ia",
+    "polozi-criar-github",
+    "polozi-instalador",
+    "polozi-instalar-time",
+    "polozi-registrar-conexao",
+    "polozi-registrar-dossie",
+    "polozi-retrospectiva",
+    "polozi-transferir-trabalho"
+  ],
+  "times": [
+    {
+      "nome": "native-ai",
+      "agentes": [
+        "native-ai-construtor",
+        "native-ai-avaliador"
+      ],
+      "skills": [
+        "native-ai-construir"
+      ]
+    },
+    {
+      "nome": "tecnologia",
+      "agentes": [
+        "tecnologia-revisor-seguranca"
+      ],
+      "skills": [
+        "tecnologia-sistema",
+        "tecnologia-publicar",
+        "tecnologia-mudar-banco",
+        "tecnologia-vigiar",
+        "tecnologia-acessos",
+        "tecnologia-definir-o-que",
+        "tecnologia-construir-tela"
+      ]
+    },
+    {
+      "nome": "pmo",
+      "agentes": [
+        "pmo-conferente"
+      ],
+      "skills": [
+        "pmo-quadro",
+        "pmo-semana",
+        "pmo-revisao-semanal",
+        "pmo-trilha",
+        "pmo-pontos"
+      ]
+    },
+    {
+      "nome": "marketing",
+      "agentes": [
+        "marketing-revisor"
+      ],
+      "skills": [
+        "marketing-persona",
+        "marketing-identidade",
+        "marketing-logo"
+      ]
+    }
+  ]
+}

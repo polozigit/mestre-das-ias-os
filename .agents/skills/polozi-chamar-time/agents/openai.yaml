@@ -1,0 +1,12 @@
+interface:
+  display_name: "Polozi Chamar Time"
+  short_description: "Aciona um time de área já instalado, um por vez, pelo nome do agente."
+  default_prompt: "Use $polozi-chamar-time para chamar o time de [área] na minha Empresa IA."
+policy:
+  # false: a skill em si não escreve, mas ela ABRE subagente, e subagente
+  # consome mais token que single-agent [24a:agentes/f10] — disparo
+  # implícito em qualquer frase com "time" gastaria cota do aluno Plus sem
+  # ele pedir; além disso o subagente delegado herda o sandbox do pai
+  # [24a:agentes/f13]. Consistente com as outras skills da fundação
+  # (todas false hoje).
+  allow_implicit_invocation: false

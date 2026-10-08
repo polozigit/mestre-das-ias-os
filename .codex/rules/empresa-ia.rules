@@ -1,0 +1,39 @@
+# Regras da Casa pra deixar o git invisível pro aluno (D24-15). Este arquivo
+# vem pronto no zip — ninguém precisa gerá-lo, só confiar a pasta pra que ele
+# carregue [24a:config/n08].
+#
+# `rules` é EXPERIMENTAL e pode mudar de formato numa versão futura do Codex
+# [24a:config/n08].
+#
+# Este arquivo NUNCA substitui ~/.codex/rules/default.rules — aquele é o
+# allow-list do PRÓPRIO aluno, gravado pelo TUI. Nunca escrever nele.
+#
+# Pra desligar (se o Codex reclamar deste arquivo): renomeie pra
+# `empresa-ia.rules.desligado` e siga em frente — a Casa funciona sem ele, o
+# git só volta a pedir aprovação a cada comando [24a:config/n07].
+
+prefix_rule(
+    pattern=["git", "commit"],
+    decision="allow",
+    justification="commit local da Casa do aluno — não sai da máquina dele.",
+)
+
+prefix_rule(
+    pattern=["git", "push"],
+    decision="allow",
+    justification="push pro repositório privado do próprio aluno no GitHub (D24-15).",
+)
+
+prefix_rule(
+    pattern=["gh"],
+    decision="allow",
+    justification="GitHub CLI usado só pra criar/gerenciar o repositório privado do aluno.",
+)
+
+# GAP ABERTO (vira gate T-git da Etapa 7, não fato publicado): não está
+# provado que decision="allow" dispensa o prompt de aprovação quando
+# approval_policy.granular.rules = false, nem que o `git commit` do Codex
+# chega como comando simples — se vier embrulhado em `bash -lc` com
+# substituição/redirecionamento, o prefix_rule acima NÃO casa
+# [24a:config/n08] e o prompt de aprovação continua aparecendo, o que já é
+# comportamento documentado em workspace-write [24a:config/n07].

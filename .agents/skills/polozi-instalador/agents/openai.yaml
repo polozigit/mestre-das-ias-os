@@ -1,0 +1,10 @@
+interface:
+  display_name: "Polozi Instalador"
+  short_description: "Começa ou retoma a instalação da Casa, etapa por etapa."
+  default_prompt: "Use $polozi-instalador para começar a instalação da minha empresa ou continuar de onde parou."
+policy:
+  # Esta skill ESCREVE (git, operacao/INSTALACAO.md, hooks): false, senão dispararia sozinha pela
+  # descrição [24a:skills/f5]. A chamada é EXPLÍCITA: o aluno digita $polozi-instalador (ou escolhe a
+  # skill na lista do app). A frase solta "começa a instalação" só chega aqui se o AGENTS.md ou o README
+  # mandar chamar a skill; quem emite o $nome, o aluno ou o modelo, é gap aberto [24a:skills/n09].
+  allow_implicit_invocation: false

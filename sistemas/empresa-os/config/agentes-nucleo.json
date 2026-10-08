@@ -1,0 +1,29 @@
+{
+  "descricao": "Os agentes do núcleo, no formato que a RPC public.sincronizar_agentes (migration 0008) aceita. O setup (scripts/setup-inicial.mjs) manda esta lista pra tela Time de Agentes. Fonte de name, descricao, quando, tier, esforco e sandbox: agents-spec/agentes.json do plugin polozi-fundacao (config/agentes-nucleo.test.ts acusa drift). descricao_curta (1 a 50 caracteres) é escrita aqui. As instruções do agente não entram: a tabela não tem coluna pra elas.",
+  "agentes": [
+    {
+      "name": "polozi-gerente-de-trabalho",
+      "time": "sistema",
+      "descricao_curta": "Abre, conclui e passa adiante cada trabalho",
+      "descricao": "Gerente do trabalho da casa: abre, conclui e transfere tarefa com handoff escrito. Chame ao abrir ou fechar trabalho.",
+      "quando": "Ao abrir, concluir ou transferir um trabalho.",
+      "tier": "terra",
+      "esforco": "medium",
+      "sandbox": "workspace-write",
+      "skills": [],
+      "estado": "instalado"
+    },
+    {
+      "name": "polozi-sistema-qa",
+      "time": "sistema",
+      "descricao_curta": "Testa o sistema como usuário antes de ir ao ar",
+      "descricao": "QA do sistema: testa o preview no navegador como usuário. Chame antes de todo deploy. Veredito binário; nunca corrige.",
+      "quando": "Depois de todo build de preview, antes de produção.",
+      "tier": "terra",
+      "esforco": "high",
+      "sandbox": "read-only",
+      "skills": [],
+      "estado": "instalado"
+    }
+  ]
+}

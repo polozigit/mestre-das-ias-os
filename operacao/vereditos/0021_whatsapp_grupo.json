@@ -1,0 +1,11 @@
+{
+  "migration": "0021_whatsapp_grupo.sql",
+  "sha256": "bb261f4d080429c4425096fa20d594e930a29d31cfbb96a7b997b6d6fdff0475",
+  "classe": "acrescenta",
+  "achados": [],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": null,
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada na fábrica udnztyonsrfjjybhiabe (schema_migrations lida em 2026-10-08T04:04:19Z, sha256 igual ao arquivo) e pgTAP do CI do template",
+  "data": "2026-10-08"
+}

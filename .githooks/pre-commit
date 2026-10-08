@@ -1,0 +1,80 @@
+#!/bin/sh
+# Trava de segredo da Empresa IA — bloqueia commit com chave/segredo, arquivo de
+# credencial/backup e lista de pessoas.
+# Instalado por polozi-criar-empresa-ia via: git config core.hooksPath .githooks
+# As regras (padrão de chave, caminhos proibidos, dado pessoal em massa) moram
+# em regras-segredo.sh, o mesmo arquivo que o pre-push usa. Sem ele o commit
+# não passa: falha fechada.
+case "$0" in
+  */*) _dir_hooks="${0%/*}" ;;
+  *) _dir_hooks="." ;;
+esac
+if [ ! -f "$_dir_hooks/regras-segredo.sh" ]; then
+  echo "BLOQUEADO: .githooks/regras-segredo.sh sumiu, entao nao da pra varrer segredo. Restaure o arquivo (git restore .githooks/regras-segredo.sh)."
+  exit 1
+fi
+. "$_dir_hooks/regras-segredo.sh"
+
+staged=$(git -c core.quotepath=off diff --cached --name-only --diff-filter=ACMR)
+bloqueado=0
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  if caminho_proibido "$f"; then
+    echo "BLOQUEADO: $f nao pode ir pro GitHub (chave, senha, backup ou dump). Tire do commit: git restore --staged \"$f\". Chave e senha ficam so em credenciais/.env, e quem mexe nelas e a skill tecnologia-acessos. Nao contorne este bloqueio."
+    bloqueado=1
+    continue
+  fi
+  if git show ":$f" 2>/dev/null | texto_tem_segredo; then
+    echo "BLOQUEADO: $f tem cara de chave ou senha. Tire a chave do arquivo e deixe ela so em credenciais/.env, pela skill tecnologia-acessos. Nao contorne este bloqueio."
+    bloqueado=1
+    continue
+  fi
+  if texto_tem_dado_pessoal_em_massa ":$f"; then
+    echo "BLOQUEADO: $f tem uma lista de pessoas (20 ou mais e-mails ou CPFs). Dado de cliente em massa nao vai pro GitHub: tire do commit (git restore --staged \"$f\") e guarde fora do repositorio."
+    bloqueado=1
+  fi
+done <<EOF_STAGED
+$staged
+EOF_STAGED
+[ "$bloqueado" = 0 ] || exit 1
+
+# Trava de migration sem veredito — o schema do banco só muda por migration
+# com um "de acordo" do auditor. Sem isso, qualquer mudança de banco (feita
+# pela IA, por engano ou por um MCP sem revisão) entraria no cofre sem
+# ninguém ter olhado. O veredito mora em operacao/vereditos/<nome>.json,
+# gerado por .agents/skills/tecnologia-mudar-banco/scripts/veredito.py, nunca escrito à mão.
+staged_migrations=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^sistemas/[^/]*/supabase/migrations/.*\.sql$')
+if [ -n "$staged_migrations" ]; then
+  echo "$staged_migrations" | while IFS= read -r f; do
+    nome=$(basename "$f" .sql)
+    vd="operacao/vereditos/$nome.json"
+    if [ ! -f "$vd" ]; then
+      echo "BLOQUEADO: $f e uma migration sem veredito. Chame a skill tecnologia-mudar-banco (ela roda: python3 .agents/skills/tecnologia-mudar-banco/scripts/veredito.py gravar $f --revisor tecnologia-revisor-seguranca --resultado APPROVED --nota ...)."
+      exit 1
+    fi
+    resultado=$(sed -n 's/.*"resultado"[[:space:]]*:[[:space:]]*"\([A-Z]*\)".*/\1/p' "$vd" | head -n 1)
+    if [ "$resultado" != "APPROVED" ]; then
+      echo "BLOQUEADO: o veredito de $f esta $resultado. Corrija e peca um veredito novo."
+      exit 1
+    fi
+    sha_vd=$(sed -n 's/.*"sha256"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' "$vd" | head -n 1)
+    if command -v shasum >/dev/null 2>&1; then
+      sha_idx=$(git show ":$f" | shasum -a 256 | cut -d' ' -f1)
+    elif command -v sha256sum >/dev/null 2>&1; then
+      sha_idx=$(git show ":$f" | sha256sum | cut -d' ' -f1)
+    else
+      echo "AVISO: nem shasum nem sha256sum disponivel - nao da pra conferir o sha256 do veredito de $f aqui. A Action da PR cobre essa checagem."
+      sha_idx=""
+    fi
+    if [ -n "$sha_idx" ] && [ "$sha_idx" != "$sha_vd" ]; then
+      echo "BLOQUEADO: $f mudou depois do veredito. Chame de novo a skill tecnologia-mudar-banco para gravar o veredito (veredito.py gravar ...)."
+      exit 1
+    fi
+  done
+  status=$?
+  if [ "$status" != "0" ]; then
+    exit 1
+  fi
+fi
+
+exit 0

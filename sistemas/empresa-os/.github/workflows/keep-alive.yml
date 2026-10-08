@@ -1,0 +1,68 @@
+# A Supabase pausa projeto do plano grátis depois de ~1 semana sem uso e
+# AVISA POR E-MAIL cerca de uma semana antes. Este arquivo toca no seu banco
+# 1x por dia pra isso não acontecer. Se receber o e-mail mesmo assim, abra o
+# painel e restaure — dá pra restaurar por até 1 ano.
+#
+# DESENHO CORRIGIDO (18/09/2026): o plano original usava
+# `supabase projects api-keys -o json` + parsing + curl no /rest/v1/. O shape
+# desse JSON não é publicado na doc oficial — codificar o parsing seria
+# chute, e um jq errado falha calado ou imprime a chave. Este arquivo usa só
+# os 3 secrets que o deploy-db.yml já exige, sem chave nova e sem parsing.
+#
+# NÃO é fato provado que `supabase migration list --linked` (conexão direta
+# ao Postgres pelo CLI) conta como "user database activity" pro critério de
+# pausa do Free — a doc fala em "user requests to the database" sem definir
+# a superfície. Isso é o gate T-keepalive da Etapa 7 (medir: deixar isto
+# rodando 8+ dias num projeto Free sem outro tráfego e ver se chega o aviso).
+name: keep-alive
+
+on:
+  schedule:
+    - cron: "23 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: sistemas/empresa-os
+
+jobs:
+  pingar:
+    name: mantém o projeto Free ativo
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+      - run: supabase migration list --linked
+
+  # Cada projeto Free pausa sozinho: a homologação também precisa do toque
+  # diário. Mesmos passos, secrets *_HOMOLOG. Keep-alive LOCAL segue só na produção.
+  homologacao:
+    name: mantém a homologação ativa
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD_HOMOLOG }}
+      SUPABASE_PROJECT_ID_HOMOLOG: ${{ secrets.SUPABASE_PROJECT_ID_HOMOLOG }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID_HOMOLOG"
+      - run: supabase --workdir . migration list --linked

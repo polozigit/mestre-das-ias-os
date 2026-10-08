@@ -1,0 +1,4 @@
+node_modules/
+npm-debug.log*
+
+# Credenciais, QR, extensao e banco ficam exclusivamente fora deste repositorio.

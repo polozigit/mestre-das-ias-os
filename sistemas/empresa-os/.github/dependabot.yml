@@ -1,0 +1,25 @@
+# PR do Dependabot passa pelo ci.yml igual às outras — pode simplesmente
+# fechar sem medo se não quiser atualizar agora.
+version: 2
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/sistemas/empresa-os"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
+
+  # Mantém as actions pinadas por major em dia (checkout, setup-node etc).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(deps)"

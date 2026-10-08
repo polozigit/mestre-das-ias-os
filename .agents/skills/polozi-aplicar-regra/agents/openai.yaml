@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Aplicar Regra"
+  short_description: "Aplica no AGENTS.md uma decisão que o dono já aprovou."
+  default_prompt: "Use $polozi-aplicar-regra para aplicar a decisão D-N que eu já aprovei."
+policy:
+  allow_implicit_invocation: false

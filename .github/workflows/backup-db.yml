@@ -1,0 +1,82 @@
+# Cópia (backup) do banco de PRODUÇÃO. Roda sob demanda e toda segunda de
+# manhã; outro workflow também pode chamá-lo (workflow_call). O deploy-db.yml
+# ainda NÃO o chama: ligar os dois só depois de um run verde deste (a skill
+# tecnologia-publicar, "Primeira vez neste sistema", passo 5).
+# O arquivo tem dado real do cliente: só é guardado se o repositório for
+# PRIVADO, como artefato do run, por poucos dias. A senha do banco só existe
+# aqui dentro (secret do GitHub): nunca é impressa e nunca passa pela IA.
+name: backup-db
+
+on:
+  workflow_dispatch:
+    inputs:
+      minimo_tabelas:
+        description: "Menos tabelas que isso no backup = backup incompleto"
+        required: false
+        default: "1"
+  schedule:
+    - cron: "17 9 * * 1" # segunda, 09:17 UTC
+  workflow_call:
+    inputs:
+      minimo_tabelas:
+        type: string
+        required: false
+        default: "1"
+
+permissions:
+  contents: read
+
+# Nunca cancelar um dump no meio.
+concurrency:
+  group: backup-db
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: sistemas/empresa-os
+
+jobs:
+  backup:
+    name: copia do banco de producao
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Só o nome, como no deploy-db.yml: agrupa os secrets e deixa o histórico
+    # visível na aba Environments do repositório.
+    environment: producao
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+      MINIMO_TABELAS: ${{ inputs.minimo_tabelas || '1' }}
+    steps:
+      - name: so continua se o repositorio for privado
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          privado=$(gh api "repos/$GITHUB_REPOSITORY" --jq .private)
+          if [ "$privado" != "true" ]; then
+            echo "Repositorio publico: nao guardo backup com dado de cliente aqui."
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+      - name: tira a copia (estrutura e dados)
+        run: |
+          set -euo pipefail
+          D="$RUNNER_TEMP/backup"
+          mkdir -p "$D"
+          A="$D/$(date -u +%F)-run${GITHUB_RUN_ID}"
+          supabase db dump --linked -f "$A.sql"
+          supabase db dump --linked --data-only -f "$A-dados.sql"
+          python3 ../../.agents/skills/tecnologia-vigiar/scripts/testar_restauracao.py "$A.sql" --minimo-tabelas "$MINIMO_TABELAS"
+          python3 ../../.agents/skills/tecnologia-vigiar/scripts/testar_restauracao.py "$A-dados.sql" --minimo-tabelas 0 --so-dados
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-banco-${{ github.run_id }}
+          path: ${{ runner.temp }}/backup/*.sql
+          retention-days: 14
+          if-no-files-found: error

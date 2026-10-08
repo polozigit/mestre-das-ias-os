@@ -1,0 +1,11 @@
+{
+  "migration": "0019_organograma.sql",
+  "sha256": "057ed77a7283a45b373771f262d5f516dbb27f234474385da97d85d737eb20fe",
+  "classe": "acrescenta",
+  "achados": [],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": null,
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada na fábrica udnztyonsrfjjybhiabe (schema_migrations lida em 2026-10-08T04:04:19Z, sha256 igual ao arquivo) e pgTAP do CI do template",
+  "data": "2026-10-08"
+}

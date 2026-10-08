@@ -1,0 +1,63 @@
+#!/bin/sh
+# Segunda rede: varre os commits que vão subir por padrão de chave (só nas
+# linhas ACRESCENTADAS: apagar uma chave que já tinha subido nunca trava o
+# push), por arquivo proibido (credenciais, .env, backup, dump) e por lista de
+# pessoas. As regras moram em regras-segredo.sh, o mesmo arquivo do pre-commit.
+# Saída quando barra: desfazer só os commits locais que ainda não subiram
+# (git reset --soft @{u}, os arquivos ficam) e salvar de novo sem o problema.
+# O git passa no stdin uma linha por ref enviada ("<ref local> <sha local>
+# <ref remota> <sha remoto>"). Varre, de cada sha local, só o que o remoto
+# ainda não tem (--not --remotes=<remoto>); remoto vazio (primeiro push) =
+# histórico inteiro. Sem linha no stdin, varre o HEAD do mesmo jeito. Se
+# algo não der pra ler, o push é cancelado (falha fechada).
+remoto="${1:-origin}"
+zero=0000000000000000000000000000000000000000
+
+case "$0" in
+  */*) _dir_hooks="${0%/*}" ;;
+  *) _dir_hooks="." ;;
+esac
+if [ ! -f "$_dir_hooks/regras-segredo.sh" ]; then
+  echo "BLOQUEADO: .githooks/regras-segredo.sh sumiu, entao nao da pra varrer segredo. Push cancelado. Restaure o arquivo (git restore .githooks/regras-segredo.sh)."
+  exit 1
+fi
+. "$_dir_hooks/regras-segredo.sh"
+
+varrer() {
+  if ! conteudo=$(git log -p "$1" --not --remotes="$remoto" -- 2>/dev/null); then
+    echo "BLOQUEADO: não consegui ler os commits que iam subir, então não dá pra varrer segredo. Push cancelado."
+    exit 1
+  fi
+  if printf '%s\n' "$conteudo" | grep -a '^+' | grep -av '^+++ ' | texto_tem_segredo; then
+    echo "BLOQUEADO: tem chave ou senha num commit que ainda nao foi enviado. Nao envie. Avise o dono, troque a chave pela skill tecnologia-acessos (ela guarda so em credenciais/.env), desfaca so os commits locais (git reset --soft @{u}, os arquivos ficam) e salve de novo sem a chave."
+    exit 1
+  fi
+  if ! arquivos=$(git -c core.quotepath=off log --name-only --diff-filter=ACMR --format= "$1" --not --remotes="$remoto" -- 2>/dev/null); then
+    echo "BLOQUEADO: não consegui listar os arquivos dos commits que iam subir, então não dá pra varrer. Push cancelado."
+    exit 1
+  fi
+  while IFS= read -r arq; do
+    [ -n "$arq" ] || continue
+    if caminho_proibido "$arq"; then
+      echo "BLOQUEADO: $arq (chave, senha, backup ou dump) esta num commit que ainda nao foi enviado. Nao envie. Avise o dono, desfaca so os commits locais (git reset --soft @{u}, os arquivos ficam), tire o arquivo do commit e salve de novo; chave vai so em credenciais/.env, pela skill tecnologia-acessos."
+      exit 1
+    fi
+    if git cat-file -e "$1:$arq" 2>/dev/null && texto_tem_dado_pessoal_em_massa "$1:$arq"; then
+      echo "BLOQUEADO: $arq parece lista de pessoas (20 ou mais e-mails ou CPFs) num commit que ainda nao foi enviado. Dado de cliente nao vai pro GitHub. Avise o dono, desfaca so os commits locais (git reset --soft @{u}, os arquivos ficam), tire o arquivo do commit e salve de novo."
+      exit 1
+    fi
+  done <<EOF_ARQ
+$arquivos
+EOF_ARQ
+}
+
+leu=0
+while read -r _ref_local sha_local _ref_remota _sha_remoto; do
+  [ -n "$sha_local" ] || continue
+  leu=1
+  # apagar branch remota não sobe conteúdo
+  [ "$sha_local" = "$zero" ] && continue
+  varrer "$sha_local"
+done
+[ "$leu" = 1 ] || varrer HEAD
+exit 0

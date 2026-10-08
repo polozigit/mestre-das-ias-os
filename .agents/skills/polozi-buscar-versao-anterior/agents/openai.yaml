@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Buscar Versão Anterior"
+  short_description: "Recupera versões antigas do GitHub."
+  default_prompt: "Use $polozi-buscar-versao-anterior para recuperar um arquivo."
+policy:
+  allow_implicit_invocation: false

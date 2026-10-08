@@ -1,0 +1,118 @@
+/* =============================================================
+   TEMA DA EMPRESA — o ÚNICO arquivo de estilo que a IA edita.
+   Como traduzir a identidade visual (ou o mockup aprovado) para
+   estes tokens: ver DESIGN.md na raiz do sistema.
+   Nenhum componente usa cor literal — só estes tokens.
+   ============================================================= */
+:root {
+  /* --- Marca (troque a escala inteira pela cor principal da empresa) --- */
+  --marca-50:  #EEF2FF;
+  --marca-100: #E0E7FF;
+  --marca-200: #C7D2FE;
+  --marca-300: #A5B4FC;
+  --marca-400: #818CF8;
+  --marca-500: #6366F1;
+  --marca-600: #4F46E5;
+  --marca-700: #4338CA;
+  --marca-800: #3730A3;
+  --marca-900: #312E81;
+  /* Texto pequeno sobre fundo claro precisa de contraste AA (>=4.5:1):
+     use o degrau 700 para texto de acento, 500/600 para ícone e borda. */
+  --acento:       var(--marca-600);
+  --acento-hover: var(--marca-700);
+  --acento-suave: var(--marca-50);
+  --acento-texto: var(--marca-700);
+  --fg-sobre-acento: #FFFFFF;
+
+  /* --- Neutros (cinza da interface; pode esquentar/esfriar conforme a marca) --- */
+  --neutro-25:  #FCFCFD;
+  --neutro-50:  #F8F8FA;
+  --neutro-100: #EFEFF2;
+  --neutro-200: #DDDDE3;
+  --neutro-300: #BBBBC6;
+  --neutro-400: #8F8F9D;
+  --neutro-500: #6A6A78;
+  --neutro-600: #4B4B57;
+  --neutro-700: #313139;
+  --neutro-800: #1D1D22;
+  --neutro-900: #111114;
+
+  /* --- Status (ajuste só se a marca conflitar) --- */
+  --ok:          #2F8F4E;
+  --ok-suave:    #E5F2E8;
+  --alerta:       #C97A0F;
+  --alerta-suave: #FBEAD2;
+  --erro:        #B5371F;
+  --erro-suave:  #F8E2DC;
+  --info:        #2A6F8C;
+  --info-suave:  #DEECF2;
+
+  /* --- Superfícies e texto (claro) --- */
+  --bg:         var(--neutro-25);
+  --bg-sutil:   var(--neutro-50);
+  --bg-elevada: #FFFFFF;
+  --fg-1: var(--neutro-900);
+  --fg-2: var(--neutro-700);
+  --fg-3: var(--neutro-500);
+  --fg-4: var(--neutro-400);
+  --borda:       var(--neutro-200);
+  --borda-suave: var(--neutro-100);
+
+  /* --- Forma e tipo --- */
+  --raio-sm:   6px;
+  --raio-md:   10px;
+  --raio-lg:   16px;
+  --raio-pill: 999px;
+  --fonte-texto: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --fonte-titulo: var(--fonte-texto);
+
+  /* --- Sombra e foco --- */
+  --sombra-sm: 0 2px 4px rgba(17, 17, 20, 0.05), 0 1px 2px rgba(17, 17, 20, 0.04);
+  --sombra-md: 0 4px 12px rgba(17, 17, 20, 0.07), 0 2px 4px rgba(17, 17, 20, 0.04);
+  --anel-foco: 0 0 0 3px color-mix(in srgb, var(--marca-500) 40%, transparent);
+}
+
+/* --- Escuro ---
+   Escolhido pelo usuário (data-theme="dark", ver src/lib/tema.ts) ou, sem
+   nenhuma escolha e sem JS, pelo sistema do aparelho. */
+:root[data-theme="dark"] {
+    --bg:         var(--neutro-900);
+    --bg-sutil:   var(--neutro-800);
+    --bg-elevada: var(--neutro-800);
+    --fg-1: var(--neutro-25);
+    --fg-2: var(--neutro-100);
+    --fg-3: var(--neutro-300);
+    --fg-4: var(--neutro-400);
+    --borda:       var(--neutro-700);
+    --borda-suave: var(--neutro-800);
+    --acento:       var(--marca-400);
+    --acento-hover: var(--marca-300);
+    --acento-suave: color-mix(in srgb, var(--marca-500) 16%, var(--neutro-900));
+    --acento-texto: var(--marca-300);
+    --ok-suave:    color-mix(in srgb, var(--ok) 18%, var(--neutro-900));
+    --alerta-suave: color-mix(in srgb, var(--alerta) 18%, var(--neutro-900));
+    --erro-suave:  color-mix(in srgb, var(--erro) 18%, var(--neutro-900));
+    --info-suave:  color-mix(in srgb, var(--info) 18%, var(--neutro-900));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg:         var(--neutro-900);
+    --bg-sutil:   var(--neutro-800);
+    --bg-elevada: var(--neutro-800);
+    --fg-1: var(--neutro-25);
+    --fg-2: var(--neutro-100);
+    --fg-3: var(--neutro-300);
+    --fg-4: var(--neutro-400);
+    --borda:       var(--neutro-700);
+    --borda-suave: var(--neutro-800);
+    --acento:       var(--marca-400);
+    --acento-hover: var(--marca-300);
+    --acento-suave: color-mix(in srgb, var(--marca-500) 16%, var(--neutro-900));
+    --acento-texto: var(--marca-300);
+    --ok-suave:    color-mix(in srgb, var(--ok) 18%, var(--neutro-900));
+    --alerta-suave: color-mix(in srgb, var(--alerta) 18%, var(--neutro-900));
+    --erro-suave:  color-mix(in srgb, var(--erro) 18%, var(--neutro-900));
+    --info-suave:  color-mix(in srgb, var(--info) 18%, var(--neutro-900));
+  }
+}

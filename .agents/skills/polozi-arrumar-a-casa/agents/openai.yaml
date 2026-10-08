@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Arrumar a Casa"
+  short_description: "Audita e arruma a estrutura da Empresa IA."
+  default_prompt: "Use $polozi-arrumar-a-casa para auditar a estrutura desta Empresa IA."
+policy:
+  allow_implicit_invocation: false

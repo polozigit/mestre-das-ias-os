@@ -1,0 +1,168 @@
+# CI do sistema. Este arquivo NASCE dentro de sistemas/empresa-os/.github/
+# (é aqui que o GitHub NÃO o lê); o script instalar_guardas.py da skill
+# tecnologia-publicar ("Primeira vez neste sistema") copia .github/ pra raiz
+# da Casa, que é onde o GitHub de fato lê workflows.
+#
+# NUNCA definir TEMPLATE_DEV aqui: essa variável existe só no CI interno da
+# Polozi (repo do molde) pra pular o teste "identidade preenchida (sem
+# {{placeholder}})" de config/empresa.test.ts. No repo do aluno, marca NÃO
+# aplicada tem que deixar o teste VERMELHO — é o jeito automático de pegar o
+# passo 3 do LEIA-ME esquecido.
+name: ci
+
+on:
+  pull_request:
+    paths:
+      - "sistemas/empresa-os/**"
+      - ".github/workflows/ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: sistemas/empresa-os
+
+jobs:
+  qualidade:
+    name: lint + tsc + testes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # GOTCHA: defaults.run.working-directory só vale pra passos "run:".
+      # Passo "uses:" resolve path a partir da RAIZ do repo — por isso o
+      # cache-dependency-path abaixo repete o caminho completo.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: sistemas/empresa-os/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
+
+  banco:
+    name: migrations idempotentes + tipos em dia
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # fetch-depth 0: a guarda GA-13 compara supabase/arquitetura/excecoes.yml
+      # com a main (lista antiga so diminui).
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Sem --workdir: o defaults.run.working-directory já põe o cwd em
+      # sistemas/empresa-os, onde está o supabase/config.toml. Passar
+      # --workdir aqui seria resolvido RELATIVO a esse cwd e quebraria.
+      - name: sobe o Postgres local (aplica todas as migrations, rodada 1)
+        run: supabase db start
+
+      # Dado de exemplo ANTES da rodada 2: migration que não é idempotente COM
+      # dado (INSERT sem ON CONFLICT, SET NOT NULL em coluna com NULL do seed,
+      # índice único sobre dado repetido) só aparece aqui. Só DML; nunca vai
+      # pra produção.
+      - name: carrega o dado de exemplo
+        env:
+          DB_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/seed_exemplo.sql
+
+      - name: prova que as migrations rodam duas vezes sem estragar nada (rodada 2, agora com dado)
+        env:
+          DB_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: |
+          set -euo pipefail
+          for f in supabase/migrations/*.sql; do
+            echo "reaplicando: $f"
+            psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+
+      # Permissão e negação COMO USUÁRIO (pgTAP) + guardas de arquitetura.
+      # Caminho EXPLÍCITO e --local: nunca --linked (rodaria contra o projeto
+      # ligado).
+      - name: testes pgTAP (permissão e negação como usuário, guardas de arquitetura)
+        run: supabase test db --local supabase/tests
+
+      - name: guardas estáticas (lista de exceções, sem organização, teste por tabela)
+        run: python3 -m unittest discover -s tests -p 'test_arquitetura.py' -v
+
+      # Padrão oficial Supabase: gerar de novo e comparar com o que está
+      # commitado. Se o schema mudou e o arquivo gerado não foi atualizado
+      # junto, este passo acusa (contrato de tipos quebrado silenciosamente
+      # é o pior tipo de bug pra quem não lê TypeScript).
+      - name: tipos em dia (supabase.gen.ts)
+        run: |
+          supabase gen types typescript --local --schema public,tarefas,organograma > src/types/supabase.gen.ts
+          git diff --exit-code src/types/supabase.gen.ts
+
+      - name: para o Postgres local
+        if: always()
+        run: supabase stop
+
+  # Fecha a lacuna do hook de commit da Casa, que dá pra contornar: a PR só passa
+  # se cada migration nova ou alterada nela tem veredito APPROVED, com o mesmo
+  # sha do arquivo e, se destrutiva, com o "sim" do dono (veredito.py conferir).
+  vereditos:
+    name: toda migration da PR tem veredito
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # O veredito mora na raiz da Casa (operacao/vereditos), não em
+    # sistemas/empresa-os: este é o único job que roda da raiz.
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: confere o veredito de cada migration nova ou alterada
+        env:
+          # Vem por env, nunca por ${{ }} dentro do script: o nome da branch
+          # não pode virar comando.
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          VER=.agents/skills/tecnologia-mudar-banco/scripts/veredito.py
+          if [ ! -f "$VER" ]; then
+            echo "Falta $VER: o time tecnologia nao esta instalado nesta Casa."
+            exit 1
+          fi
+          if [ -z "$BASE_REF" ]; then
+            echo "Execucao manual: nao ha PR, nada a conferir."
+            exit 0
+          fi
+          git fetch --no-tags origin "$BASE_REF"
+          # --no-renames: migration renomeada sai como A (nome novo) e e conferida.
+          lista=$(git diff --name-only --no-renames --diff-filter=ACM "origin/$BASE_REF...HEAD" -- 'sistemas/*/supabase/migrations/*.sql')
+          if [ -z "$lista" ]; then
+            echo "Nenhuma migration na PR."
+            exit 0
+          fi
+          falhou=0
+          for f in $lista; do
+            echo "conferindo: $f"
+            python3 "$VER" conferir "$f" || falhou=1
+          done
+          if [ "$falhou" != "0" ]; then
+            echo "Ha migration sem veredito valido (motivos acima)."
+            exit 1
+          fi
+
+# Nome do check que a Vercel (Deployment Checks) e o hook de merge da Casa
+# amarram: "ci", que é o nome do WORKFLOW, não de um job. Os jobs aparecem no
+# GitHub como "ci / qualidade", "ci / banco" e "ci / vereditos". Para a PR ser
+# bloqueada de verdade o check "ci" precisa ser obrigatório; no repositório
+# privado do plano grátis o GitHub não impõe isso, por isso a skill
+# tecnologia-publicar espera os checks sozinha antes do merge.

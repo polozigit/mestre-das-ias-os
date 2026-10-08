@@ -1,0 +1,22 @@
+{
+  "versao": "1.0",
+  "diretoria": "pmo",
+  "origem": "polozi",
+  "agentes": [
+    {
+      "name": "pmo-conferente",
+      "descricao": "Confere a prova de uma tarefa antes de concluir",
+      "quando": "Use antes de concluir tarefa do plano de 90 dias ou prioridade do trimestre, chamado pelo pmo-quadro com a tarefa e a evidência",
+      "instrucoes": "agentes/pmo-conferente.md",
+      "claude": {"model": "opus", "effort": "medium", "tools": ["Read", "Grep", "Glob"]},
+      "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "medium", "sandbox_mode": "read-only"}
+    }
+  ],
+  "skills": [
+    {"name": "pmo-quadro", "dir": ".agents/skills/pmo-quadro", "quando": "Ponto de entrada do time: ver o quadro, abrir, priorizar e mover tarefa", "entrada": true},
+    {"name": "pmo-semana", "dir": ".agents/skills/pmo-semana", "quando": "Planejar a semana: escolher o que entra e marcar as tarefas"},
+    {"name": "pmo-revisao-semanal", "dir": ".agents/skills/pmo-revisao-semanal", "quando": "Fazer a revisão da semana: o que andou, o que parou e o que entra na próxima"},
+    {"name": "pmo-trilha", "dir": ".agents/skills/pmo-trilha", "quando": "Mostrar a trilha de 90 dias, o cronograma e as prioridades do trimestre"},
+    {"name": "pmo-pontos", "dir": ".agents/skills/pmo-pontos", "quando": "Mostrar os pontos da empresa e de cada pessoa, com a regra"}
+  ]
+}

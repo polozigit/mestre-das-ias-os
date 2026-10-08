@@ -1,0 +1,21 @@
+# dependências
+/node_modules
+
+# next.js
+/.next/
+/out/
+/build
+
+# ambiente — segredo NUNCA no repo (vars de produção vivem no painel da Vercel;
+# o .env.local de dev é gerado pela IA a partir de credenciais/.env da Casa)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# sistema
+.DS_Store

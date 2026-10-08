@@ -1,0 +1,11 @@
+{
+  "migration": "0009_execucoes_agente.sql",
+  "sha256": "a23c9b2c3525779870b36e7093ff491f1c7d70b478f440fc00503b7aaa6565c4",
+  "classe": "acrescenta",
+  "achados": [],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": null,
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada na fábrica udnztyonsrfjjybhiabe (schema_migrations lida em 2026-10-08T04:04:19Z, sha256 igual ao arquivo) e pgTAP do CI do template",
+  "data": "2026-10-08"
+}

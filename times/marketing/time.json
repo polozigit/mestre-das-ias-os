@@ -1,0 +1,20 @@
+{
+  "versao": "1.0",
+  "diretoria": "marketing",
+  "origem": "polozi",
+  "agentes": [
+    {
+      "name": "marketing-revisor",
+      "descricao": "Confere persona e marca contra o dossiê",
+      "quando": "Use antes de publicar persona, identidade visual, tom de voz ou logo, chamado pelas skills marketing-persona, marketing-identidade e marketing-logo com o documento e o dossiê",
+      "instrucoes": "agentes/marketing-revisor.md",
+      "claude": {"model": "opus", "effort": "high", "tools": ["Read", "Grep", "Glob"]},
+      "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "high", "sandbox_mode": "read-only"}
+    }
+  ],
+  "skills": [
+    {"name": "marketing-persona", "dir": ".agents/skills/marketing-persona", "quando": "Ponto de entrada do time: montar o cliente ideal e a persona a partir do dossiê da empresa", "entrada": true},
+    {"name": "marketing-identidade", "dir": ".agents/skills/marketing-identidade", "quando": "Montar a identidade visual e o tom de voz: paleta, tipografia e manual curto"},
+    {"name": "marketing-logo", "dir": ".agents/skills/marketing-logo", "quando": "Tratar o logo que o dono entregou: fundo transparente, ícone e variantes"}
+  ]
+}

@@ -1,0 +1,48 @@
+# Se isto ficar vermelho, uma senha ou chave entrou no repositório: troque a
+# chave ANTES de mexer no código (a chave já está na história do git).
+#
+# NUNCA gatilho `push`: o autosave (peça a) gera dezenas de pushes por dia, e
+# a trava por push já é o .githooks/pre-commit do próprio modelo. Aqui a
+# varredura é por PR (pega antes de mergear) e por agendamento diário (pega o
+# que passou batido, ex.: commit direto sem o hook local instalado).
+name: gitleaks
+
+on:
+  pull_request:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # A action lista os commits da PR pela API; sem isto toda PR falha com 403.
+  pull-requests: read
+
+concurrency:
+  group: gitleaks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  varredura:
+    name: caça-segredo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # fetch-depth 0: a varredura é de COMMITS, não de diff — arquivo
+      # corrigido depois não limpa o commit antigo que ainda tem o segredo.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Regras da Casa (chaves do nosso padrão) somadas às do gitleaks.
+          GITLEAKS_CONFIG: .gitleaks.toml
+          # Comentar na PR exigiria pull-requests: write, que não damos ao
+          # token; o vazamento aparece no job vermelho e no Summary do run.
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          # SEM GITLEAKS_LICENSE: só é exigida em repositório de ORGANIZAÇÃO.
+          # A Casa do aluno é conta pessoal. Se um dia a Casa virar org, este
+          # job passa a falhar por licença, não por segredo — troque a conta
+          # ou adicione o secret GITLEAKS_LICENSE.

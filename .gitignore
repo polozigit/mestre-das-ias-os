@@ -1,0 +1,17 @@
+# Segredos e dados sensíveis — NUNCA sobem pro GitHub
+credenciais/.env
+credenciais/*.env
+# Lixo de sistema
+.DS_Store
+node_modules/
+# Log local dos hooks (guarda/autosave) - nao e historico do negocio
+operacao/telemetria.jsonl
+# Backup do banco - dado real do cliente, NUNCA sobe
+operacao/backups/
+# Rascunho da vigilia (pode carregar mensagem de erro do banco)
+operacao/vigilancia/entrada.json
+# Copia de trabalho do PMO (tarefas lidas do banco, com nome de pessoa): refeita a cada leitura
+operacao/pmo/tarefas.json
+# o repo do kit ignora .codex/ e .agents/; aqui eles PRECISAM subir (Casa pronta no zip)
+!.codex/
+!.agents/

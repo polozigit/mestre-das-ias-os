@@ -1,0 +1,69 @@
+# Regras da varredura de segredo do GitHub (workflow gitleaks).
+# Soma as regras prontas do gitleaks com as chaves do padrão da Casa: cada regra
+# abaixo espelha uma alternativa de PADRAO_SEGREDO em .githooks/regras-segredo.sh.
+# Mexeu num lado? Mexa no outro (um teste confere que os dois andam juntos).
+# Sintaxe de regex: Go (RE2), sem lookahead.
+title = "Casa: chaves e senhas"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "casa-chave-sk"
+description = "Chave que começa com sk-"
+regex = '''(^|[^A-Za-z0-9])sk-[A-Za-z0-9]{8,}'''
+keywords = ["sk-"]
+
+[[rules]]
+id = "casa-token-ghp"
+description = "Token do GitHub (ghp_)"
+regex = '''ghp_[A-Za-z0-9]{8,}'''
+keywords = ["ghp_"]
+
+[[rules]]
+id = "casa-chave-sb-secret"
+description = "Chave secreta do Supabase (sb_secret_)"
+regex = '''sb_secret_[A-Za-z0-9]'''
+keywords = ["sb_secret_"]
+
+[[rules]]
+id = "casa-chave-aws-akia"
+description = "Chave de acesso da AWS (AKIA)"
+regex = '''AKIA[0-9A-Z]{12,}'''
+keywords = ["akia"]
+
+[[rules]]
+id = "casa-chave-privada"
+description = "Chave privada (bloco BEGIN PRIVATE KEY)"
+regex = '''-----BEGIN [A-Z ]*PRIVATE KEY'''
+keywords = ["-----begin"]
+
+[[rules]]
+id = "casa-chave-sk-live"
+description = "Chave live da Stripe (sk_live_)"
+regex = '''sk_live_[A-Za-z0-9]{8,}'''
+keywords = ["sk_live_"]
+
+[[rules]]
+id = "casa-token-github-pat"
+description = "Token pessoal fino do GitHub (github_pat_)"
+regex = '''github_pat_[A-Za-z0-9_]{20,}'''
+keywords = ["github_pat_"]
+
+[[rules]]
+id = "casa-token-slack"
+description = "Token do Slack (xox)"
+regex = '''xox[baprs]-[A-Za-z0-9-]{10,}'''
+keywords = ["xox"]
+
+[[rules]]
+id = "casa-chave-google-aiza"
+description = "Chave de API do Google (AIza)"
+regex = '''AIza[0-9A-Za-z_-]{35}'''
+keywords = ["aiza"]
+
+[[rules]]
+id = "casa-chave-sk-projeto"
+description = "Chave de API com prefixo de projeto (sk-proj-, sk-ant-, sk-svcacct-, sk-admin-)"
+regex = '''sk-(proj|ant|svcacct|admin)-[A-Za-z0-9_-]{20,}'''
+keywords = ["sk-proj-", "sk-ant-", "sk-svcacct-", "sk-admin-"]

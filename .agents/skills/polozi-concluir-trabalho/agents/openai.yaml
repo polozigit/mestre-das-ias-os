@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Concluir Trabalho"
+  short_description: "Fecha o trabalho da sessão e atualiza a memória operacional."
+  default_prompt: "Digite \"$polozi-concluir-trabalho\" quando terminar o trabalho desta sessão: valido os critérios, provo por git que subiu pro GitHub e só então fecho a task."
+policy:
+  allow_implicit_invocation: false

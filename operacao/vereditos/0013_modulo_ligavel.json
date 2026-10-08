@@ -1,0 +1,17 @@
+{
+  "migration": "0013_modulo_ligavel.sql",
+  "sha256": "8fbd37aa1e4d4bd3e6036608c01cb6353bc7c026691435a6753eb481388c814c",
+  "classe": "destrutiva",
+  "achados": [
+    {
+      "linha": 418,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.modulo SET ligado = false WHERE slug = 'crm';"
+    }
+  ],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": "Mestre das IAs (kit) em 2026-10-08: sim, migration do modelo revisada na construção do template",
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada na fábrica udnztyonsrfjjybhiabe (schema_migrations lida em 2026-10-08T04:04:19Z, sha256 igual ao arquivo) e pgTAP do CI do template",
+  "data": "2026-10-08"
+}

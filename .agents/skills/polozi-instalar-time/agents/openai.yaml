@@ -1,0 +1,9 @@
+interface:
+  display_name: "Polozi Instalar Time"
+  short_description: "Liga e desliga um time de área sob demanda, sem pesar o boot da Casa."
+  default_prompt: "Use $polozi-instalar-time para instalar ou remover o time de [área] na minha Empresa IA."
+policy:
+  # allow_implicit_invocation default é true [24a:skills/f5]; esta skill
+  # ESCREVE (.codex/agents/*.toml, capacidades/PLUGINS.md), então precisa
+  # declarar false — senão dispararia sozinha em qualquer menção a "time".
+  allow_implicit_invocation: false

@@ -1,0 +1,42 @@
+{
+  "versao": "1.0",
+  "diretoria": "native-ai",
+  "origem": "polozi",
+  "agentes": [
+    {
+      "name": "native-ai-construtor",
+      "descricao": "Escreve os arquivos do desenho nas 2 plataformas",
+      "quando": "Use só quando a skill native-ai-construir chamar no passo 5 (construção), com a ficha, o plano e os caminhos permitidos",
+      "instrucoes": "agentes/native-ai-construtor.md",
+      "claude": {
+        "model": "sonnet",
+        "effort": "medium",
+        "tools": ["Read", "Grep", "Glob", "Write", "Edit"]
+      },
+      "codex": {
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium",
+        "sandbox_mode": "workspace-write"
+      }
+    },
+    {
+      "name": "native-ai-avaliador",
+      "descricao": "Avalia o que o time cria, sem ter construído",
+      "quando": "Use só quando a skill native-ai-construir chamar no passo 1 (critério e casos) ou no passo 8 (veredito)",
+      "instrucoes": "agentes/native-ai-avaliador.md",
+      "claude": {
+        "model": "opus",
+        "effort": "high",
+        "tools": ["Read", "Grep", "Glob"]
+      },
+      "codex": {
+        "model": "gpt-6.1-sol",
+        "model_reasoning_effort": "high",
+        "sandbox_mode": "read-only"
+      }
+    }
+  ],
+  "skills": [
+    {"name": "native-ai-construir", "dir": ".agents/skills/native-ai-construir"}
+  ]
+}

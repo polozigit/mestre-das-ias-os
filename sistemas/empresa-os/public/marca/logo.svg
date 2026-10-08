@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 32" role="img" aria-label="Logo">
+  <!-- Placeholder: substituído pela logo da empresa na instalação (LEIA-ME passo 3). -->
+  <rect x="0" y="0" width="32" height="32" rx="8" fill="#6366F1"/>
+  <text x="16" y="21" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">OS</text>
+  <!-- Cinza medio de proposito: legivel em fundo claro E escuro (o placeholder
+       nao sabe o tema; a logo real da empresa substitui este arquivo). -->
+  <text x="40" y="21" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#8F8F9D">Empresa</text>
+</svg>

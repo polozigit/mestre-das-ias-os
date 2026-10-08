@@ -1,0 +1,81 @@
+# Lista antiga de excecoes as guardas de arquitetura (GA-01..GA-17, ADR-012).
+# Cada item: guarda, objeto, dono, adr. SO DIMINUI: item novo sem `adr` que
+# exista em adrs.yml reprova (GA-13, tests/test_arquitetura.py). O espelho desta
+# lista esta em tests/000_arquitetura.sql (tabela temporaria _exc); o teste
+# confere que os dois batem.
+excecoes:
+  - guarda: GA-07
+    objeto: public.empresa.nome
+    dono: Lider de Dados
+    adr: ADR-001
+    motivo: nome da EMPRESA (pessoa juridica do dono), nao de pessoa natural
+  - guarda: GA-07
+    objeto: public.modulo.nome
+    dono: Lider de Dados
+    adr: ADR-012
+    motivo: nome de exibicao de modulo do sistema, nao de pessoa
+  - guarda: GA-05
+    objeto: fk_plano_atividade_agente
+    dono: Integrador
+    adr: ADR-013
+    motivo: agente padrao da atividade do modelo de plano aponta public.agentes (nucleo)
+  - guarda: GA-05
+    objeto: fk_plano_instancia_dono
+    dono: Integrador
+    adr: ADR-013
+    motivo: dono do plano aponta public.usuarios (nucleo)
+  - guarda: GA-05
+    objeto: fk_plano_instancia_parte
+    dono: Integrador
+    adr: ADR-013
+    motivo: Parte de quem e o plano aponta public.parte (nucleo)
+  - guarda: GA-05
+    objeto: fk_tarefa_plano_tarefa
+    dono: Integrador
+    adr: ADR-013
+    motivo: tarefa do plano aponta public.tarefas (spec v2, em public ate o ADR-012 item 12)
+  - guarda: GA-04
+    objeto: tarefas.v_tarefa_com_instrucao -> public.tarefas
+    dono: Integrador
+    adr: ADR-020
+    motivo: public.tarefas e a tabela do proprio modulo, em public ate o ADR-012 item 12
+  - guarda: GA-04
+    objeto: tarefas.v_fila_agente -> public.tarefas
+    dono: Integrador
+    adr: ADR-020
+    motivo: fila do agente sobre public.tarefas, sem tabela nova (ADR-020)
+  - guarda: GA-09
+    objeto: tarefas.fn_instanciar -> public.tarefas
+    dono: Integrador
+    adr: ADR-020
+    motivo: a instancia do plano vira linhas de public.tarefas (ADR-020)
+  - guarda: GA-05
+    objeto: fk_posicao_ocupacao_parte
+    dono: CHRO
+    adr: ADR-013
+    motivo: ocupante da posicao aponta para o nucleo (public.parte)
+  - guarda: GA-05
+    objeto: fk_posicao_ocupacao_agente
+    dono: CHRO
+    adr: ADR-013
+    motivo: ocupante da posicao aponta para o nucleo (public.agentes)
+  - guarda: GA-04
+    objeto: organograma.v_posicao_ocupante -> public.agentes
+    dono: CHRO
+    adr: ADR-013
+    motivo: a view mostra o nome do agente que ocupa a posicao; agentes e nucleo (LEFT JOIN, security_invoker)
+  - guarda: GA-07
+    objeto: organograma.org_workflow.nome
+    dono: CHRO
+    adr: ADR-012
+    motivo: nome do workflow de referencia (processo), nao de pessoa natural
+  - guarda: GA-07
+    objeto: organograma.org_workflow_raia.nome
+    dono: CHRO
+    adr: ADR-012
+    motivo: nome da raia do workflow de referencia (papel), nao de pessoa natural
+  - guarda: GA-07
+    objeto: public.artefatos_ia.nome
+    dono: Lider de Dados
+    adr: ADR-012
+    motivo: nome do artefato de IA (agente, skill ou workflow, identificador de ferramenta), nao de pessoa natural

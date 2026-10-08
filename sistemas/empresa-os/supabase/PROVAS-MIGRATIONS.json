@@ -1,0 +1,139 @@
+{
+  "gerado_em": "2026-10-08T04:04:19Z",
+  "fabrica_ref": "udnztyonsrfjjybhiabe",
+  "fonte": "fabrica.sh migrations (supabase_migrations.schema_migrations) + sha256 do arquivo; pgTAP roda no CI do template (empresa-os-tests)",
+  "migrations": [
+    {
+      "versao": "0001",
+      "arquivo": "0001_gates_seguranca.sql",
+      "sha256": "096ca0b885ec7929b6dc776ad5f9d528430076a1fc8255a46f79235edc251dd1",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0002",
+      "arquivo": "0002_empresa.sql",
+      "sha256": "cc41716338f894451a44dd9973ee9ad34c0cffdc8e2f0b0363edbb99f21f7e25",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0003",
+      "arquivo": "0003_usuarios_permissoes.sql",
+      "sha256": "ae1d2e91db9cf199a16d1e09231905b226d98e540ee6c77f32bdc16ef3ea95b2",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0004",
+      "arquivo": "0004_rbac_helpers.sql",
+      "sha256": "02ffbdf5bd3d97d73716bc8dd224259b55489ca28a3d86f697e6de7548ad805f",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0005",
+      "arquivo": "0005_agentes.sql",
+      "sha256": "47202b1d1afa05a0263c0896cf11c6091d522314792ad072c2c4b87c5ea9d0af",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0006",
+      "arquivo": "0006_tarefas.sql",
+      "sha256": "8e20b7aea8667c8f1a251531e4be83336d04d9a304a16f830336a24f56ed5dfc",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0007",
+      "arquivo": "0007_atividade.sql",
+      "sha256": "190d33afe2c808aee6e5ce6f787daeb0e4c0d48f6f81788b0058bff0e23ec199",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0008",
+      "arquivo": "0008_seed_funcao.sql",
+      "sha256": "06bf4e1c26a8ffb53c9f4edaa60980c1d91490a451c734af220bcb2a0c17175a",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0009",
+      "arquivo": "0009_execucoes_agente.sql",
+      "sha256": "a23c9b2c3525779870b36e7093ff491f1c7d70b478f440fc00503b7aaa6565c4",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0010",
+      "arquivo": "0010_documentos_publicados.sql",
+      "sha256": "5df98a42bab477a61019c3dfd78ebdbe23f74ffe9dd7ebd3706a27939c13ef97",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0011",
+      "arquivo": "0011_melhorias.sql",
+      "sha256": "6aae7e42f454aecfef1fe7af92c3efac45d02f4e224ee53dcb955db4ffc6c0d3",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0012",
+      "arquivo": "0012_fundacao_extensao.sql",
+      "sha256": "91865fb995ea414ac7b2dae37e991694a0e1bbe0932fdc4541c3a1ef97f2537d",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0013",
+      "arquivo": "0013_modulo_ligavel.sql",
+      "sha256": "8fbd37aa1e4d4bd3e6036608c01cb6353bc7c026691435a6753eb481388c814c",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0014",
+      "arquivo": "0014_tarefas_plano_modelo.sql",
+      "sha256": "6553b2682cd05729612b2eb1ead5aa1cc35c7cd163995139f65cb2368df053fd",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0015",
+      "arquivo": "0015_nucleo_comum.sql",
+      "sha256": "8dd34e4061d8c9e938a101826a261bca8e8267b8b2cda1764a49c160a74f2be2",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0016",
+      "arquivo": "0016_tarefas_plano_instancia.sql",
+      "sha256": "d15743f51e939a96bd41b2cc9a2e74494ff5e728af2fe53616a69e09859f9e55",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0017",
+      "arquivo": "0017_conexoes.sql",
+      "sha256": "2562763edae2a3870c4733f0a9bf2d849a55fdd127bac42caf96b8fc4c786de6",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0018",
+      "arquivo": "0018_whatsapp.sql",
+      "sha256": "12d7054f60b15ae0bf2d2f974172ea0611b1b47d4f47c00b440bb2f9182b8179",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0019",
+      "arquivo": "0019_organograma.sql",
+      "sha256": "057ed77a7283a45b373771f262d5f516dbb27f234474385da97d85d737eb20fe",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0020",
+      "arquivo": "0020_organograma_ocupar_agente.sql",
+      "sha256": "294daf234948649c958fc6a2db24bcac048951a8d70d9b308eacef49646d2a3c",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0021",
+      "arquivo": "0021_whatsapp_grupo.sql",
+      "sha256": "bb261f4d080429c4425096fa20d594e930a29d31cfbb96a7b997b6d6fdff0475",
+      "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "0022",
+      "arquivo": "0022_catalogo_ia.sql",
+      "sha256": "cd39b9db2aa8976056252dfdfd00cb06d078d7bc2bc0034f7f29672d5103dd12",
+      "aplicada_na_fabrica": true
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "description": "Hooks da Casa: confere o estado ao abrir a sessão, guarda as ferramentas e salva o trabalho ao parar.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"{{CASA_ABS}}/.codex/hooks/verificar_estado.py\" --evento startup",
+            "commandWindows": "py -3 \"{{CASA_ABS}}\\.codex\\hooks\\verificar_estado.py\" --evento startup",
+            "timeout": 25,
+            "statusMessage": "Conferindo a Casa..."
+          }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"{{CASA_ABS}}/.codex/hooks/verificar_estado.py\" --evento compact",
+            "commandWindows": "py -3 \"{{CASA_ABS}}\\.codex\\hooks\\verificar_estado.py\" --evento compact",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"{{CASA_ABS}}/.codex/hooks/guarda.py\"",
+            "commandWindows": "py -3 \"{{CASA_ABS}}\\.codex\\hooks\\guarda.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"{{CASA_ABS}}/.codex/hooks/autosave.py\"",
+            "commandWindows": "py -3 \"{{CASA_ABS}}\\.codex\\hooks\\autosave.py\"",
+            "timeout": 120,
+            "statusMessage": "Salvando o trabalho..."
+          }
+        ]
+      }
+    ]
+  }
+}

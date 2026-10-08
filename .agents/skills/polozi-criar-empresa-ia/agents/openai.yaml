@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Criar Empresa IA"
+  short_description: "Cria a Casa da Empresa IA com git local e agentes-núcleo."
+  default_prompt: "Use $polozi-criar-empresa-ia para inicializar esta pasta como a Empresa IA da minha empresa."
+policy:
+  allow_implicit_invocation: false

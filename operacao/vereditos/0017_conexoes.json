@@ -1,0 +1,11 @@
+{
+  "migration": "0017_conexoes.sql",
+  "sha256": "2562763edae2a3870c4733f0a9bf2d849a55fdd127bac42caf96b8fc4c786de6",
+  "classe": "acrescenta",
+  "achados": [],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": null,
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada na fábrica udnztyonsrfjjybhiabe (schema_migrations lida em 2026-10-08T04:04:19Z, sha256 igual ao arquivo) e pgTAP do CI do template",
+  "data": "2026-10-08"
+}

@@ -1,0 +1,31 @@
+# Config da Casa. Só vale depois que você confiar nesta pasta no Codex [24a:config/f2].
+# Vence o ~/.codex/config.toml da sua máquina [24a:config/f4].
+# Não crie outro config.toml dentro de sistemas/ - o mais próximo do cwd ganha [24a:config/f4].
+#
+# Modelos do kit [24a:modelos/f3, f4, f5]: a Casa pina o Terra (gpt-5.6-terra) pro dia a dia. Os agentes
+# de veredito (revisor de segurança, conferente, avaliador) declaram o Sol (gpt-6.1-sol) no .toml de cada
+# um, de propósito diferente do modelo de quem fez; a rotina barata usa o Luna (gpt-6-luna). Sol e Luna
+# só rodam no Codex 0.160 ou mais novo: o preflight do instalador confere a versão.
+
+model = "gpt-5.6-terra"  # dia a dia da Casa [24a:modelos/f4]
+model_reasoning_effort = "medium"  # default oficial, minimal|low|medium|high|xhigh [24a:config/f9, modelos/f12, modelos/f14]
+approval_policy = "on-request"  # o Codex pausa e pergunta quando precisa [24a:config/f10]
+sandbox_mode = "workspace-write"  # escreve na pasta da Casa, nunca danger-full-access [24a:agentes/f14]
+
+[sandbox_workspace_write]
+network_access = true  # política do kit (push/gh/MCP); é opt-in, o exemplo oficial mostra false, o default não é publicado [24a:config/n06]
+
+[agents]
+enabled = true  # liga multi-agente; false desligaria os 4 agentes de veredito [24a:agentes/f8, agentes/f9]
+max_concurrent_threads_per_session = 1  # política do kit: 1 conversa = 1 trabalho; a chave existe, o default não é publicado [24a:agentes/f5]
+default_subagent_model = "gpt-5.6-terra"  # rede de segurança, o toml de cada agente vence [24a:agentes/f8, agentes/f7]
+default_subagent_reasoning_effort = "medium"  # rede de segurança, o toml de cada agente vence [24a:agentes/f8, agentes/f7]
+
+# O MCP de Supabase e Vercel NÃO entra aqui — o dono conecta pelo app
+# desktop, aba de plugins, botão `+` [24a:plugins/f12], e o próprio
+# ChatGPT guarda o estado on/off em `~/.codex/config.toml`
+# [24a:plugins/n18]. A IA só PROVA, nunca escreve config; cada MCP
+# ligado pesa em toda mensagem [24a:modelos/n03]. FALLBACKS, se travar
+# no app: `codex mcp add <id> --url <url>` [24a:conectores_mcp/n12], ou
+# um bloco [mcp_servers.<id>] com url = "..." [24a:conectores_mcp/f01]
+# aqui — só com a pasta confiada [24a:config/f2] [24a:conectores_mcp/n14].

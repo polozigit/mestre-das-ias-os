@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Registrar Dossiê"
+  short_description: "Organiza a transcrição do dossiê como fonte."
+  default_prompt: "Use $polozi-registrar-dossie para registrar a transcrição anexada nesta Empresa IA."
+policy:
+  allow_implicit_invocation: false

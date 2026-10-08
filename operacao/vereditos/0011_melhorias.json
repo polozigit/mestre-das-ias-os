@@ -1,0 +1,37 @@
+{
+  "migration": "0011_melhorias.sql",
+  "sha256": "6aae7e42f454aecfef1fe7af92c3efac45d02f4e224ee53dcb955db4ffc6c0d3",
+  "classe": "destrutiva",
+  "achados": [
+    {
+      "linha": 162,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.melhorias"
+    },
+    {
+      "linha": 167,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.melhorias SET status = 'aprovada', decidido_em = now() WHERE id = v_id;"
+    },
+    {
+      "linha": 169,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.melhorias SET status = 'aplicada', aplicada_em = now() WHERE id = v_id;"
+    },
+    {
+      "linha": 171,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.melhorias SET status = 'aplicada', aplicada_em = now(), commit_sha = 'abcdef1'"
+    },
+    {
+      "linha": 174,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.melhorias SET status = 'proposta' WHERE id = v_id;"
+    }
+  ],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": "Mestre das IAs (kit) em 2026-10-08: sim, migration do modelo revisada na construção do template",
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada na fábrica udnztyonsrfjjybhiabe (schema_migrations lida em 2026-10-08T04:04:19Z, sha256 igual ao arquivo) e pgTAP do CI do template",
+  "data": "2026-10-08"
+}

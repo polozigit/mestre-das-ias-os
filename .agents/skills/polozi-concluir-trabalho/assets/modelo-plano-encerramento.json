@@ -1,0 +1,44 @@
+{
+  "trabalho": "Descrição objetiva do resultado confirmado nesta sessão.",
+  "estado": "Estado operacional após a conclusão.",
+  "proximo_marco": "Próximo resultado que ainda precisa ser alcançado.",
+  "changelog": ["Mudança relevante concluída."],
+  "decisoes": [
+    {
+      "titulo": "Título curto da decisão",
+      "decisao": "Escolha explicitamente confirmada pelo usuário.",
+      "motivo": "Motivo confirmado no chat.",
+      "responsavel": "usuário"
+    }
+  ],
+  "pendencias_adicionar": [
+    {
+      "pendencia": "Pendência concreta que permanece aberta.",
+      "origem": "descoberta-ia",
+      "prioridade": "media"
+    }
+  ],
+  "pendencias_resolver": ["Texto exato de uma pendência existente e comprovadamente resolvida."],
+  "proxima_sessao": {
+    "objetivo": "Objetivo claro do próximo trabalho.",
+    "capacidade_sugerida": "Nome da Skill sugerida ou orientação manual.",
+    "entrada_necessaria": "Arquivos, dados ou decisão necessários.",
+    "decisoes_pendentes": ["Decisão humana ainda necessária."],
+    "criterio_conclusao": "Condição objetiva para encerrar o próximo trabalho."
+  },
+  "mapa_atualizacoes": [
+    {
+      "papel": "publico.persona",
+      "estado": "em-revisao"
+    }
+  ],
+  "plugins_instalados": [
+    {
+      "nome": "Nome do plugin instalado nesta sessão",
+      "finalidade": "Finalidade curta do plugin."
+    }
+  ],
+  "tarefa": {
+    "numero": "Número sequencial da TASK que esta sessão está fechando (vazio quando não há TASK em arquivo para fechar)."
+  }
+}

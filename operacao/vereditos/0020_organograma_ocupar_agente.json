@@ -1,0 +1,11 @@
+{
+  "migration": "0020_organograma_ocupar_agente.sql",
+  "sha256": "294daf234948649c958fc6a2db24bcac048951a8d70d9b308eacef49646d2a3c",
+  "classe": "acrescenta",
+  "achados": [],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": null,
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada na fábrica udnztyonsrfjjybhiabe (schema_migrations lida em 2026-10-08T04:04:19Z, sha256 igual ao arquivo) e pgTAP do CI do template",
+  "data": "2026-10-08"
+}

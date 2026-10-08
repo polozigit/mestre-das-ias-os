@@ -1,0 +1,25 @@
+{
+  "empresariais": [
+    {"papel": "contexto.dossie", "caminho": "contexto/dossie/dossie-completo.md", "conteudo": "transcrição íntegra das 71 perguntas", "estado": "ausente", "capacidade": "polozi-registrar-dossie"},
+    {"papel": "marca.identidade-visual", "caminho": "empresa/marca/identidade-visual.md", "conteudo": "cores, tipografia, uso do logo", "estado": "ausente", "capacidade": "identidade visual (marketing)"},
+    {"papel": "marca.tom-de-voz", "caminho": "empresa/marca/tom-de-voz.md", "conteudo": "como a marca fala; palavras banidas", "estado": "ausente", "capacidade": "identidade visual (marketing)"},
+    {"papel": "publico.persona", "caminho": "empresa/publico/persona.md", "conteudo": "cliente ideal", "estado": "ausente", "capacidade": "persona (marketing)"},
+    {"papel": "oferta.catalogo", "caminho": "empresa/oferta/catalogo.md", "conteudo": "o que vendemos", "estado": "ausente", "capacidade": "aprovação humana"},
+    {"papel": "oferta.preco", "caminho": "empresa/oferta/tabela-preco.md", "conteudo": "preço vigente — ÚNICA fonte", "estado": "ausente", "capacidade": "aprovação humana"},
+    {"papel": "comercial.processo-vendas", "caminho": "empresa/comercial/processo-de-vendas.md", "conteudo": "como vendemos", "estado": "ausente", "capacidade": "time de vendas"},
+    {"papel": "operacao-empresa.processos", "caminho": "empresa/processos/processos.md", "conteudo": "processos da operação", "estado": "ausente", "capacidade": "time de gestão"},
+    {"papel": "pessoas.estrutura", "caminho": "empresa/pessoas/estrutura.md", "conteudo": "organograma humano", "estado": "ausente", "capacidade": "aprovação humana"}
+  ],
+  "operacionais": [
+    {"papel": "operacao.status", "caminho": "operacao/STATUS-ATUAL.md", "autoridade": "concluir/transferir-trabalho"},
+    {"papel": "operacao.pendencias", "caminho": "operacao/PENDENCIAS.md", "autoridade": "qualquer sessão"},
+    {"papel": "operacao.decisoes", "caminho": "operacao/DECISOES.md", "autoridade": "decisão do dono"},
+    {"papel": "operacao.changelog", "caminho": "operacao/CHANGELOG.md", "autoridade": "concluir-trabalho"},
+    {"papel": "operacao.proxima-sessao", "caminho": "operacao/PROXIMA-SESSAO.md", "autoridade": "transferir-trabalho"},
+    {"papel": "operacao.instalacao", "caminho": "operacao/INSTALACAO.md", "autoridade": "polozi-instalador"},
+    {"papel": "capacidades.plugins", "caminho": "capacidades/PLUGINS.md", "autoridade": "catálogo"},
+    {"papel": "capacidades.automacoes", "caminho": "capacidades/AUTOMACOES.md", "autoridade": "catálogo"},
+    {"papel": "credenciais.conexoes", "caminho": "credenciais/CONEXOES.md", "autoridade": "polozi-registrar-conexao — nunca valores"},
+    {"papel": "operacao.vigilancia", "caminho": "operacao/vigilancia/", "autoridade": "tecnologia-vigiar: uma linha por rodada diária; o dump fica fora do Git"}
+  ]
+}

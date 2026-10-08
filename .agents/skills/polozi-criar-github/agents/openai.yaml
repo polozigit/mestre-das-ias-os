@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Criar GitHub"
+  short_description: "Cria o repositório privado da Empresa IA no GitHub."
+  default_prompt: "Use $polozi-criar-github para criar o GitHub da minha empresa."
+policy:
+  allow_implicit_invocation: false

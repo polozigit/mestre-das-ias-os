@@ -1,0 +1,32 @@
+{
+  "migration": "0003_usuarios_permissoes.sql",
+  "sha256": "ae1d2e91db9cf199a16d1e09231905b226d98e540ee6c77f32bdc16ef3ea95b2",
+  "classe": "destrutiva",
+  "achados": [
+    {
+      "linha": 283,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.usuarios SET ativo = false WHERE id = v_id1;"
+    },
+    {
+      "linha": 288,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.usuarios SET e_dono = false WHERE id = v_id1;"
+    },
+    {
+      "linha": 293,
+      "comando": "DELETE",
+      "trecho": "DELETE FROM public.usuarios WHERE id = v_id1;"
+    },
+    {
+      "linha": 298,
+      "comando": "UPDATE",
+      "trecho": "UPDATE public.usuarios SET e_dono = true WHERE id = v_id2;"
+    }
+  ],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": "Mestre das IAs (kit) em 2026-10-08: sim, migration do modelo revisada na construção do template",
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada na fábrica udnztyonsrfjjybhiabe (schema_migrations lida em 2026-10-08T04:04:19Z, sha256 igual ao arquivo) e pgTAP do CI do template",
+  "data": "2026-10-08"
+}

@@ -1,0 +1,110 @@
+{
+  "versao": "1",
+  "titulo": "Guia de Perguntas para Gravação - Dossiê da Empresa",
+  "instrucoes": "O participante diz somente Pergunta X.Y e responde sem ler a pergunta.",
+  "secoes": [
+    {"codigo": "1", "titulo": "Identificação da Empresa", "perguntas": [
+      {"codigo": "1.1", "texto": "Qual é o seu nome e seu cargo na empresa?"},
+      {"codigo": "1.2", "texto": "Qual o nome da sua empresa e o que ela faz?"},
+      {"codigo": "1.3", "texto": "Há quantos anos ela existe?"},
+      {"codigo": "1.4", "texto": "Quantas pessoas trabalham nela hoje?"},
+      {"codigo": "1.5", "texto": "Em que cidade e estado ela fica?"}
+    ]},
+    {"codigo": "2", "titulo": "O Que Vendemos e Pra Quem", "perguntas": [
+      {"codigo": "2.1", "texto": "O que você vende: produto, serviço ou os dois?"},
+      {"codigo": "2.2", "texto": "Quais são seus produtos ou serviços mais vendidos? Qual dá mais lucro?"},
+      {"codigo": "2.3", "texto": "Você vende pra pessoa física, pra outras empresas, ou pros dois?"},
+      {"codigo": "2.4", "texto": "Quem é o cliente ideal - a pessoa que mais compra e mais gosta do que você vende?"},
+      {"codigo": "2.5", "texto": "O cliente costuma comprar de novo, ou é sempre venda única?"},
+      {"codigo": "2.6", "texto": "Onde você mais vende: pela internet, pessoalmente, por indicação, ou com vendedor?"},
+      {"codigo": "2.7", "texto": "Depois da venda, tem entrega, instalação ou atendimento contínuo? Como funciona isso?"},
+      {"codigo": "2.8", "texto": "Tem época do ano que vende mais e época que vende menos?"}
+    ]},
+    {"codigo": "3", "titulo": "Faturamento e Margem", "perguntas": [
+      {"codigo": "3.1", "texto": "Fique à vontade pro nível de detalhe que preferir. Qual foi seu faturamento no ano passado?"},
+      {"codigo": "3.2", "texto": "Quanto sobrou de lucro no ano passado?"},
+      {"codigo": "3.3", "texto": "Nos últimos 5 anos, o faturamento cresceu, ficou igual ou caiu?"},
+      {"codigo": "3.4", "texto": "Nos últimos 5 anos, o lucro melhorou, ficou igual ou piorou?"}
+    ]},
+    {"codigo": "4", "titulo": "Estratégia - Pra Onde a Empresa Está Indo", "perguntas": [
+      {"codigo": "4.1", "texto": "Qual é o plano principal pra empresa crescer este ano?"},
+      {"codigo": "4.2", "texto": "Se você tivesse que dizer, numa frase, o que a sua empresa faz de melhor no mundo, o que seria?"},
+      {"codigo": "4.3", "texto": "Você acompanha números toda semana ou todo mês pra saber se as coisas vão bem?"},
+      {"codigo": "4.4", "texto": "Quando você decide algo importante, decide mais no dado (planilha, número) ou mais no feeling?"},
+      {"codigo": "4.5", "texto": "Se a empresa continuar exatamente do jeito que está, em 5 anos ela vai estar mais forte ou vai ficar pra trás dos concorrentes? Por quê?"}
+    ]},
+    {"codigo": "5", "titulo": "Garantias e Compromissos com o Cliente", "perguntas": [
+      {"codigo": "5.1", "texto": "O que você garante pro cliente quando ele compra (prazo, garantia, devolução)?"},
+      {"codigo": "5.2", "texto": "Tem algo que a empresa nunca promete, porque sabe que não pode cumprir?"}
+    ]},
+    {"codigo": "6", "titulo": "Gestão do Tempo e Como as Coisas São Feitas Aqui", "perguntas": [
+      {"codigo": "6.1", "texto": "Você sente que controla sua agenda, ou vive apagando incêndio?"},
+      {"codigo": "6.2", "texto": "Você usa algum jeito de organizar o tempo (lista de tarefa, agenda por bloco)?"},
+      {"codigo": "6.3", "texto": "Sua equipe sabe o que é prioridade, ou fica perdida sobre o que fazer primeiro?"},
+      {"codigo": "6.4", "texto": "A empresa tem um jeito certo de fazer cada tarefa, e todo mundo segue esse jeito? Ou cada um faz do seu jeito?"},
+      {"codigo": "6.5", "texto": "As pessoas têm liberdade pra decidir sozinhas, ou precisam sempre esperar sua aprovação?"}
+    ]},
+    {"codigo": "7", "titulo": "Contratação e Time", "perguntas": [
+      {"codigo": "7.1", "texto": "Qual é a maior dificuldade que você tem pra contratar gente boa?"},
+      {"codigo": "7.2", "texto": "Você tem um processo pra contratar (etapas, critério), ou contrata quando aperta, sem muito plano?"},
+      {"codigo": "7.3", "texto": "Hoje, as pessoas certas estão nos lugares certos? Se não, o que falta pra isso acontecer?"},
+      {"codigo": "7.4", "texto": "Você tem um jeito claro de saber quem está indo bem e quem não está?"}
+    ]},
+    {"codigo": "8", "titulo": "Treinamento", "perguntas": [
+      {"codigo": "8.1", "texto": "A empresa tem um programa de treinamento pra equipe?"},
+      {"codigo": "8.2", "texto": "Com que frequência a equipe é treinada ou relembrada de como fazer as coisas?"},
+      {"codigo": "8.3", "texto": "A equipe gosta de aprender coisa nova, ou tem resistência a mudança?"},
+      {"codigo": "8.4", "texto": "Depois que contrata alguém bom, você tem um plano pra essa pessoa continuar crescendo?"}
+    ]},
+    {"codigo": "9", "titulo": "Liderança", "perguntas": [
+      {"codigo": "9.1", "texto": "Quando a empresa tem um resultado bom, de quem é o mérito - da equipe, da sorte, ou só seu?"},
+      {"codigo": "9.2", "texto": "Você está preparando alguém pra tocar a empresa se você precisar se afastar?"},
+      {"codigo": "9.3", "texto": "Os líderes da sua equipe inspiram e ajudam o time, ou só cobram resultado?"},
+      {"codigo": "9.4", "texto": "Você reconhece quem faz um bom trabalho? De que jeito - elogio, prêmio, dinheiro, promoção?"}
+    ]},
+    {"codigo": "10", "titulo": "Confiança Dentro da Equipe", "perguntas": [
+      {"codigo": "10.1", "texto": "A missão e os valores da empresa são coisa que todo mundo usa no dia a dia, ou é só uma frase bonita na parede?"},
+      {"codigo": "10.2", "texto": "Na sua empresa, dá pra falar a verdade sobre um problema sem medo de bronca?"},
+      {"codigo": "10.3", "texto": "A equipe se sente à vontade pra dar opinião e sugestão?"},
+      {"codigo": "10.4", "texto": "A empresa já passou por uma crise grande? O que você aprendeu com ela?"}
+    ]},
+    {"codigo": "11", "titulo": "Marketing - Como Atrai Cliente Novo", "perguntas": [
+      {"codigo": "11.1", "texto": "Qual é sua principal forma de atrair cliente novo hoje?"},
+      {"codigo": "11.2", "texto": "Antes de vender, você ensina ou informa o cliente sobre alguma coisa (conteúdo, dica, vídeo)? Ou só anuncia o produto?"},
+      {"codigo": "11.3", "texto": "Qual é o maior problema pra conseguir mais clientes interessados?"},
+      {"codigo": "11.4", "texto": "O time de marketing e o time de vendas trabalham juntos, ou cada um faz o seu sem se falar?"}
+    ]},
+    {"codigo": "12", "titulo": "Vendas", "perguntas": [
+      {"codigo": "12.1", "texto": "Sua equipe sabe identificar quem são os melhores clientes pra focar, ou atira pra todo lado?"},
+      {"codigo": "12.2", "texto": "Todo vendedor segue o mesmo roteiro de venda, ou cada um vende do seu jeito?"},
+      {"codigo": "12.3", "texto": "Qual é a maior dificuldade na hora de fechar uma venda?"},
+      {"codigo": "12.4", "texto": "Depois do primeiro contato, tem um jeito certo de continuar conversando com o cliente, ou ele acaba esquecido?"},
+      {"codigo": "12.5", "texto": "Quantas vezes você ou sua equipe tenta marcar reunião ou vender pra um contato antes de desistir dele?"},
+      {"codigo": "12.6", "texto": "Depois que vende, você continua cuidando desse cliente de alguma forma?"}
+    ]},
+    {"codigo": "13", "titulo": "Ferramentas e Sistemas que Você Já Usa", "perguntas": [
+      {"codigo": "13.1", "texto": "Quais programas, sites ou aplicativos você usa hoje pra vender, atender ou organizar a empresa (WhatsApp Business, planilha, sistema de vendas, site, Instagram)?"},
+      {"codigo": "13.2", "texto": "Algum desses já resolve bem o problema, ou tem algo que você usa mas não funciona direito?"},
+      {"codigo": "13.3", "texto": "Tem alguma tarefa que você faz manualmente hoje e gostaria que fosse automática?"}
+    ]},
+    {"codigo": "14", "titulo": "Tecnologia - Como Você Decide Usar", "perguntas": [
+      {"codigo": "14.1", "texto": "Quando você adota uma tecnologia nova, é porque ela resolve um problema real, ou porque todo mundo está usando?"},
+      {"codigo": "14.2", "texto": "Já investiu em alguma tecnologia que acabou não usando? O que você aprendeu com isso?"},
+      {"codigo": "14.3", "texto": "Tem alguma tecnologia que você sabe que ajudaria a empresa, mas ainda não colocou em prática?"}
+    ]},
+    {"codigo": "15", "titulo": "Crescimento e Continuidade", "perguntas": [
+      {"codigo": "15.1", "texto": "Sua empresa pensa no futuro mais distante (não só no mês que vem), ou vive resolvendo o problema de hoje?"},
+      {"codigo": "15.2", "texto": "Tem alguma coisa fixa que garante dinheiro entrando todo mês, ou tudo depende de vender bastante toda vez?"},
+      {"codigo": "15.3", "texto": "Já aconteceu de a empresa crescer rápido e depois cair forte? Isso se repete?"},
+      {"codigo": "15.4", "texto": "A empresa está sempre melhorando um pouco, ou só corre atrás quando o problema já apareceu?"},
+      {"codigo": "15.5", "texto": "Se você se afastasse da empresa hoje, ela continuaria funcionando bem, ou dependeria muito de você?"}
+    ]},
+    {"codigo": "16", "titulo": "Orçamento", "perguntas": [
+      {"codigo": "16.1", "texto": "O dinheiro da empresa é planejado pra fazer ela crescer, ou só usado pra pagar as contas do mês?"},
+      {"codigo": "16.2", "texto": "Você sabe, mês a mês, quanto pode gastar em cada área (marketing, equipe, operação) sem apertar o caixa?"},
+      {"codigo": "16.3", "texto": "Antes de gastar num valor grande, você compara com algum plano ou limite definido, ou decide na hora?"},
+      {"codigo": "16.4", "texto": "Tem algum gasto fixo hoje que, se você olhasse com calma, talvez pudesse cortar ou reduzir?"},
+      {"codigo": "16.5", "texto": "Você guarda uma reserva pros meses mais fracos, ou o caixa vive no zero a zero?"}
+    ]}
+  ]
+}

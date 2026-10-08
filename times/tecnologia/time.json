@@ -1,0 +1,24 @@
+{
+  "versao": "1.0",
+  "diretoria": "tecnologia",
+  "origem": "polozi",
+  "agentes": [
+    {
+      "name": "tecnologia-revisor-seguranca",
+      "descricao": "Revisa a mudança do sistema antes do merge",
+      "quando": "Use antes de todo merge de mudança em sistemas/ (tela, banco, rota), chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito",
+      "instrucoes": "agentes/tecnologia-revisor-seguranca.md",
+      "claude": {"model": "opus", "effort": "high", "tools": ["Read", "Grep", "Glob"]},
+      "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "high", "sandbox_mode": "read-only"}
+    }
+  ],
+  "skills": [
+    {"name": "tecnologia-sistema", "dir": ".agents/skills/tecnologia-sistema"},
+    {"name": "tecnologia-publicar", "dir": ".agents/skills/tecnologia-publicar"},
+    {"name": "tecnologia-mudar-banco", "dir": ".agents/skills/tecnologia-mudar-banco"},
+    {"name": "tecnologia-vigiar", "dir": ".agents/skills/tecnologia-vigiar"},
+    {"name": "tecnologia-acessos", "dir": ".agents/skills/tecnologia-acessos"},
+    {"name": "tecnologia-definir-o-que", "dir": ".agents/skills/tecnologia-definir-o-que"},
+    {"name": "tecnologia-construir-tela", "dir": ".agents/skills/tecnologia-construir-tela"}
+  ]
+}

@@ -1,0 +1,46 @@
+# Quem aplica migration em produção é este arquivo, nunca a IA e nunca você
+# na mão. Rodar `supabase db push` fora daqui é o jeito de o schema do banco
+# divergir do que está versionado no repo.
+name: deploy-db
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "sistemas/empresa-os/supabase/migrations/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# DESVIO DELIBERADO do padrão dos outros 3 workflows: cancel-in-progress
+# FALSE. Cancelar um `db push` no meio deixa o schema pela metade — pior do
+# que esperar a fila.
+concurrency:
+  group: deploy-db
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: sistemas/empresa-os
+
+jobs:
+  migrar:
+    name: aplica migrations em produção
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Só o nome — approval de environment é recurso pago. Serve pra agrupar
+    # os secrets abaixo e deixar o histórico de deploys visível na aba
+    # Environments do repositório.
+    environment: producao
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+      - run: supabase db push

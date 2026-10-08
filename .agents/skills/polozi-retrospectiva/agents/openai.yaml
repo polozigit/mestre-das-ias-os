@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Retrospectiva"
+  short_description: "Revisa a semana e propõe até 3 regras novas pro dono aprovar."
+  default_prompt: "Use $polozi-retrospectiva para revisar a semana e propor melhorias."
+policy:
+  allow_implicit_invocation: false

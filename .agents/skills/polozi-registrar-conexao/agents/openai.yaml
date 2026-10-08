@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Registrar Conexão"
+  short_description: "Conecta um serviço externo e prova a conexão por comando."
+  default_prompt: "Use $polozi-registrar-conexao para conectar [serviço] a minha Empresa IA (MCP OAuth, gh ou chave)."
+policy:
+  allow_implicit_invocation: false

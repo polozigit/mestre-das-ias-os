@@ -1,0 +1,162 @@
+/* Arquivo FIXO do template — não editar para trocar a marca.
+   A marca vive em theme.css (ver DESIGN.md). */
+@import "tailwindcss";
+@import "./theme.css";
+
+/* Variante dark dirigida por <html data-theme="dark"> (não pelo media query). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Mapeia os tokens do tema para utilitários do Tailwind
+   (bg-bg, text-fg-1, border-borda, bg-acento, rounded-md...). */
+@theme inline {
+  --color-marca-50:  var(--marca-50);
+  --color-marca-100: var(--marca-100);
+  --color-marca-200: var(--marca-200);
+  --color-marca-300: var(--marca-300);
+  --color-marca-400: var(--marca-400);
+  --color-marca-500: var(--marca-500);
+  --color-marca-600: var(--marca-600);
+  --color-marca-700: var(--marca-700);
+  --color-marca-800: var(--marca-800);
+  --color-marca-900: var(--marca-900);
+
+  --color-bg:         var(--bg);
+  --color-bg-sutil:   var(--bg-sutil);
+  --color-bg-elevada: var(--bg-elevada);
+
+  --color-fg-1: var(--fg-1);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
+
+  --color-borda:       var(--borda);
+  --color-borda-suave: var(--borda-suave);
+
+  --color-acento:          var(--acento);
+  --color-acento-hover:    var(--acento-hover);
+  --color-acento-suave:    var(--acento-suave);
+  --color-acento-texto:    var(--acento-texto);
+  --color-fg-sobre-acento: var(--fg-sobre-acento);
+
+  --color-ok:           var(--ok);
+  --color-ok-suave:     var(--ok-suave);
+  --color-alerta:       var(--alerta);
+  --color-alerta-suave: var(--alerta-suave);
+  --color-erro:         var(--erro);
+  --color-erro-suave:   var(--erro-suave);
+  --color-info:         var(--info);
+  --color-info-suave:   var(--info-suave);
+
+  --radius-sm:  var(--raio-sm);
+  --radius-md:  var(--raio-md);
+  --radius-lg:  var(--raio-lg);
+  --radius-pill: var(--raio-pill);
+
+  --font-sans:    var(--fonte-texto);
+  --font-display: var(--fonte-titulo);
+}
+
+/* =============================================================
+   Shell: sidebar recolhível (só desktop) — mecânica fixa, sem marca.
+   Dirigido por <html data-sidebar="collapsed|expanded">. No celular a
+   gaveta ignora "collapsed" (largura e rótulos preservados).
+   ============================================================= */
+:root {
+  --sidebar-w: 240px;
+  --sidebar-collapsed-w: 68px;
+  --sidebar-active-w: var(--sidebar-w);
+  --topbar-h: 56px;
+}
+@media (min-width: 1024px) {
+  [data-sidebar="collapsed"] { --sidebar-active-w: var(--sidebar-collapsed-w); }
+  [data-sidebar="collapsed"] .sidebar-label,
+  [data-sidebar="collapsed"] .sidebar-group-title,
+  [data-sidebar="collapsed"] .sidebar-wordmark { display: none; }
+  [data-sidebar="collapsed"] .sidebar-header { justify-content: center; padding-left: 0; padding-right: 0; }
+  [data-sidebar="collapsed"] .sidebar-link { justify-content: center; }
+  [data-sidebar="collapsed"] .sidebar-footer { justify-content: center; }
+  [data-sidebar="collapsed"] .sidebar-tooltip { display: block; }
+}
+.sidebar-tooltip { display: none; }
+
+/* Utilitários tipográficos (só tokens). */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.h2 {
+  font-family: var(--fonte-titulo);
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--fg-1);
+}
+.h3 {
+  font-family: var(--fonte-titulo);
+  font-size: 1.125rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--fg-1);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg-1);
+  font-family: var(--fonte-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--anel-foco);
+}
+
+/* =============================================================
+   ResponsiveTable (components/ui/ResponsiveTable.tsx) — mecânica
+   fixa do template, não é marca (a marca entra via tokens).
+
+   Card-stack <480px via data-label: a <table> semântica fica
+   intacta, só re-layouta em cards (par label:valor). data-primary
+   vira o título do card; data-mobile-hidden some no card.
+   ============================================================= */
+@media (max-width: 479px) {
+  .rtable {
+    & table, & thead, & tbody, & tr, & td { display: block; width: 100%; }
+    & thead { display: none; }
+    & tbody { display: flex; flex-direction: column; gap: 0.5rem; }
+    & tbody > tr {
+      border: 1px solid var(--borda);
+      border-radius: var(--raio-md);
+      background: var(--bg-elevada);
+      padding: 0.25rem 0;
+    }
+    & td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.5rem 0.75rem;
+      text-align: right;
+    }
+    & td::before {
+      content: attr(data-label);
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-4);
+      text-align: left;
+    }
+    & td[data-primary] {
+      justify-content: flex-start;
+      text-align: left;
+      border-bottom: 1px solid var(--borda-suave);
+    }
+    & td[data-primary]::before { display: none; }
+    & td[data-mobile-hidden] { display: none; }
+  }
+}

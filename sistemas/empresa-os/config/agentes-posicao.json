@@ -1,0 +1,9 @@
+{
+  "descricao": "Mapa explicito agente (do nucleo e dos times instalados) -> cargo do Time de IA (area time-de-ia de organograma.json). O setup (scripts/setup-inicial.mjs) coloca cada agente instalado na posicao 0 do cargo. Agente fora do mapa fica sem posicao. Um cargo por agente e um agente por cargo (a posicao 0 tem um ocupante so).",
+  "agentes": {
+    "polozi-gerente-de-trabalho": "coordenador-do-time-de-ia",
+    "tecnologia-publicar": "engenheiro-de-harness-e-contexto",
+    "tecnologia-revisor-seguranca": "guardiao-de-acessos",
+    "polozi-sistema-qa": "engenheiro-de-evals"
+  }
+}

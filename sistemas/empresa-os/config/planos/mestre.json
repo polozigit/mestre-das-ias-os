@@ -1,0 +1,697 @@
+{
+  "chave": "mestre",
+  "versao": 5,
+  "titulo": "Mestre das IAs: 3 dias de curso e 90 dias de trilha",
+  "descricao": "O curso monta; a trilha prova. Dia 0 da trilha = fim do D3.",
+  "caminho_origem": "config/planos/mestre.json",
+  "etapas": [
+    {
+      "chave": "d1",
+      "ordem": 1,
+      "titulo": "Dia 1: instalação, sistema no ar e primeiro time",
+      "objetivo": "Sair com o sistema no ar, a empresa gravada no banco e o primeiro time respondendo.",
+      "trilha": "curso",
+      "fase": "D1",
+      "inicio_dias": 0,
+      "atividades": [
+        {
+          "chave": "contas",
+          "ordem": 1,
+          "titulo": "Criar as contas",
+          "objetivo": "Todas as contas prontas para instalar o resto.",
+          "instrucao": "Tenha a conta paga do ChatGPT e crie a sua conta no GitHub. Com o GitHub, abra as contas do banco (Supabase) e da hospedagem (Vercel) clicando em \"Continue with GitHub\": não precisa de senha nova.",
+          "por_que": "Sem essas quatro contas a IA não tem onde guardar, publicar nem rodar nada do que vocês montam nos próximos passos.",
+          "passos": [
+            "Confirme que a assinatura paga do ChatGPT está ativa e entre no aplicativo.",
+            "Crie a sua conta no GitHub (github.com) com um e-mail que você usa todo dia.",
+            "Entre no Supabase (supabase.com) clicando em \"Continue with GitHub\".",
+            "Entre na Vercel (vercel.com) também com \"Continue with GitHub\".",
+            "Se algum site pedir uma senha nova, pare e chame o professor: com o GitHub não precisa."
+          ],
+          "comando": "Vou criar as contas do curso: ChatGPT (já tenho a assinatura paga), GitHub, Supabase e Vercel. Me guie uma conta por vez, em linguagem simples, usando \"Continue with GitHub\" no Supabase e na Vercel. Não peça senha no chat: eu digito direto nos sites. No fim, confira comigo se consigo entrar nas quatro.",
+          "prova": "Você consegue entrar no ChatGPT, no GitHub, no Supabase e na Vercel.",
+          "prazo_dias": 0,
+          "executor_padrao": "pessoa",
+          "feita_na_instalacao": true
+        },
+        {
+          "chave": "conectores",
+          "ordem": 2,
+          "titulo": "Ligar os conectores",
+          "objetivo": "O aplicativo enxerga o banco e a hospedagem.",
+          "instrucao": "No app do ChatGPT/Codex, ligue os conectores do Supabase e da Vercel e autorize cada um quando o app pedir; senha nunca vai no chat. O GitHub não usa conector: o login dele é pelo terminal (gh), que a IA conduz na etapa do GitHub do instalador, e o conector do GitHub é opcional, só de leitura.",
+          "por_que": "Sem os conectores do Supabase e da Vercel autorizados o aplicativo não enxerga o seu banco nem a sua hospedagem, e a IA não consegue trabalhar neles por você.",
+          "passos": [
+            "Abra o aplicativo do ChatGPT/Codex e vá em Plugins (botão +).",
+            "Procure o conector do Supabase e clique para conectar.",
+            "Autorize no navegador quando o aplicativo pedir: a senha você digita direto no site.",
+            "Repita o mesmo com o conector da Vercel.",
+            "O GitHub não precisa de conector: a IA faz o login dele pelo terminal (gh), no instalador. O conector do GitHub é opcional e só lê.",
+            "Confira se o Supabase e a Vercel aparecem como ligados. Se algum não pedir login agora, não reinstale: autorize no primeiro uso."
+          ],
+          "comando": "Vou ligar os conectores do Supabase e da Vercel no aplicativo (aba Plugins, botão +). Me guie clique a clique e, quando eu disser que terminei, confira se os dois aparecem como ligados. O GitHub eu ligo depois pelo terminal (gh), no instalador. Não peça senha: eu faço o login direto no navegador.",
+          "prova": "Os conectores do Supabase e da Vercel aparecem como ligados no app do ChatGPT/Codex.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "contas",
+          "feita_na_instalacao": true
+        },
+        {
+          "chave": "config-codex",
+          "ordem": 3,
+          "titulo": "Configurar o Codex",
+          "objetivo": "Codex pronto para trabalhar com segurança na pasta da empresa.",
+          "instrucao": "Abra as configurações do Codex e deixe-o trabalhando só dentro da pasta da empresa, pedindo a sua aprovação antes de qualquer coisa fora dela.",
+          "por_que": "Limitar o Codex à pasta da empresa e exigir a sua aprovação para o resto evita que ele mexa em arquivos seus que não têm a ver com o trabalho.",
+          "passos": [
+            "Abra as configurações do Codex.",
+            "Deixe o acesso só à pasta de trabalho da empresa, não ao computador inteiro.",
+            "Marque para ele pedir a sua aprovação antes de qualquer ação fora dessa pasta.",
+            "Salve e volte à tela principal para conferir."
+          ],
+          "comando": "Quero deixar o Codex seguro. Me mostre, passo a passo, onde ficam as configurações de acesso e de aprovação no aplicativo e como deixá-lo trabalhando só dentro da pasta da empresa, pedindo a minha aprovação para qualquer coisa fora dela. Depois me peça para confirmar na tela.",
+          "prova": "Nas configurações, o Codex está limitado à pasta de trabalho e pede aprovação para o resto.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "conectores",
+          "feita_na_instalacao": true
+        },
+        {
+          "chave": "clonar-repo",
+          "ordem": 4,
+          "titulo": "Baixar a cópia do sistema",
+          "objetivo": "A base do sistema da empresa no seu computador.",
+          "instrucao": "Peça ao Codex para baixar a cópia do sistema do curso pro seu computador, numa pasta nova com o nome da sua empresa, e abri-la como projeto.",
+          "por_que": "Sem a pasta da empresa no seu computador a IA não tem onde trabalhar nem onde guardar o que cria.",
+          "passos": [
+            "Abra um chat novo no Codex.",
+            "Cole o comando abaixo e deixe a IA baixar a cópia.",
+            "Escolha a pasta nova, com o nome da sua empresa.",
+            "Abra essa pasta como projeto no Codex.",
+            "Confira se os arquivos do sistema apareceram dentro dela."
+          ],
+          "comando": "Baixe para o meu computador a cópia do repositório do curso (o endereço que o professor passou), numa pasta nova com o nome da minha empresa, e abra essa pasta como projeto. Depois liste o que veio dentro para eu conferir.",
+          "prova": "A pasta existe no seu computador, aberta como projeto, com os arquivos do sistema dentro.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "config-codex",
+          "feita_na_instalacao": true
+        },
+        {
+          "chave": "instalador",
+          "ordem": 5,
+          "titulo": "Rodar o instalador",
+          "objetivo": "A estrutura da empresa criada, com o manual de instruções (AGENTS.md) e os primeiros agentes.",
+          "instrucao": "Num chat novo do projeto, digite $ e escolha polozi-instalador, depois responda o nome da empresa, o seu nome e o seu e-mail. Ele mostra o que vai criar e só segue quando você disser \"pode criar\".",
+          "por_que": "O instalador transforma a pasta baixada na estrutura da sua empresa e escreve as regras que a IA vai seguir daqui para a frente.",
+          "passos": [
+            "Abra um chat novo dentro do projeto.",
+            "Cole o comando abaixo (ou digite $ e escolha polozi-instalador).",
+            "Responda as três perguntas: nome da empresa, o seu nome e o seu e-mail.",
+            "Leia o que ele vai criar e só diga \"pode criar\" se estiver certo.",
+            "Quando ele pedir, confie na pasta no Codex; no fim da estrutura, em Configurações, Hooks, escolha \"Confiar em tudo\" para a pasta da empresa."
+          ],
+          "comando": "$polozi-instalador Quero instalar a estrutura da minha empresa. Faça as três perguntas (nome da empresa, meu nome e meu e-mail), mostre o que vai criar e só crie quando eu disser \"pode criar\".",
+          "prova": "A pasta ganha a estrutura da empresa, o manual de instruções (AGENTS.md) e os primeiros agentes.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "clonar-repo",
+          "feita_na_instalacao": true
+        },
+        {
+          "chave": "banco",
+          "ordem": 6,
+          "titulo": "Montar o banco de dados",
+          "objetivo": "A memória da empresa criada e trancada.",
+          "instrucao": "Peça ao instalador para continuar de onde parou até o banco ficar pronto: ele guarda o código no seu GitHub, conecta o Supabase e monta as tabelas pelo GitHub, nunca na mão. Você só autoriza o conector e copia as chaves pelo comando que ele indicar: elas nunca vão no chat.",
+          "por_que": "O banco é onde a empresa guarda tarefas, marca e agentes; trancado por login, ninguém de fora lê nada.",
+          "passos": [
+            "Cole o comando abaixo no chat do projeto; o instalador continua da etapa que falta.",
+            "Se o projeto ainda não existe, crie no painel do Supabase o projeto com o nome que o instalador indicar e guarde a senha do banco.",
+            "Autorize o conector do Supabase quando o aplicativo pedir.",
+            "Copie cada chave do painel pelo comando que a IA mostrar: o valor vai direto para o arquivo, nunca para o chat.",
+            "Acompanhe a IA montar as tabelas pelo GitHub e esperar a montagem ficar verde; quando ela pedir, libere os schemas tarefas e organograma no painel.",
+            "Depois de pronto, qualquer mudança no banco passa pela skill tecnologia-mudar-banco, uma mudança por vez e conferida antes de entrar."
+          ],
+          "comando": "$polozi-instalador Continue a instalação de onde parou até o banco ficar pronto: conecte o Supabase e monte as tabelas pelo GitHub, nunca na mão. Guarde as chaves sem me mostrar. Eu autorizo o conector e copio cada chave pelo comando que você indicar. No fim, me mostre a montagem verde no GitHub.",
+          "prova": "A IA mostra a montagem das tabelas terminando verde no GitHub e o Supabase com as tabelas do sistema criadas.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "instalador",
+          "feita_na_instalacao": true
+        },
+        {
+          "chave": "sistema-no-ar",
+          "ordem": 7,
+          "titulo": "Colocar o sistema no ar",
+          "objetivo": "O sistema da empresa publicado, com login e ligado ao banco.",
+          "instrucao": "Peça ao instalador para continuar na etapa do sistema: ele cria a sua empresa e o seu login no banco, sobe uma prévia, testa como usuário e só depois coloca no ar. Você faz o primeiro login pelo e-mail de convite.",
+          "por_que": "Com o sistema no ar você e a sua equipe acessam a empresa de qualquer lugar, até do celular, só com login.",
+          "passos": [
+            "Cole o comando abaixo no chat do projeto.",
+            "Acompanhe a IA criando a sua empresa e o seu login no banco e subindo uma prévia do sistema.",
+            "Veja a IA testar a prévia como se fosse um usuário e espere ela dizer que está tudo certo antes de publicar.",
+            "Abra o e-mail de convite que chegar e defina a sua senha, duas vezes.",
+            "Entre pelo celular e veja o Início com o Cronograma.",
+            "Daqui pra frente, cada mudança no sistema vai para o ar pela skill tecnologia-publicar, sempre com uma prévia testada antes."
+          ],
+          "comando": "$polozi-instalador Continue a instalação na etapa do sistema: crie a minha empresa e o meu login no banco, suba uma prévia, teste como usuário e só depois publique. Me avise quando o e-mail de convite for enviado e me passe o endereço do sistema.",
+          "prova": "Você abre o endereço do sistema no celular, entra com o seu login e vê o Início com o Cronograma.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "banco"
+        },
+        {
+          "chave": "dossie-persona-marca",
+          "ordem": 8,
+          "titulo": "Gravar dossiê, persona e marca",
+          "objetivo": "A empresa gravada no banco e visível no sistema.",
+          "instrucao": "Registre o dossiê com a skill polozi-registrar-dossie e publique-o; depois peça a persona do cliente ideal e a identidade visual com as skills marketing-persona e marketing-identidade e, se você tem logo, o tratamento dele com a skill marketing-logo. Os três documentos passam a aparecer em Marca no sistema.",
+          "por_que": "Com dossiê, persona e identidade visual gravados, todo time passa a escrever e decidir com a sua cara e o seu cliente, não com texto genérico.",
+          "passos": [
+            "Separe a transcrição das 71 perguntas do dossiê que você gravou com o professor.",
+            "Cole o comando abaixo e anexe a transcrição quando a IA pedir.",
+            "Confirme a prévia do registro do dossiê, uma única vez, e diga sim quando a IA perguntar se pode publicá-lo no sistema.",
+            "Responda as perguntas da IA para criar a persona do cliente ideal e a identidade visual; se você tem o arquivo do logo, ela também trata o logo.",
+            "Se a persona ou a marca já estavam aprovadas antes de o banco existir, peça: \"publica a persona e a marca\".",
+            "Abra Marca no sistema e confira as três abas: Dossiê, Persona e Identidade e voz."
+          ],
+          "comando": "Registre o meu dossiê com $polozi-registrar-dossie (vou anexar a transcrição das 71 perguntas) e publique-o no sistema. Depois use $marketing-persona para criar a persona do meu cliente ideal e $marketing-identidade para criar a minha identidade visual. Se eu tiver um logo, use $marketing-logo para tratá-lo. Publique cada documento no sistema para aparecer em Marca.",
+          "prova": "Em Marca aparecem os 3 documentos: o dossiê (aba Dossiê), a persona do cliente ideal (aba Persona) e a identidade visual com o tom de voz (aba Identidade e voz).",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "sistema-no-ar"
+        },
+        {
+          "chave": "whatsapp",
+          "ordem": 9,
+          "titulo": "Conectar o WhatsApp",
+          "objetivo": "Times recebendo e respondendo pelo WhatsApp.",
+          "instrucao": "Peça ao Codex para conectar o seu WhatsApp, leia o QR Code pelo celular (Aparelhos conectados) e digite ENVIAR no primeiro teste.",
+          "por_que": "Com o WhatsApp conectado a IA da empresa passa a enviar mensagens pelo seu número e você consegue falar com ela direto do celular.",
+          "passos": [
+            "Cole o comando abaixo no chat do projeto.",
+            "Espere a página do QR Code abrir no navegador.",
+            "No celular, abra o WhatsApp, vá em Aparelhos conectados e leia o QR Code.",
+            "Quando a IA avisar que conectou, digite ENVIAR no primeiro teste.",
+            "Confira se a mensagem de teste chegou no seu próprio WhatsApp."
+          ],
+          "comando": "Conecte o meu WhatsApp ao sistema: rode npm run conectar na pasta sistemas/whatsapp, abra a página do QR Code e me avise quando conectar. Eu leio o QR pelo celular (WhatsApp, Aparelhos conectados) e depois confirmo o primeiro teste digitando ENVIAR. Me repasse só o resultado.",
+          "prova": "A mensagem de teste chega no seu próprio WhatsApp.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "dossie-persona-marca"
+        },
+        {
+          "chave": "times",
+          "ordem": 10,
+          "titulo": "Conferir os times e chamar o primeiro",
+          "objetivo": "Os quatro times do kit (Native AI, Tecnologia, PMO e Marketing) instalados e o primeiro chamado.",
+          "instrucao": "Os quatro times do kit (Native AI, Tecnologia, PMO e Marketing) já vêm instalados no repositório. Peça à IA para conferir cada um e depois chame o primeiro pelo nome.",
+          "por_que": "Conferir primeiro garante que a IA enxerga os times que vão trabalhar com você antes de você precisar deles de verdade.",
+          "passos": [
+            "Cole o comando abaixo no chat do projeto.",
+            "Veja a IA conferir os quatro times: Native AI, Tecnologia, PMO e Marketing.",
+            "Se algum aparecer como não instalado, peça para ela instalar e conferir de novo.",
+            "Escolha um time para chamar e faça um pedido pequeno, só para ver ele responder.",
+            "Confira se o time respondeu e se os agentes aparecem em Time de Agentes."
+          ],
+          "comando": "$polozi-instalar-time Confira se os quatro times do kit (Native AI, Tecnologia, PMO e Marketing) estão instalados, um por vez (opção --verificar), e me mostre o resultado de cada um. Depois, com $polozi-chamar-time, chame um deles com um pedido pequeno só para eu ver que responde.",
+          "prova": "A conferência (--verificar) dos quatro times passa, ou o AGENTS.md lista os quatro, e o time chamado responde.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "whatsapp"
+        },
+        {
+          "chave": "primeiro-time",
+          "ordem": 11,
+          "titulo": "Primeiro time respondendo",
+          "objetivo": "Uma tarefa real feita por um time.",
+          "instrucao": "Peça uma tarefa real a um dos times e registre a entrega.",
+          "por_que": "Uma tarefa de verdade, com a entrega registrada, mostra se o time ajuda no seu negócio e deixa a prova guardada.",
+          "passos": [
+            "Escolha uma tarefa real da sua empresa que caiba em uma conversa.",
+            "Cole o comando abaixo, trocando o texto entre colchetes pela sua tarefa.",
+            "Responda o que a IA perguntar sobre o objetivo e o formato da entrega.",
+            "Leia a entrega e peça os ajustes que precisar.",
+            "Aprove e peça para a IA registrar a entrega."
+          ],
+          "comando": "$polozi-chamar-time Chame um dos times instalados para esta tarefa real da minha empresa: [escreva aqui a tarefa]. Antes de começar, me pergunte o objetivo e o formato da entrega. Quando eu aprovar, registre o que foi entregue em operacao/CHANGELOG.md.",
+          "prova": "Existe uma entrega real de um time, aprovada por você e registrada no CHANGELOG da empresa.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "times"
+        },
+        {
+          "chave": "gate-d1",
+          "ordem": 12,
+          "titulo": "Provar o gate do Dia 1",
+          "objetivo": "Eixo A no nível 2.",
+          "instrucao": "Confira o gate de garantia do Dia 1 com o professor.",
+          "por_que": "O gate é a conferência que mostra que o que foi montado no Dia 1 funciona de verdade, antes de você seguir para o Dia 2.",
+          "passos": [
+            "Peça à IA a lista de provas do Dia 1, uma por passo do cronograma.",
+            "Confira cada prova na tela ou no arquivo que a IA indicar.",
+            "Marque o que falta e peça à IA para resolver antes da conferência.",
+            "Mostre a lista ao professor e peça a conferência do gate."
+          ],
+          "comando": "Monte a lista de provas do Dia 1: para cada passo do curso, mostre a prova de que foi feito (a tela, o arquivo ou a resposta). Diga o que ainda falta, para eu mostrar ao professor e conferir o gate do Dia 1.",
+          "prova": "O professor confere a lista e confirma o gate do Dia 1 (eixo A no nível 2).",
+          "prazo_dias": 0,
+          "executor_padrao": "pessoa",
+          "depende_de": "primeiro-time"
+        }
+      ]
+    },
+    {
+      "chave": "d2",
+      "ordem": 2,
+      "titulo": "Dia 2: times operando",
+      "objetivo": "Times em rotinas e nas áreas.",
+      "trilha": "curso",
+      "fase": "D2",
+      "inicio_dias": 1,
+      "atividades": [
+        {
+          "chave": "rotinas",
+          "ordem": 1,
+          "titulo": "Agendar rotinas",
+          "objetivo": "Rotinas rodando sozinhas.",
+          "instrucao": "Agende as rotinas diárias dos times.",
+          "por_que": "Rotina agendada faz o trabalho acontecer todo dia sem você precisar abrir o chat e pedir.",
+          "passos": [
+            "Escolha uma rotina diária pequena para cada time (por exemplo, a vigília diária do sistema, tecnologia-vigiar).",
+            "Cole o comando abaixo para a IA te guiar na tarefa agendada do aplicativo.",
+            "No aplicativo, crie a tarefa com modo de execução Local e permissão de gravação só na pasta do projeto.",
+            "Defina o horário e o texto da rotina, como a IA indicar.",
+            "Rode cada rotina uma vez à mão para ver o resultado."
+          ],
+          "comando": "Quero agendar uma rotina diária para cada time instalado. Para cada um, sugira UMA rotina pequena e me guie para criar a tarefa agendada no aplicativo, seguindo o manual de sessões (manual/sessoes-e-contexto.md): modo Local e permissão de gravação só na pasta do projeto. Depois rode cada rotina uma vez à mão para eu ver o resultado.",
+          "prova": "Cada time tem uma tarefa agendada na lista do aplicativo e a rotina rodou pelo menos uma vez.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla"
+        },
+        {
+          "chave": "areas",
+          "ordem": 2,
+          "titulo": "Times nas áreas",
+          "objetivo": "Marketing e gestão de tarefas com time operando.",
+          "instrucao": "Ponha os times Marketing e PMO para operar uma rotina real cada: Marketing na comunicação da empresa e PMO nas tarefas da semana.",
+          "por_que": "Um time só mostra valor quando faz uma rotina real da sua empresa, não um exemplo de aula.",
+          "passos": [
+            "Escolha uma rotina real de marketing (por exemplo, a semana de conteúdo) e uma de gestão (planejar e revisar a semana).",
+            "Cole o comando abaixo para chamar o time de Marketing na primeira rotina.",
+            "Chame o time PMO para a segunda: planejar a semana e revisar o que andou.",
+            "Leia o que cada time entregou e peça os ajustes.",
+            "Peça para a IA registrar o que cada time entregou."
+          ],
+          "comando": "$polozi-chamar-time Chame o time de Marketing para esta rotina real da minha empresa: [escreva a rotina]. Depois chame o time PMO: com $pmo-semana planeje a minha semana e com $pmo-revisao-semanal revise o que andou. Registre o que cada time entregou.",
+          "prova": "Marketing e PMO entregaram uma rotina real cada e a entrega de cada um está registrada.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "rotinas"
+        }
+      ]
+    },
+    {
+      "chave": "d3",
+      "ordem": 3,
+      "titulo": "Dia 3: o primeiro time seu",
+      "objetivo": "Time autoral criado e plano de 90 dias em tarefas.",
+      "trilha": "curso",
+      "fase": "D3",
+      "inicio_dias": 2,
+      "atividades": [
+        {
+          "chave": "fabrica",
+          "ordem": 1,
+          "titulo": "Criar o primeiro time autoral",
+          "objetivo": "Time novo testado com caso real, auditado e ativo.",
+          "instrucao": "Use a skill native-ai-construir, do time Native AI, para criar um time para a área que mais pesa hoje. Ela define com você o critério de sucesso e os casos de teste, constrói, prova e entrega a proposta pronta para você instalar.",
+          "por_que": "Um time feito sob medida para a área que mais pesa na sua empresa resolve o seu problema, não um problema genérico.",
+          "passos": [
+            "Escolha a área que mais pesa hoje, a que mais toma tempo ou gera erro.",
+            "Cole o comando abaixo e responda uma pergunta por vez.",
+            "Assine o critério de sucesso e os casos de teste que a IA propuser.",
+            "Aprove o desenho e o plano quando entender o que o time vai fazer.",
+            "Veja a prova com um caso real e o veredito do avaliador; só então instale o time."
+          ],
+          "comando": "$native-ai-construir Quero criar o primeiro time autoral da minha empresa para a área que mais pesa hoje: [escreva a área e o problema]. Conduza o processo completo comigo, uma pergunta por vez: critério de sucesso, casos de teste, desenho, construção, prova com um caso real e veredito. Só instale quando eu aprovar.",
+          "prova": "O time novo passou nos casos de teste, recebeu o veredito do avaliador e está instalado e respondendo a um caso real.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla"
+        },
+        {
+          "chave": "plano90",
+          "ordem": 2,
+          "titulo": "Plano de 90 dias em tarefas",
+          "objetivo": "Trilha de 90 dias visível no Cronograma.",
+          "instrucao": "Revise as tarefas da trilha de 90 dias e defina os donos.",
+          "por_que": "Tarefa com dono e prazo é a diferença entre um plano de 90 dias que anda e um que fica no papel.",
+          "passos": [
+            "Abra o Cronograma no sistema e veja as cinco fases do plano de 90 dias.",
+            "Cole o comando abaixo para a IA mostrar a trilha e o que vence primeiro.",
+            "Para cada tarefa da primeira semana, escolha quem é o dono.",
+            "Peça à IA para gravar os donos no quadro de tarefas, uma por vez.",
+            "Confira no Cronograma que as tarefas da semana 1 têm dono e prazo."
+          ],
+          "comando": "$pmo-trilha Mostre a trilha de 90 dias da minha empresa: a fase atual, o que vence primeiro e o que está sem dono. Depois, com $pmo-quadro, me ajude a definir o dono de cada tarefa da primeira semana e grave no quadro, uma por vez, com o meu sim.",
+          "prova": "O Cronograma mostra a trilha de 90 dias e as tarefas da semana 1 têm dono definido.",
+          "prazo_dias": 0,
+          "executor_padrao": "pessoa",
+          "depende_de": "fabrica"
+        }
+      ]
+    },
+    {
+      "chave": "clareza",
+      "ordem": 4,
+      "titulo": "Semana 1: Clareza",
+      "objetivo": "Confirmar o nível 2 e escolher as áreas com dono.",
+      "trilha": "plano90",
+      "fase": "clareza",
+      "inicio_dias": 3,
+      "atividades": [
+        {
+          "chave": "painel",
+          "ordem": 1,
+          "titulo": "Rodar o painel de nota",
+          "objetivo": "Nota 0-10 por dimensão e área e o que falta, gravados.",
+          "instrucao": "Rode o painel de maturidade pela primeira vez e salve o resultado.",
+          "por_que": "A primeira nota mostra de onde você parte e o que falta, e é com ela que você compara o seu avanço nas próximas semanas.",
+          "passos": [
+            "Separe as dimensões e as áreas que o professor passou no curso.",
+            "Cole o comando abaixo para a IA montar o painel com você.",
+            "Responda o que ela perguntar sobre como a empresa trabalha hoje.",
+            "Confira a nota de 0 a 10 de cada dimensão e de cada área, com o que falta para subir.",
+            "Peça para a IA salvar o resultado."
+          ],
+          "comando": "Rode pela primeira vez o painel de maturidade da minha empresa, com as dimensões e as áreas do curso. Me pergunte o que precisar, dê uma nota de 0 a 10 para cada dimensão e cada área, diga o que falta para subir e salve o resultado em um arquivo com a data de hoje.",
+          "prova": "O resultado do painel está salvo, com nota de 0 a 10 por dimensão e por área e o que falta.",
+          "prazo_dias": 7,
+          "executor_padrao": "dupla"
+        },
+        {
+          "chave": "donos",
+          "ordem": 2,
+          "titulo": "Escolher 4 áreas com dono",
+          "objetivo": "4 áreas universais com dono humano nomeado.",
+          "instrucao": "Escolha 4 áreas universais e nomeie um dono humano para cada uma.",
+          "por_que": "Área sem dono humano não anda: alguém precisa responder pelo resultado quando a IA entrega.",
+          "passos": [
+            "Veja a lista das áreas universais do curso, como Comercial, Atendimento, Gestão e Operações.",
+            "Escolha as 4 que mais pesam na sua empresa.",
+            "Para cada uma, escolha uma pessoa que responde por ela (pode ser você).",
+            "Peça à IA para registrar os quatro donos."
+          ],
+          "comando": "Me ajude a escolher 4 áreas universais para a minha empresa (como Comercial, Atendimento, Gestão e Operações). Para cada área, pergunte quem é o dono humano e registre os quatro donos num arquivo da pasta operacao/, me dizendo onde ficou. Só registre o que eu confirmar.",
+          "prova": "Há 4 áreas registradas, cada uma com um dono humano nomeado.",
+          "prazo_dias": 7,
+          "executor_padrao": "pessoa"
+        },
+        {
+          "chave": "linha-base",
+          "ordem": 3,
+          "titulo": "Medir a linha de base",
+          "objetivo": "Horas humanas de 3 processos medidas.",
+          "instrucao": "Meça quantas horas por mês as pessoas gastam em 3 processos.",
+          "por_que": "Sem medir quantas horas as pessoas gastam hoje, você não consegue provar depois quanto a IA economizou.",
+          "passos": [
+            "Escolha 3 processos que tomam tempo da equipe, como orçamento, atendimento e relatório.",
+            "Para cada um, anote quantas horas por mês as pessoas gastam hoje.",
+            "Cole o comando abaixo e passe os números para a IA conferir.",
+            "Peça para a IA salvar a medição com a data."
+          ],
+          "comando": "Vou medir a linha de base da minha empresa. Me ajude a escolher 3 processos que tomam tempo da equipe e, para cada um, pergunte quantas horas por mês as pessoas gastam hoje e quem faz. Salve a medição num arquivo com a data de hoje, sem inventar nenhum número que eu não tenha dito.",
+          "prova": "Há um arquivo com as horas humanas por mês de 3 processos, medidas e com a data.",
+          "prazo_dias": 7,
+          "executor_padrao": "pessoa"
+        },
+        {
+          "chave": "ritual-semanal",
+          "ordem": 4,
+          "titulo": "Ligar a revisão semanal das tarefas",
+          "objetivo": "Revisão semanal das tarefas feita uma vez e agendada para toda segunda.",
+          "instrucao": "Chame a skill pmo-revisao-semanal para fazer a primeira revisão e depois agende-a para toda segunda de manhã (tarefa agendada do aplicativo).",
+          "por_que": "A revisão semanal de 30 minutos é o que mantém o quadro de tarefas limpo e a semana planejada, em vez de só crescer.",
+          "passos": [
+            "Cole o comando abaixo para fazer a primeira revisão agora, com a IA.",
+            "Responda o que andou, o que parou e o que entra na próxima semana.",
+            "Confira o relatório que a IA gravar em operacao/pmo/revisoes/.",
+            "Peça para a IA te guiar na tarefa agendada de toda segunda de manhã (modo Local).",
+            "Confirme que a tarefa aparece na lista de tarefas agendadas do aplicativo."
+          ],
+          "comando": "$pmo-revisao-semanal Faça comigo a primeira revisão semanal das minhas tarefas agora. No fim, me guie para agendar essa revisão para toda segunda de manhã, como tarefa agendada do aplicativo (modo Local, só gerando o relatório).",
+          "prova": "Existe operacao/pmo/revisoes/<semana>.md da primeira revisão e a tarefa agendada de segunda aparece na lista de tarefas agendadas.",
+          "prazo_dias": 7,
+          "executor_padrao": "dupla"
+        }
+      ]
+    },
+    {
+      "chave": "fundacao",
+      "ordem": 5,
+      "titulo": "Semanas 2-3: Fundação",
+      "objetivo": "Nível 2 da empresa fechado.",
+      "trilha": "plano90",
+      "fase": "fundacao",
+      "inicio_dias": 10,
+      "atividades": [
+        {
+          "chave": "gates-fase1",
+          "ordem": 1,
+          "titulo": "Fechar os gates que faltaram",
+          "objetivo": "6 áreas universais na fase 2.",
+          "instrucao": "Feche os gates da fase 1 para 2 que ficaram abertos.",
+          "por_que": "Sem fechar esses gates a empresa não passa para o nível 2 e as áreas ficam presas na fase 1.",
+          "passos": [
+            "Peça à IA a lista dos gates da fase 1 para a fase 2 que ficaram abertos.",
+            "Escolha os que cabem nestas duas semanas, começando pelos mais simples.",
+            "Para cada gate, faça com a IA o que ele pede (um arquivo, uma contagem, uma regra).",
+            "Peça à IA para anotar a prova de cada gate fechado."
+          ],
+          "comando": "Liste os gates da fase 1 para a fase 2 que ficaram abertos nas áreas da minha empresa. Para cada um, diga o que falta e o que eu preciso fazer, e me ajude a fechar um por vez, anotando a prova de cada gate fechado.",
+          "prova": "As áreas universais estão na fase 2 e cada gate fechado tem a prova anotada.",
+          "prazo_dias": 14,
+          "executor_padrao": "dupla"
+        },
+        {
+          "chave": "gates-permanentes",
+          "ordem": 2,
+          "titulo": "Gravar os 6 gates permanentes",
+          "objetivo": "Gates no AGENTS.md.",
+          "instrucao": "Escreva os 6 gates permanentes no AGENTS.md da empresa.",
+          "por_que": "São as seis decisões que ficam sempre com você, mesmo quando a IA faz quase tudo; escritas no AGENTS.md, nenhuma IA pode pular.",
+          "passos": [
+            "Liste as seis decisões que só uma pessoa toma: dinheiro que sai, contrato que assina, admissão e demissão, promessa a cliente, envio externo em massa e dado que não volta.",
+            "Peça à IA para escrever cada uma como regra proposta em operacao/DECISOES.md.",
+            "Leia as seis regras e aprove as que estão certas.",
+            "Peça para a IA aplicar as aprovadas no AGENTS.md pela skill de regras."
+          ],
+          "comando": "Escreva como propostas em operacao/DECISOES.md os 6 gates permanentes da minha empresa, as decisões que ficam sempre com uma pessoa: dinheiro que sai, contrato que assina, admissão e demissão, promessa a cliente, envio externo em massa e dado que não volta. Eu aprovo uma a uma e depois você aplica no AGENTS.md com $polozi-aplicar-regra.",
+          "prova": "Os 6 gates permanentes estão escritos na seção de regras do AGENTS.md da empresa.",
+          "prazo_dias": 14,
+          "executor_padrao": "dupla"
+        },
+        {
+          "chave": "backup",
+          "ordem": 3,
+          "titulo": "Provar a restauração do backup",
+          "objetivo": "Backup restaurado com sucesso.",
+          "instrucao": "Restaure um backup e registre a prova.",
+          "por_que": "Backup que nunca foi restaurado é só esperança: só a restauração mostra que você consegue voltar se perder o banco.",
+          "passos": [
+            "Cole o comando abaixo no chat do projeto.",
+            "Deixe a IA tirar a cópia do banco; a senha do banco só você digita, quando ela pedir.",
+            "Acompanhe a restauração da cópia num banco de teste no seu computador, nunca no de produção.",
+            "Confira o número de tabelas que voltaram.",
+            "Peça para a IA registrar o resultado em operacao/vigilancia/BACKUPS.md."
+          ],
+          "comando": "$tecnologia-vigiar Tire a cópia do banco da minha empresa e prove que ela restaura: restaure num banco de teste no meu computador (nunca no de produção), conte as tabelas que voltaram e registre o resultado em operacao/vigilancia/BACKUPS.md. Se faltar Docker ou a senha do banco, me diga o que falta, sem fingir que fez.",
+          "prova": "Há uma linha em operacao/vigilancia/BACKUPS.md com \"restaurado em\" e a data, e o número de tabelas que voltaram.",
+          "prazo_dias": 14,
+          "executor_padrao": "dupla"
+        }
+      ]
+    },
+    {
+      "chave": "ativacao",
+      "ordem": 6,
+      "titulo": "Semanas 4-7: Ativação",
+      "objetivo": "Nível 3.",
+      "trilha": "plano90",
+      "fase": "ativacao",
+      "inicio_dias": 24,
+      "atividades": [
+        {
+          "chave": "series",
+          "ordem": 1,
+          "titulo": "Rotinas viram série",
+          "objetivo": "Rotinas diárias registradas sem falha.",
+          "instrucao": "Garanta que as rotinas diárias rodam e ficam registradas todo dia.",
+          "por_que": "Uma rotina que roda todo dia e deixa registro é a prova de que o time funciona sem você pedir.",
+          "passos": [
+            "Liste as rotinas diárias que você agendou nos times.",
+            "Peça à IA para conferir em quais dias cada rotina rodou e deixou registro.",
+            "Corrija com a IA as rotinas que falharam ou pularam dias.",
+            "Repita a conferência durante a semana até ficar sem falha."
+          ],
+          "comando": "Confira as rotinas diárias agendadas dos meus times: em quais dias da última semana cada uma rodou e deixou registro. Liste as falhas e os dias pulados, corrija comigo o que for possível e me diga o que depende de eu manter o computador ligado.",
+          "prova": "As rotinas diárias têm registro todos os dias, sem falha, por pelo menos uma semana.",
+          "prazo_dias": 28,
+          "executor_padrao": "agente"
+        },
+        {
+          "chave": "custo",
+          "ordem": 2,
+          "titulo": "Custo por tarefa",
+          "objetivo": "Custo registrado em 80% das execuções.",
+          "instrucao": "Meça o custo por tarefa em 3 tarefas e registre o custo das execuções.",
+          "por_que": "Saber quanto cada tarefa custa é o que permite decidir onde vale usar IA e onde não vale.",
+          "passos": [
+            "Escolha 3 tarefas que os times fazem com frequência.",
+            "Para cada uma, anote quanto de uso foi gasto numa execução (o painel de uso do aplicativo mostra).",
+            "Peça à IA para calcular e registrar o custo por tarefa.",
+            "Registre o custo das próximas execuções, e escreva \"não medido\" onde faltar o número."
+          ],
+          "comando": "Me ajude a medir o custo por tarefa de 3 tarefas que os meus times fazem sempre. Para cada uma, pergunte quanto de uso foi gasto numa execução (vou olhar no painel de uso do aplicativo), calcule e registre o custo num arquivo com a data. Onde eu não tiver o número, escreva \"não medido\" e não invente.",
+          "prova": "O custo por tarefa de 3 tarefas está registrado, e o custo está anotado em pelo menos 80% das execuções.",
+          "prazo_dias": 28,
+          "executor_padrao": "dupla"
+        },
+        {
+          "chave": "eval",
+          "ordem": 3,
+          "titulo": "Primeira suíte de casos",
+          "objetivo": "Suíte de 10 casos rodando.",
+          "instrucao": "Monte uma suíte de 10 casos para um time e rode.",
+          "por_que": "Uma suíte de casos mostra, com nota, se o time continua acertando depois de qualquer mudança.",
+          "passos": [
+            "Escolha o time da suíte, por exemplo o que você criou no Dia 3.",
+            "Cole o comando abaixo para a IA propor 10 casos reais, com o resultado esperado de cada um.",
+            "Revise os casos e aprove os que representam o trabalho de verdade.",
+            "Rode a suíte e leia a nota de cada caso.",
+            "Peça à IA para guardar a suíte e o resultado."
+          ],
+          "comando": "$native-ai-construir Monte uma suíte de 10 casos para o time [escreva o nome do time], com o resultado esperado de cada caso, e rode a suíte com o avaliador do time Native AI. Me mostre a nota de cada caso e o que reprovou, e guarde a suíte e o resultado nos arquivos da tarefa.",
+          "prova": "Existe uma suíte de 10 casos para um time, rodada, com a nota de cada caso guardada.",
+          "prazo_dias": 28,
+          "executor_padrao": "dupla"
+        }
+      ]
+    },
+    {
+      "chave": "aplicacao",
+      "ordem": 7,
+      "titulo": "Semanas 8-12: Aplicação",
+      "objetivo": "Nível 4.",
+      "trilha": "plano90",
+      "fase": "aplicacao",
+      "inicio_dias": 52,
+      "atividades": [
+        {
+          "chave": "checagem",
+          "ordem": 1,
+          "titulo": "Checagem semanal verde",
+          "objetivo": "4 semanas seguidas de checagem, auditoria e avaliação.",
+          "instrucao": "Rode toda semana a checagem da estrutura da empresa, a vigília do sistema e a avaliação dos agentes.",
+          "por_que": "Quatro semanas seguidas de checagem verde mostram que o sistema se mantém de pé sem você ficar vigiando.",
+          "passos": [
+            "Escolha um dia fixo da semana para a checagem.",
+            "Cole o comando abaixo para a IA rodar a checagem da estrutura, a vigília do sistema e a avaliação dos agentes.",
+            "Leia o resultado e corrija com a IA o que ficou vermelho.",
+            "Agende o comando para rodar sozinho toda semana.",
+            "Anote cada semana verde até chegar a quatro seguidas."
+          ],
+          "comando": "Faça a checagem semanal da minha empresa: audite a estrutura com $polozi-arrumar-a-casa (só o relatório), rode a vigília do sistema com $tecnologia-vigiar e a avaliação dos agentes. Mostre o resultado de cada uma e o que ficou vermelho, e registre a semana em operacao/.",
+          "prova": "Quatro semanas seguidas com a checagem, a auditoria e a avaliação registradas e verdes.",
+          "prazo_dias": 35,
+          "executor_padrao": "agente"
+        },
+        {
+          "chave": "ia-x-humano",
+          "ordem": 2,
+          "titulo": "Custo IA x humano",
+          "objetivo": "Comparação em 3 processos.",
+          "instrucao": "Compare o custo da IA com o custo humano em 3 processos.",
+          "por_que": "Comparar o custo da IA com o custo da pessoa em 3 processos mostra onde a IA já compensa e onde ainda não.",
+          "passos": [
+            "Pegue os 3 processos da linha de base, com as horas humanas por mês.",
+            "Peça à IA o custo da IA nesses mesmos processos, no mesmo período.",
+            "Compare lado a lado o custo humano e o da IA.",
+            "Registre a conclusão de cada processo: compensa, não compensa ou falta dado."
+          ],
+          "comando": "Compare o custo da IA com o custo humano nos 3 processos da linha de base da minha empresa. Use as horas humanas que medi e o custo por tarefa registrado, mostre lado a lado e conclua, para cada processo, se compensa, não compensa ou falta dado. Não invente número que não foi medido.",
+          "prova": "Há uma comparação do custo da IA com o custo humano em 3 processos, com a conclusão de cada um.",
+          "prazo_dias": 35,
+          "executor_padrao": "dupla"
+        },
+        {
+          "chave": "amostra",
+          "ordem": 3,
+          "titulo": "Amostra humana de 10%",
+          "objetivo": "10% das saídas revisadas por gente.",
+          "instrucao": "Revise 10% das saídas dos agentes e registre.",
+          "por_que": "Uma pessoa conferindo 10% do que os agentes entregam é o que pega erro cedo e mantém a qualidade.",
+          "passos": [
+            "Peça à IA para sortear 10% das saídas dos agentes da última semana.",
+            "Leia cada saída sorteada e marque: boa, com ajuste ou ruim.",
+            "Anote o que errou e por quê.",
+            "Peça à IA para registrar a amostra e a taxa de acerto."
+          ],
+          "comando": "Sorteie 10% das saídas que os meus agentes entregaram na última semana e me mostre uma por vez para eu revisar. Eu digo se está boa, com ajuste ou ruim. No fim, registre a amostra, o resultado de cada saída e a taxa de acerto.",
+          "prova": "Existe um registro de que 10% das saídas dos agentes foram revisadas por uma pessoa, com o resultado de cada uma.",
+          "prazo_dias": 35,
+          "executor_padrao": "pessoa"
+        }
+      ]
+    },
+    {
+      "chave": "escala",
+      "ordem": 8,
+      "titulo": "Semana 13: Escala",
+      "objetivo": "Nível declarado e continuação planejada.",
+      "trilha": "plano90",
+      "fase": "escala",
+      "inicio_dias": 87,
+      "atividades": [
+        {
+          "chave": "nota-final",
+          "ordem": 1,
+          "titulo": "Nota final no painel",
+          "objetivo": "Nível declarado com prova.",
+          "instrucao": "Rode o painel e declare o nível com a prova.",
+          "por_que": "A nota final declara o nível que a empresa conquistou, com prova, e mostra o que ainda falta.",
+          "passos": [
+            "Rode o painel de maturidade de novo, como na semana 1.",
+            "Compare cada nota com a primeira.",
+            "Declare o nível da empresa e anote a prova de cada gate que sustenta a declaração.",
+            "Peça à IA para salvar a nota final."
+          ],
+          "comando": "Rode de novo o painel de maturidade da minha empresa, compare com o resultado da semana 1 e me ajude a declarar o nível, mostrando a prova de cada gate que sustenta a declaração. Não declare nível que não tenha prova. Salve a nota final com a data de hoje.",
+          "prova": "A nota final está salva e o nível declarado tem a prova de cada gate.",
+          "prazo_dias": 7,
+          "executor_padrao": "dupla"
+        },
+        {
+          "chave": "continuacao",
+          "ordem": 2,
+          "titulo": "Plano de continuação",
+          "objetivo": "O que falta para o nível 5 gravado como tarefas.",
+          "instrucao": "Liste o que falta para o nível 5 e grave como tarefas.",
+          "por_que": "Os próximos meses são o que leva a empresa ao nível 5; sem virar tarefa, o plano morre quando o curso acaba.",
+          "passos": [
+            "Peça à IA a trilha atual e o que falta para continuar rumo ao nível 5.",
+            "Escolha o que entra no próximo trimestre, de 3 a 7 prioridades.",
+            "Defina um dono, um prazo e um critério de pronto para cada prioridade.",
+            "Grave as prioridades como tarefas no quadro."
+          ],
+          "comando": "$pmo-trilha Mostre em que fase da trilha a minha empresa está e proponha de 3 a 7 prioridades para o próximo trimestre rumo ao nível 5, cada uma com critério de pronto, prazo e um dono. Depois de eu dizer sim, abra cada uma no quadro com $pmo-quadro.",
+          "prova": "O que falta para o nível 5 está gravado como prioridades do próximo trimestre no quadro, cada uma com dono e prazo.",
+          "prazo_dias": 7,
+          "executor_padrao": "pessoa"
+        }
+      ]
+    }
+  ]
+}
