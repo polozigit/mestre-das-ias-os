@@ -74,7 +74,7 @@ jobs:
           supabase db dump --linked --data-only -f "$A-dados.sql"
           python3 ../../.agents/skills/tecnologia-vigiar/scripts/testar_restauracao.py "$A.sql" --minimo-tabelas "$MINIMO_TABELAS"
           python3 ../../.agents/skills/tecnologia-vigiar/scripts/testar_restauracao.py "$A-dados.sql" --minimo-tabelas 0 --so-dados
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: backup-banco-${{ github.run_id }}
           path: ${{ runner.temp }}/backup/*.sql
