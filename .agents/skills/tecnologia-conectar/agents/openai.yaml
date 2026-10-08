@@ -1,0 +1,7 @@
+interface:
+  display_name: "Tecnologia Conectar"
+  short_description: "Liga a Vercel e o Supabase do sistema e prova o site no ar."
+  default_prompt: "Use $tecnologia-conectar para ligar a Vercel e o Supabase do sistema."
+
+policy:
+  allow_implicit_invocation: false

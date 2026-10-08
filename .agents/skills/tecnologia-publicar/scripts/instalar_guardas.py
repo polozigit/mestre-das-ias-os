@@ -2,11 +2,13 @@
 """Primeira vez neste sistema: liga o caminho seguro de publicação (skill tecnologia-publicar).
 
 Por CLI, liga tudo que faz o caminho seguro de publicação existir: vincula o
-projeto Vercel, conecta o git, gera e publica o token de QA, publica o par de
-login do usuário de QA (quando o dono já o criou), confere a integração
-Supabase -> Vercel (só pelos NOMES), copia os workflows e o dependabot para a
-raiz da Casa, grava os secrets do GitHub e liga o Dependabot. Só então registra
-um resumo (sem valor de segredo) em `operacao/INSTALACAO.md`.
+projeto Vercel pelo nome do sistema (`vercel link --yes --project <slug_os>`, com
+o `slug_os:` de `operacao/INSTALACAO.md`), conecta o git, gera e publica o token
+de QA, publica o par de login do usuário de QA (quando o dono já o criou),
+confere pelos NOMES que as variáveis do Supabase estão na Vercel (quem as grava
+é a skill `tecnologia-conectar`, subcomando `vercel-env`), copia os workflows e o
+dependabot para a raiz da Casa, grava os secrets do GitHub e liga o Dependabot.
+Só então registra um resumo (sem valor de segredo) em `operacao/INSTALACAO.md`.
 
 Stdlib puro (argparse/subprocess/pathlib/secrets/shutil/filecmp/os/sys/
 json/re/tempfile), sem rede própria (quem fala com a rede é `vercel`/`gh`),
@@ -121,9 +123,16 @@ class Contexto:
 
 
 def _rodar(comando: list[str], cwd: Path | None = None, stdin_handle=None) -> subprocess.CompletedProcess | None:
+    # Binário pelo caminho completo: no Windows a CLI da Vercel é `vercel.cmd`, que o
+    # `subprocess` com lista não acha sem o caminho inteiro.
+    executavel = shutil.which(comando[0])
+    if executavel is None:
+        return None
     try:
         return subprocess.run(
-            comando, cwd=str(cwd) if cwd else None, stdin=stdin_handle,
+            [executavel, *comando[1:]], cwd=str(cwd) if cwd else None,
+            # sem handle: STDIN vazio (CLI que pergunta algo recebe EOF em vez de herdar o do processo pai)
+            stdin=stdin_handle if stdin_handle is not None else subprocess.DEVNULL,
             capture_output=True, text=True, timeout=TIMEOUT_PADRAO, check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
@@ -251,14 +260,38 @@ def checar_pre_requisitos(ctx: Contexto) -> Resultado:
 # Passo 2
 
 
+def _ler_slug_os(ctx: Contexto) -> str:
+    """`slug_os:` do frontmatter de `operacao/INSTALACAO.md`, ou "" se faltar ou for
+    inválido. Lido DENTRO do passo (nunca no Contexto): o `--so gravar_secrets` da
+    `7-banco` roda antes de existir projeto e não pode depender dele."""
+    caminho = ctx.casa / "operacao" / "INSTALACAO.md"
+    if not caminho.is_file():
+        return ""
+    frontmatter = re.match(r"---\r?\n(.*?)\r?\n---", caminho.read_text(encoding="utf-8-sig"), re.S)
+    achado = re.search(r"(?m)^slug_os:\s*(\S+)", frontmatter.group(1)) if frontmatter else None
+    slug = achado.group(1) if achado else ""
+    return slug if re.fullmatch(r"[a-z0-9][a-z0-9-]*", slug) else ""
+
+
 def vincular_projeto(ctx: Contexto) -> Resultado:
     if not ctx.projeto.is_dir():
         return Resultado(False, "", mensagem_erro=f"pasta do projeto não existe: {ctx.projeto}")
     project_json = ctx.projeto / ".vercel" / "project.json"
     if not project_json.is_file():
-        resultado = _rodar(["vercel", "link", "--yes"], cwd=ctx.projeto)
+        slug = _ler_slug_os(ctx)
+        if not slug:
+            return Resultado(
+                False, "",
+                mensagem_erro=(
+                    "operacao/INSTALACAO.md sem `slug_os:` válido (letras minúsculas, números e hífen). "
+                    "O projeto da Vercel tem que se chamar como o sistema; volte à etapa 3-casa do instalador."
+                ),
+            )
+        resultado = _rodar(["vercel", "link", "--yes", "--project", slug], cwd=ctx.projeto)
         if resultado is None or resultado.returncode != 0:
-            return Resultado(False, "", mensagem_erro=f"`vercel link --yes` falhou: {_saida(resultado)}")
+            return Resultado(
+                False, "", mensagem_erro=f"`vercel link --yes --project {slug}` falhou: {_saida(resultado)}"
+            )
     if not project_json.is_file() or "projectId" not in project_json.read_text(encoding="utf-8"):
         return Resultado(False, "", mensagem_erro="`.vercel/project.json` sem `projectId` após `vercel link`.")
     return Resultado(
@@ -274,6 +307,10 @@ def vincular_projeto(ctx: Contexto) -> Resultado:
 
 def conectar_git(ctx: Contexto) -> Resultado:
     resultado = _rodar(["vercel", "git", "connect"], cwd=ctx.projeto)
+    saida = _saida(resultado)
+    if "already" in saida.lower():
+        # O conector da Vercel já ligou o git ao criar o projeto: é "pulado", não erro.
+        return Resultado(True, "ok: vercel git connect (idempotente)", pulado=True)
     if resultado is None or resultado.returncode != 0:
         return Resultado(False, "", mensagem_erro=f"`vercel git connect` falhou: {_saida(resultado)}")
     return Resultado(True, "ok: vercel git connect (idempotente)")
@@ -351,11 +388,6 @@ def publicar_usuario_qa_na_vercel(ctx: Contexto) -> Resultado:
 
 
 def conferir_integracao_supabase(ctx: Contexto) -> Resultado:
-    print(
-        "Instrução pro DONO: no Supabase, vá em Settings -> Integrations -> "
-        "instale 'Vercel' e autorize a integração."
-    )
-    print("Depois, na Vercel, confirme que o app 'Vercel for GitHub' está instalado no repositório.")
     resultado = _rodar(["vercel", "env", "ls"], cwd=ctx.projeto)
     texto_bruto = _saida(resultado)
     # Filtra a saída para SÓ NOMES antes de qualquer print: nenhum valor cru da
@@ -364,10 +396,12 @@ def conferir_integracao_supabase(ctx: Contexto) -> Resultado:
     ausentes = sorted(set(NOMES_SUPABASE_ESPERADOS) - set(achados))
     if ausentes:
         return Resultado(
-            True, f"nao medido: faltam {', '.join(ausentes)} em vercel env ls (medição aberta)",
+            True,
+            f"nao medido: faltam {', '.join(ausentes)} em vercel env ls; "
+            "quem grava é $tecnologia-conectar vercel-env (próximo passo do instalador)",
             nao_medido=True,
         )
-    return Resultado(True, "ok: 3/3 nomes da integração Supabase presentes em vercel env ls")
+    return Resultado(True, "ok: 3/3 nomes das variáveis do Supabase presentes em vercel env ls")
 
 
 # ---------------------------------------------------------------------------
@@ -468,7 +502,7 @@ PASSOS: list[tuple[str, str, "callable"]] = [
     ("gerar_token_qa", "Gerar token de QA", gerar_token_qa),
     ("publicar_token_na_vercel", "Publicar token na Vercel (preview)", publicar_token_na_vercel),
     ("usuario_qa", "Publicar o usuário de QA na Vercel (preview)", publicar_usuario_qa_na_vercel),
-    ("conferir_integracao_supabase", "Conferir integração Supabase -> Vercel", conferir_integracao_supabase),
+    ("conferir_integracao_supabase", "Conferir variáveis do Supabase na Vercel", conferir_integracao_supabase),
     ("copiar_guardas", "Copiar workflows/dependabot para .github/ da raiz", copiar_guardas),
     ("gravar_secrets", "Gravar secrets do GitHub", gravar_secrets),
     ("ligar_dependabot", "Ligar Dependabot", ligar_dependabot),

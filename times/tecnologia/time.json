@@ -19,6 +19,7 @@
     {"name": "tecnologia-vigiar", "dir": ".agents/skills/tecnologia-vigiar"},
     {"name": "tecnologia-acessos", "dir": ".agents/skills/tecnologia-acessos"},
     {"name": "tecnologia-definir-o-que", "dir": ".agents/skills/tecnologia-definir-o-que"},
-    {"name": "tecnologia-construir-tela", "dir": ".agents/skills/tecnologia-construir-tela"}
+    {"name": "tecnologia-construir-tela", "dir": ".agents/skills/tecnologia-construir-tela"},
+    {"name": "tecnologia-conectar", "dir": ".agents/skills/tecnologia-conectar"}
   ]
 }

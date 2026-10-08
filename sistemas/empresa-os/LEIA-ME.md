@@ -82,23 +82,27 @@ só é concluído com prova real: `SITE_URL` em https (sem localhost) e o
 `/login` respondendo 200. Rodando antes da Vercel, ele fica aberto e o setup
 avisa; rode de novo depois do deploy, com a URL da Vercel, pra concluir.
 
-**7. Vercel.** Crie/importe o projeto na Vercel pelo GitHub da Casa (diretório
-raiz = `sistemas/empresa-os/`). Ligue a INTEGRAÇÃO oficial Supabase → Vercel —
-ela publica sozinha as variáveis do banco (produção + preview), com o nome novo
-ou o antigo de cada uma: a URL (`NEXT_PUBLIC_SUPABASE_URL` ou `SUPABASE_URL`), a
+**7. Vercel.** O projeto na Vercel se chama `<slug>` (o `slug_os` da Casa) e a raiz dele é `sistemas/empresa-os/`. Na instalação a IA o cria pelo conector da Vercel; sem o conector, você importa o repositório da Casa à mão, com esse nome.
+As variáveis do banco, em produção e preview, quem grava é a skill `tecnologia-conectar` (subcomando `vercel-env`): a URL (`NEXT_PUBLIC_SUPABASE_URL` ou `SUPABASE_URL`), a
 chave pública (`NEXT_PUBLIC_SUPABASE_ANON_KEY` ou `SUPABASE_PUBLISHABLE_KEY`) e a
 chave de serviço (`SUPABASE_SERVICE_ROLE_KEY` ou `SUPABASE_SECRET_KEY`). O sistema
 aceita os dois nomes de cada uma (leitura única em `config/supabase-env.mjs` e
-`config/supabase-env-servidor.mjs`; ver `conexao.md`); a IA só PROVA por
-`vercel env ls` que um nome de cada apareceu, nunca cadastra isso na mão no painel.
+`config/supabase-env-servidor.mjs`; ver `conexao.md`) e a skill grava o primeiro nome
+de cada par. Não ligue também a integração do Marketplace Supabase → Vercel: ela grava os
+outros nomes e duplica as variáveis. A IA só PROVA por `vercel env ls` que os nomes
+apareceram, nunca cadastra isso na mão no painel. O preview usa o MESMO banco da
+produção até existir homologação: um teste no preview mexe em dado real (risco aceito,
+anotado como pendência na etapa `7-banco` do instalador).
 O token de QA (`PREVIEW_TEST_TOKEN`, e o par `PREVIEW_QA_EMAIL`/
 `PREVIEW_QA_PASSWORD`) entra por CLI (`vercel env add PREVIEW_TEST_TOKEN
 preview`, valor vindo de arquivo, nunca do chat): quem faz isso é o
 `instalar_guardas.py` da skill `tecnologia-publicar` (passo 9). O par é de um
 membro só de leitura que o dono cria na tela Usuários; o script só o publica
-depois que o dono o guardou em `credenciais/.env`. No Supabase, adicione às Redirect
-URLs: `https://<slug>.vercel.app/**` e `https://*-<projeto>.vercel.app/**`
-(previews). Deploy de preview → QA exercita como usuário (regra no AGENTS.md)
+depois que o dono o guardou em `credenciais/.env`. Depois da primeira publicação,
+a `tecnologia-conectar` (subcomando `auth-urls`) grava no Supabase o Site URL e as
+Redirect URLs `https://<dominio>/**` e `https://*-<time-da-vercel>.vercel.app/**`
+(previews; `<time-da-vercel>` é o apelido do time da Vercel, não o nome do projeto),
+sem apagar as que já existem. Deploy de preview → QA exercita como usuário (regra no AGENTS.md)
 → aprovado → produção. Com o sistema publicado, rode o setup do passo 6 de novo com o
 `SITE_URL` definitivo: é ele que conclui o passo "sistema no ar". Convite já
 enviado só sai de novo com `REENVIAR_CONVITE=1`.
@@ -125,6 +129,8 @@ suportada de ligá-los é a seção "Primeira vez neste sistema" da skill
 ```
 python3 .agents/skills/tecnologia-publicar/scripts/instalar_guardas.py --casa "<pasta principal da Casa>"
 ```
+
+Na instalação pelo instalador, ele já roda no passo 7; aqui só confira o bloco `DEPLOY` de `operacao/INSTALACAO.md`.
 
 **Token da Supabase (`SUPABASE_ACCESS_TOKEN`).** O `instalar_guardas.py` grava
 esse token nos Secrets do GitHub (`deploy-db.yml`, `backup-db.yml` e

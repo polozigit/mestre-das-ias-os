@@ -13,6 +13,7 @@ Time de agentes que cuida do sistema da empresa do aluno (Next.js + Supabase): d
 | `tecnologia-acessos` | Conecta serviço novo e guarda a chave sem expor, mantém o inventário de quem acessa GitHub, Vercel e Supabase e prepara a saída de pessoa (o dono revoga e gira as chaves). |
 | `tecnologia-definir-o-que` | Transforma o pedido do dono numa tarefa clara: o problema, quem usa, o que aparece na tela e como saber que ficou pronto (`requisito.md`, com o "ok" dele). |
 | `tecnologia-construir-tela` | Constrói ou muda tela do sistema seguindo o `DESIGN.md` e as regras de segurança do modelo, e manda publicar com link de teste. |
+| `tecnologia-conectar` | Liga a Vercel e o Supabase do sistema na instalação, guarda as chaves no cofre do banco e prova o sistema no ar. |
 | `tecnologia-revisor-seguranca` (subagente) | Revisa a mudança antes do merge, só leitura, sem ter construído: responde `APPROVED` ou `BLOCKED` com achados `arquivo:linha`. |
 
 ## Onde moram

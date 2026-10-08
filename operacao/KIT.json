@@ -1,7 +1,7 @@
 {
   "kit": "mestre-das-ias-os",
-  "gerado_em": "2026-10-08T15:07:39Z",
-  "origem_git_sha": "dca26750",
+  "gerado_em": "2026-10-08T18:53:50Z",
+  "origem_git_sha": "c852462b",
   "fundacao_skills": [
     "polozi-aplicar-regra",
     "polozi-arrumar-a-casa",
@@ -40,7 +40,8 @@
         "tecnologia-vigiar",
         "tecnologia-acessos",
         "tecnologia-definir-o-que",
-        "tecnologia-construir-tela"
+        "tecnologia-construir-tela",
+        "tecnologia-conectar"
       ]
     },
     {

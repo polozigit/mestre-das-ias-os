@@ -183,20 +183,21 @@ Use o Python de `operacao/INSTALACAO.md` (campo `comando_python`; no Windows cos
 
 | Passo | O que faz |
 |---|---|
-| `vincular_projeto` | `vercel link --yes` em `sistemas/empresa-os`. Cria o `.vercel/project.json`, o sinal de "sistema publicado". |
+| `vincular_projeto` | `vercel link --yes --project <slug_os>` em `sistemas/empresa-os` (o `slug_os:` vem de `operacao/INSTALACAO.md`; sem ele o passo para). Cria o `.vercel/project.json`, o sinal de "sistema publicado". |
 | `conectar_git` | `vercel git connect`: branch gera link de teste, `main` gera produção. |
 | `gerar_token_qa`, `publicar_token_na_vercel` | Gera o `PREVIEW_TEST_TOKEN`, guarda em `credenciais/.env` (modo 600) e publica no ambiente preview da Vercel, com o valor num arquivo temporário. |
 | `usuario_qa` | Publica `PREVIEW_QA_EMAIL` e `PREVIEW_QA_PASSWORD` no preview, do mesmo jeito, SE o dono já guardou o par em `credenciais/.env`. Sem o par o passo fica `NAO-MEDIDO` e a instalação segue. |
-| `conferir_integracao_supabase` | Confere pelos NOMES (`vercel env ls`) que a integração Supabase para Vercel trouxe as três variáveis. Nunca imprime valor. |
+| `conferir_integracao_supabase` | Confere pelos NOMES (`vercel env ls`) que as três variáveis do banco estão na Vercel; quem as grava é a `tecnologia-conectar` (`vercel-env`). Nunca imprime valor. |
 | `copiar_guardas` | Copia os workflows e o `dependabot.yml` de `sistemas/empresa-os/.github/` para o `.github/` da raiz, o único lugar onde o GitHub os lê (`ci`, `deploy-db`, `deploy-db-homologacao`, `gitleaks`, `keep-alive`, `backup-db`). |
 | `gravar_secrets` | `gh secret set` dos três segredos da automação, sempre por arquivo temporário. |
 | `ligar_dependabot` | Liga alerta de vulnerabilidade e correção automática no repositório. |
 
 O resumo, sem nenhum valor de segredo, vai para `operacao/INSTALACAO.md` (bloco `DEPLOY`; se o bloco não existir o script o cria no fim do arquivo). Saída 0 = tudo provado ou registrado como `NAO-MEDIDO`; saída 2 = parou num passo, e a mensagem diz o que falta (leia, resolva e rode de novo). Nunca diga "ligado" com saída diferente de 0.
 
+As variáveis do banco na Vercel são da `tecnologia-conectar` (`vercel-env`), não da integração do Marketplace do Supabase: não mande o dono ligar essa integração.
+
 **3. O que só o dono faz**, em palavras simples, sem esperar uma resposta para seguir com o resto:
 
-- **Integração Supabase para Vercel (2 cliques).** "No Supabase, abra Settings, depois Integrations, instale a Vercel e autorize. Na Vercel, confirme que o app Vercel for GitHub está no repositório." Você só confere os nomes depois (`conferir_integracao_supabase`); nunca cadastra essas variáveis no painel.
 - **Usuário de teste do preview.** O preview entra com um membro só de leitura, que só o dono cria: "No sistema, abra Usuários, convide um membro chamado Teste de QA com um e-mail que você consiga abrir, dê só as permissões de leitura e defina a senha pelo link do e-mail. Depois me diga pronto." O convite do sistema não aceita senha (quem abre o e-mail a define), por isso este script não cria esse usuário. Quando o dono disser pronto, guarde o par em `credenciais/.env` pelo mesmo caminho de chave de uma linha da `tecnologia-acessos` (passo 3 de "Conectar"): o dono copia o e-mail, você roda o comando da área de transferência para `PREVIEW_QA_EMAIL`; o mesmo para `PREVIEW_QA_PASSWORD`. Você nunca digita, cola nem lê a senha. Em seguida rode `--so usuario_qa`, confira os três nomes (`vercel env ls preview | grep -E "PREVIEW_TEST_TOKEN|PREVIEW_QA_EMAIL|PREVIEW_QA_PASSWORD"`) e grave `PREVIEW_QA: configurado em AAAA-MM-DD` em `operacao/sistema.md`, como descreve o passo 9a da `tecnologia-construir-tela`. Enquanto o par não existe, o QA do preview vira prova só por teste e isso não trava nada.
 
 **4. Salvar o que o script mudou.** O script grava `.github/` e `operacao/INSTALACAO.md`, e como a Casa já tem produção publicada o caminho é o dos `## Passos`: branch curta, commit só desses caminhos, PR e merge. `.github/` é arquivo protegido: faça o passo 3a (diga que são "os testes automáticos e a publicação do GitHub" e pergunte "Posso mudar isso? Responda sim ou não."). Sem o "sim" gravado, não publique esses arquivos.
