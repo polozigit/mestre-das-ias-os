@@ -1,5 +1,5 @@
-# dependências
-/node_modules
+# dependências (em qualquer pasta, também scripts/node_modules)
+node_modules/
 
 # next.js
 /.next/

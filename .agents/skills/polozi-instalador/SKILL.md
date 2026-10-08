@@ -95,14 +95,28 @@ py -3 --version
 python --version
 ```
 
-O PRIMEIRO que imprimir `Python 3.` vira `<PY>` — todo comando desta skill,
-daqui pra frente, escreve `<PY>` no lugar de "python". Gravar o comando
-escolhido no frontmatter de `operacao/INSTALACAO.md`, campo `comando_python:`
-(o script da ETAPA 0 já faz isso sozinho com `--gravar`). Nenhum comando
-desta skill pode conter `python3` literal fora desta checagem de versão.
+O PRIMEIRO que imprimir `Python 3.` vira o `<PY>` provisório — todo comando
+desta skill, daqui pra frente, escreve `<PY>` no lugar de "python". Pode ser o
+3.9 que vem com o Mac: ele roda o preflight e o instalador de requisitos. Depois
+que o preflight gravar `comando_python:` em `operacao/INSTALACAO.md` (campo do
+frontmatter; o script da ETAPA 0 faz isso sozinho com `--gravar`) com um Python
+3.10 ou mais novo, `<PY>` passa a ser ESSE comando (no Mac pode ser o caminho
+completo do Python do instalador oficial, em `/Library/Frameworks/Python.framework/`).
+Nenhum comando desta skill pode conter `python3` literal fora desta checagem de
+versão.
 
-Se os 3 falharem: a ETAPA 0 bloqueia e instrui a instalar o Python oficial
-(python.org) [24a:windows/f10].
+Nenhum dos 3 respondeu (não há Python): no Mac, rode `xcode-select --install`
+(traz o git e um Python), espere a janela do sistema terminar e tente de novo.
+No Windows, rode direto, sem script (não há Python pra rodar um):
+
+```
+winget install --exact --id Python.Python.3.12 --scope user --silent --accept-package-agreements --accept-source-agreements
+```
+
+Sem winget: baixe `https://www.python.org/ftp/python/3.13.16/python-3.13.16-amd64.exe`
+e rode com `/quiet InstallAllUsers=0 PrependPath=1`. Depois peça ao aluno uma
+conversa nova (o Windows só enxerga o programa novo numa conversa nova) e
+`$polozi-instalador` de novo.
 
 ## ETAPA 0 — `0-preflight` (antes de tudo)
 
@@ -110,7 +124,23 @@ Se os 3 falharem: a ETAPA 0 bloqueia e instrui a instalar o Python oficial
    ```
    <PY> <SKILL_DIR>/scripts/preflight.py --pasta "<PASTA_ABERTA>" --json
    ```
-2. Ler todos os itens (cada um traz `id`, `estado`, `evidencia` e
+2. **Faltou programa (`py`, `node`, `git` ou `gh` em `bloqueio`).** Antes de
+   parar, rode `<PY> <SKILL_DIR>/scripts/instalar_requisitos.py --plano`,
+   mostre a lista do que falta e pergunte UMA vez: "Posso instalar agora?
+   Responda sim ou não." Com o "sim": um por um, na ordem (Mac: `git` primeiro,
+   que traz as Command Line Tools, depois `py`, `node`, `gh`; Windows: `py`,
+   `git`, `node`, `gh`), rode `<PY> <SKILL_DIR>/scripts/instalar_requisitos.py --instalar <id>`
+   e repasse ao aluno a linha `ACAO_DO_ALUNO` (a senha do Mac é digitada por ele
+   NA JANELA DO SISTEMA; a IA nunca digita senha). Computer Use NÃO é preciso:
+   no Windows a janela de permissão fica numa área protegida que ele não
+   alcança; no Mac pode ajudar a clicar Continuar, é opcional. Se o Codex
+   recusar o download ou a abertura pela sandbox, aceite a aprovação que ele
+   oferece (é o mesmo comando). Terminado cada instalador, mostre o `DEPOIS`:
+   no Mac rode o preflight de novo nesta mesma conversa; no Windows peça uma
+   conversa nova e `$polozi-instalador` de novo (o PATH novo só vale em processo
+   novo). "Não" = PARE com o `como_resolver` de cada item, como no passo
+   seguinte.
+3. Ler todos os itens (cada um traz `id`, `estado`, `evidencia` e
    `como_resolver`). QUALQUER item `bloqueio` = PARE, mostre o `como_resolver`
    daquele item e não avance — não renderize nada, não rode git. Itens
    `aviso` e `nao_verificavel` seguem, mas entram no registro. Três itens
@@ -124,12 +154,12 @@ Se os 3 falharem: a ETAPA 0 bloqueia e instrui a instalar o Python oficial
    - `node`: o sistema roda no Next.js 16, que exige o Node 20.9 ou mais novo
      (doc do Next e `engines` do `next` no `package-lock.json` do sistema).
      Abaixo disso é `bloqueio` e o `como_resolver` traz a instalação
-     (nodejs.org, versão LTS). Do 20.9 ao 21.x é `aviso`: o pacote do Supabase
+     (o instalador instala sozinho com o OK do aluno, ou nodejs.org, versão LTS). Do 20.9 ao 21.x é `aviso`: o pacote do Supabase
      do sistema declara o Node 22, então o npm avisa na instalação; recomende o
      Node 22 LTS ou mais novo, sem bloquear.
    - `casa_git`: conta se a Casa é clonada do repositório-modelo ou do zip.
      Nunca bloqueia: `.git` com `origin` do modelo não é erro.
-3. **Confiar na pasta.** Instruir o aluno a marcar esta pasta como confiada
+4. **Confiar na pasta.** Instruir o aluno a marcar esta pasta como confiada
    no Codex — sem isso o `.codex/config.toml` E o `.codex/rules/` do projeto
    são ignorados EM SILÊNCIO [24a:config/f2, hooks/f05]. Dizer, com todas as
    letras, que NÃO existe hoje comando publicado que prove que o config do
@@ -150,7 +180,7 @@ Se os 3 falharem: a ETAPA 0 bloqueia e instrui a instalar o Python oficial
    ferramenta, e confiar antes do arquivo definitivo derruba a confiança em
    silêncio (a confiança de hook não-gerenciado é rastreada pelo HASH da
    definição: mudou o arquivo, o hash muda, a confiança some).
-4. Fechar a ETAPA 0, com o mesmo caminho absoluto:
+5. Fechar a ETAPA 0, com o mesmo caminho absoluto:
    ```
    <PY> <SKILL_DIR>/scripts/preflight.py --pasta "<PASTA_ABERTA>" --gravar
    ```
@@ -285,7 +315,7 @@ da tabela.
 | `3-casa` | Seção "3-casa" acima. |
 | `4-github` | Delegar em `polozi-criar-github`: cria o repositório PRIVADO com o nome do sistema (`slug_os:` de `operacao/INSTALACAO.md`). Casa clonada: troca o `origin` do modelo pelo repositório do aluno ANTES do primeiro push (push no modelo nunca). Aluno que já tem um repositório dele com outro nome: `gh repo rename` no repositório DELE, nunca no modelo. |
 | `7-banco` | Delegar em `polozi-registrar-conexao` (Supabase do sistema, projeto `<slug_os>`) e fechar o banco como na seção "7-banco" abaixo: Secrets do GitHub gravados e migrations aplicadas pela Action `deploy-db.yml`, disparada à mão, nunca por `supabase db push`. Sem o time Tecnologia na Casa ou sem o repositório do aluno no `origin`: **PARAR**. |
-| `8-sistema` | Delegar na skill `tecnologia-publicar` (publica o sistema; o projeto na Vercel se chama como o sistema, `<slug_os>`) e seguir o roteiro `sistemas/empresa-os/LEIA-ME.md` pelos passos abaixo. Exige a `7-banco` `concluida` (banco no ar, migrations aplicadas pela Action, schemas expostos); senão volte à `7-banco`. O sistema já está em `sistemas/empresa-os/`: o passo 1 do roteiro sobre descompactar não vale, o passo 5 (migrations) foi a `7-banco` e o passo 2 (mockup) e o tema e a logo do passo 3 são da `6-marca`. Na ordem: (a) `npm install` dentro de `sistemas/empresa-os` (passo 1); (b) preencher a identidade em `sistemas/empresa-os/config/empresa.ts` (a parte do passo 3 que o setup exige) com as respostas da `3-casa`, sem perguntar de novo: `nome` é o nome da empresa, `nomeMaster` e `emailMaster` são o nome e o e-mail do dono, `slug` é o `slug_os:` de `operacao/INSTALACAO.md` e `descricao` é uma frase curta que você escreve com o nome da empresa; (c) passo 4 (preview local), só se o dono quiser ver antes; (d) passo 6: o `scripts/setup-inicial.mjs` do sistema cria a empresa e o dono, carrega o plano e manda o e-mail de convite (as chaves vêm de `credenciais/.env` sem aparecer no chat; na 1ª vez com `SITE_URL=http://localhost:3000`) e para sem o `npm install` e sem o `config/empresa.ts` preenchido; (e) passo 7 (Vercel), com a `tecnologia-publicar` e a `tecnologia-conectar`, nesta ordem: (e1) a IA cria o projeto `<slug_os>` pelo conector da Vercel (`create_git_project`, pasta raiz `sistemas/empresa-os`, `deploy=false`; sem o conector, o roteiro "Projeto na Vercel a mão" da `tecnologia-conectar`); (e2) `<PY> "<PASTA_ABERTA>/.agents/skills/tecnologia-publicar/scripts/instalar_guardas.py" --casa "<PASTA_ABERTA>"` (link com `--project <slug_os>`, git, QA, guardas, Secrets e Dependabot); (e3) `$tecnologia-conectar` `projeto` (prova o link) e `vercel-env` (as variáveis do banco na Vercel, antes da primeira publicação); (e4) a primeira publicação, pela `tecnologia-publicar`; (e5) `$tecnologia-conectar` `auth-urls`, `provar` (só segue com `TUDO LIGADO`) e `vault`; e então o `setup-inicial.mjs` de novo com o `SITE_URL` definitivo: é ele que marca "sistema no ar" no plano (e6); (f) passo 8 (primeiro login): o dono abre o e-mail de convite, define a senha e entra, de preferência pelo celular; (g) passo 9 (guardas): as guardas já ligaram no (e2), então só confira o bloco `DEPLOY` de `operacao/INSTALACAO.md`. Se `.agents/skills/tecnologia-publicar/` ou `.agents/skills/tecnologia-conectar/` não existir (Casa clonada antes da skill nova: atualizar o time Tecnologia): instruir a instalar o time Tecnologia e **PARAR**. |
+| `8-sistema` | Delegar na skill `tecnologia-publicar` (publica o sistema; o projeto na Vercel se chama como o sistema, `<slug_os>`) e seguir o roteiro `sistemas/empresa-os/LEIA-ME.md` pelos passos abaixo. Exige a `7-banco` `concluida` (banco no ar, migrations aplicadas pela Action, schemas expostos); senão volte à `7-banco`. O sistema já está em `sistemas/empresa-os/`: o passo 1 do roteiro sobre descompactar não vale, o passo 5 (migrations) foi a `7-banco` e o passo 2 (mockup) e o tema e a logo do passo 3 são da `6-marca`. Na ordem: (a) só o pacote do setup dentro de `sistemas/empresa-os` (passo 1): `npm install --prefix scripts --no-save "@supabase/supabase-js@2"`, nunca o `npm install` completo (a Vercel instala tudo na nuvem; ~500 MB por aluno na rede da sala); (b) preencher a identidade em `sistemas/empresa-os/config/empresa.ts` (a parte do passo 3 que o setup exige) com as respostas da `3-casa`, sem perguntar de novo: `nome` é o nome da empresa, `nomeMaster` e `emailMaster` são o nome e o e-mail do dono, `slug` é o `slug_os:` de `operacao/INSTALACAO.md` e `descricao` é uma frase curta que você escreve com o nome da empresa; (c) passo 4 (preview local), só se o dono quiser ver antes: aí sim o `npm install` completo; (d) passo 6: o `scripts/setup-inicial.mjs` do sistema cria a empresa e o dono, carrega o plano e manda o e-mail de convite (as chaves vêm de `credenciais/.env` sem aparecer no chat; na 1ª vez com `SITE_URL=http://localhost:3000`) e para sem o pacote do setup instalado e sem o `config/empresa.ts` preenchido; (e) passo 7 (Vercel), com a `tecnologia-publicar` e a `tecnologia-conectar`, nesta ordem: (e1) a IA cria o projeto `<slug_os>` pelo conector da Vercel (`create_git_project`, pasta raiz `sistemas/empresa-os`, `deploy=false`; sem o conector, o roteiro "Projeto na Vercel a mão" da `tecnologia-conectar`); (e2) `<PY> "<PASTA_ABERTA>/.agents/skills/tecnologia-publicar/scripts/instalar_guardas.py" --casa "<PASTA_ABERTA>"` (link com `--project <slug_os>`, git, QA, guardas, Secrets e Dependabot); (e3) `$tecnologia-conectar` `projeto` (prova o link) e `vercel-env` (as variáveis do banco na Vercel, antes da primeira publicação); (e4) a primeira publicação, pela `tecnologia-publicar`; (e5) `$tecnologia-conectar` `auth-urls`, `provar` (só segue com `TUDO LIGADO`) e `vault`; e então o `setup-inicial.mjs` de novo com o `SITE_URL` definitivo: é ele que marca "sistema no ar" no plano (e6); (f) passo 8 (primeiro login): o dono abre o e-mail de convite, define a senha e entra, de preferência pelo celular; (g) passo 9 (guardas): as guardas já ligaram no (e2), então só confira o bloco `DEPLOY` de `operacao/INSTALACAO.md`. Se `.agents/skills/tecnologia-publicar/` ou `.agents/skills/tecnologia-conectar/` não existir (Casa clonada antes da skill nova: atualizar o time Tecnologia): instruir a instalar o time Tecnologia e **PARAR**. |
 | `5-dossie` | Delegar em `polozi-registrar-dossie` (só quando o usuário tiver a transcrição pronta). Vem depois do sistema no ar: o dossiê é gravado no banco e aparece na aba Dossiê da tela Marca. |
 | `6-marca` | Exige a `5-dossie` concluída e o time Marketing na Casa (`.agents/skills/marketing-persona/` existe). Presente: delegar, uma por vez e nesta ordem, em `marketing-persona` (cliente ideal e persona a partir do dossiê), `marketing-identidade` (cores, letra e tom de voz) e, só se o dono tem o arquivo do logo, `marketing-logo` (opcional; usa o Pillow, e a skill pede o "sim" do dono antes de instalá-lo); cada uma pede o "sim" do dono antes de publicar na tela Marca. Conclui quando `empresa/publico/persona.md`, `empresa/marca/identidade-visual.md` e `empresa/marca/tom-de-voz.md` estão `aprovado` no `MAPA-DA-EMPRESA-IA.md`. Publicar na tela Marca NÃO é condição (o banco e o sistema já estão no ar, etapas 7 e 8, e cada skill publica ao ser aprovada): a skill que terminar com `FALTA` deixa o documento aprovado na pasta e a publicação sai depois, quando o dono pedir "publica a persona e a marca" (a `marketing-persona` publica o que ficou pendente) ou pela atividade `dossie-persona-marca` do plano. Dossiê ausente (`contexto/dossie/dossie-completo.md` não existe, ou a `5-dossie` está `pulada`): instruir a `5-dossie` e **PARAR**; se o dono prefere deixar a marca para depois, vale "Pular uma etapa" (a `6-marca` fica `pulada`, com o motivo em `operacao/DECISOES.md`). Time ausente (`.agents/skills/marketing-persona/` ou `.agents/skills/marketing-identidade/` não existe): o time Marketing não está nesta Casa, instruir a instalá-lo com a skill `polozi-instalar-time` (ou clonar de novo o repositório-modelo, que já vem com ele) e **PARAR**: não marcar como `pulada`, não improvisar persona nem identidade visual sozinho. |
 
@@ -478,6 +508,7 @@ volta a pedir aprovação [24a:config/n07].
   de ser o repositório-modelo quando a `4-github` termina.
 - Nunca gravar `projeto_confiado: sim` sem o aluno confirmar.
 - Nunca marcar `0-preflight` concluída com item em bloqueio.
+- `instalar_requisitos.py` só roda com o "sim" do aluno, uma pergunta só para a lista inteira; nunca com senha digitada pela IA.
 
 ## Limites
 
@@ -502,3 +533,4 @@ volta a pedir aprovação [24a:config/n07].
   dependência.
 - Nunca gravar `projeto_confiado: sim` sem o aluno confirmar.
 - Nunca marcar `0-preflight` concluída havendo item em bloqueio.
+- Nunca digitar senha (a do Mac é do aluno, na janela do sistema) e nunca instalar programa sem o "sim" do aluno; a pergunta é uma só para a lista inteira.

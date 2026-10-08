@@ -30,6 +30,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import glob
 import json
 import os
 import re
@@ -91,8 +92,30 @@ VERSAO_MINIMA_NODE = (20, 9)
 VERSAO_RECOMENDADA_NODE = (22, 0)
 
 COMO_INSTALAR_NODE = (
-    "Instale ou atualize o Node.js: baixe a versão LTS em nodejs.org (precisa ser a 20.9 ou mais nova; o "
-    "sistema usa o Next.js 16, que não roda em versão menor). Depois feche e abra o Codex de novo e rode o "
+    "Instale ou atualize o Node.js: o instalador instala sozinho com o seu OK (instalar_requisitos.py), ou "
+    "baixe a versão LTS em nodejs.org (precisa ser a 20.9 ou mais nova; o sistema usa o Next.js 16, que não "
+    "roda em versão menor). Depois feche e abra o Codex de novo e rode o preflight outra vez."
+)
+
+# O Python 3.9 que vem com o Mac (Command Line Tools) roda os scripts do kit, mas o kit pede o 3.10+.
+# O instalador oficial do Mac (python.org) grava em /Library/Frameworks/Python.framework/Versions/3.X/
+# (docs.python.org/3/using/mac.html, lida em 08/10/2026).
+PADRAO_PYTHON_FRAMEWORK_MAC = "/Library/Frameworks/Python.framework/Versions/3.*/bin/python3"
+
+COMO_INSTALAR_PY = (
+    "Falta o Python 3.10 ou mais novo. O instalador instala sozinho com o seu OK "
+    "(instalar_requisitos.py --plano mostra o que vai ser feito), ou baixe o oficial em python.org. "
+    "Depois rode o preflight outra vez."
+)
+
+COMO_INSTALAR_GIT = (
+    "Instale o Git: o instalador instala sozinho com o seu OK (instalar_requisitos.py), ou veja "
+    "git-scm.com [24a:windows/f10]. Depois rode o preflight outra vez."
+)
+
+COMO_INSTALAR_GH = (
+    "Instale o GitHub CLI (gh): o instalador instala sozinho com o seu OK (instalar_requisitos.py), ou veja "
+    "cli.github.com. O git invisível do aluno passa por ele (D24-15) [24a:windows/f10]. Depois rode o "
     "preflight outra vez."
 )
 
@@ -135,32 +158,52 @@ def _rodar(comando: list[str], cwd: Path | None = None):
         return None
 
 
+def _tentativas_py() -> list[tuple[str, list[str]]]:
+    """As 3 tentativas da PATH e, no Mac, os Pythons do instalador oficial (python.org), mais novo primeiro.
+    O instalador oficial do Mac põe o Python em /Library/Frameworks/Python.framework/Versions/3.X/bin/python3
+    (docs.python.org/3/using/mac.html, lida em 08/10/2026) e nem sempre muda a PATH da conversa já aberta."""
+    tentativas = list(TENTATIVAS_PY)
+    if sys.platform == "darwin":
+        def _chave(caminho: str) -> int:
+            achado = re.search(r"/Versions/3\.(\d+)/", caminho)
+            return int(achado.group(1)) if achado else -1
+
+        for caminho in sorted(glob.glob(PADRAO_PYTHON_FRAMEWORK_MAC), key=_chave, reverse=True):
+            tentativas.append((caminho, [caminho, "--version"]))
+    return tentativas
+
+
 def checar_py() -> tuple[dict, str]:
-    for rotulo, comando in TENTATIVAS_PY:
+    """Percorre TODOS os candidatos: o `python3` da Apple (3.9) responde primeiro no Mac e não pode esconder
+    um 3.10+ instalado depois. Vence o primeiro >= 3.10; senão bloqueia citando o melhor achado."""
+    melhor: tuple[tuple[int, int], str, str] | None = None
+    for rotulo, comando in _tentativas_py():
         resultado = _rodar(comando)
-        if resultado is None:
+        if resultado is None or resultado.returncode != 0:
             continue
         saida = ((resultado.stdout or "") + (resultado.stderr or "")).strip()
-        if resultado.returncode != 0:
-            continue
         correspondencia = re.search(r"Python (\d+)\.(\d+)", saida)
         if not correspondencia:
             continue
         versao = (int(correspondencia.group(1)), int(correspondencia.group(2)))
         if versao >= (3, 10):
             return item("py", "Python 3.10+", "ok", f"{saida} ({rotulo})"), rotulo
+        if melhor is None or versao > melhor[0]:
+            melhor = (versao, saida, rotulo)
+    if melhor is not None:
         return (
             item(
-                "py", "Python 3.10+", "bloqueio", f"{saida} ({rotulo}) — versão abaixo de 3.10",
-                "Instale o Python 3.10+ oficial (python.org) [24a:windows/f10].",
+                "py", "Python 3.10+", "bloqueio",
+                f"{melhor[1]} ({melhor[2]}): versão abaixo de 3.10",
+                COMO_INSTALAR_PY,
             ),
             "pendente",
         )
     return (
         item(
             "py", "Python 3.10+", "bloqueio",
-            "nenhuma das 3 tentativas respondeu 'Python 3.'",
-            "Instale o Python 3.10+ oficial (python.org) [24a:windows/f10].",
+            "nenhuma das tentativas respondeu 'Python 3.'",
+            COMO_INSTALAR_PY,
         ),
         "pendente",
     )
@@ -391,14 +434,8 @@ def rodar_checagens(pasta: Path) -> dict:
     itens = [
         item_py,
         checar_node(),
-        checar_binario_obrigatorio(
-            "git", "Git", ["git", "--version"], "Instale o Git [24a:windows/f10]."
-        ),
-        checar_binario_obrigatorio(
-            "gh", "GitHub CLI", ["gh", "--version"],
-            "Instale o GitHub CLI (gh) — o git invisível do aluno passa por ele (D24-15) "
-            "[24a:windows/f10].",
-        ),
+        checar_binario_obrigatorio("git", "Git", ["git", "--version"], COMO_INSTALAR_GIT),
+        checar_binario_obrigatorio("gh", "GitHub CLI", ["gh", "--version"], COMO_INSTALAR_GH),
         checar_codex(),
         checar_binario_opcional(
             "docker", "Docker", ["docker", "--version"],
@@ -481,7 +518,10 @@ def gravar_resultado(pasta: Path, resultado: dict) -> Path:
     texto = _substituir_bloco_preflight(texto, resultado)
     texto = _gravar_comando_python(texto, resultado["comando_python"])
     texto = _gravar_linha_etapa(texto, resultado)
-    caminho.write_text(texto, encoding="utf-8", newline="\n")
+    # open(), não Path.write_text(newline=...): o parâmetro `newline` do write_text só existe a partir do
+    # Python 3.10, e o preflight roda também no 3.9 que vem com o Mac (Python provisório da ETAPA 0).
+    with open(caminho, "w", encoding="utf-8", newline="\n") as arquivo:
+        arquivo.write(texto)
     return caminho
 
 

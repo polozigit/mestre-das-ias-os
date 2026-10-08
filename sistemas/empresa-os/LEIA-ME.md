@@ -13,8 +13,18 @@
 
 **1. Dependências.** O sistema já está em `sistemas/empresa-os/` da Casa (vem
 no repositório-modelo; no zip antigo, descompacte aí). Pasta FIXA: skills e
-instruções do curso apontam pra esse caminho; nunca renomear. Rode
-`npm install` dentro da pasta (Node 20.9 ou mais novo; o preflight confere).
+instruções do curso apontam pra esse caminho; nunca renomear. O setup do
+passo 6 só precisa de um pacote (Node 20.9 ou mais novo; o preflight confere).
+Dentro de `sistemas/empresa-os`, rode
+`npm install --prefix scripts --no-save "@supabase/supabase-js@2"`: baixa uns
+9 MB em `scripts/node_modules` (git-ignored) e não mexe no `package.json` do
+sistema. As aspas são obrigatórias (no PowerShell o `@` sem aspas quebra).
+Prove com
+`node -p "require.resolve('@supabase/supabase-js', {paths: ['./scripts']})"`
+(imprime um caminho dentro de `scripts/node_modules`) e com
+`git status --porcelain` (nada novo). A Vercel instala as dependências
+completas na nuvem, no build. O `npm install` completo (centenas de MB) só vale
+para a prévia local do passo 4 ou para mexer no código (lint, tsc, test).
 
 **2. Mockup (opcional, só com marca pronta).** Se `empresa/marca/identidade-visual.md`
 já existe, pergunte ao dono: *"quer ver 2-3 conceitos visuais do seu sistema
@@ -37,7 +47,8 @@ O nome exibido do sistema é sempre `<Nome da Empresa> OS` — vem pronto do
 `config/empresa.ts`, não montar na mão.
 
 **4. Preview local.** Gere `.env.local` a partir do `credenciais/.env` da Casa
-(só as variáveis do `conexao.md`; o arquivo é git-ignored). Rode `npm run dev`
+(só as variáveis do `conexao.md`; o arquivo é git-ignored). Rode `npm install` (o completo, uma vez; o passo 1 baixou só o pacote do setup)
+e depois `npm run dev`
 e abra no navegador: *"olha como ficou"*. Ajuste o tema até o dono aprovar.
 
 **5. Migrations no banco.** Aplique TODOS os arquivos de `supabase/migrations/`
