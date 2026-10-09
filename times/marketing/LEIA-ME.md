@@ -1,20 +1,21 @@
 # Time Marketing
 
-Time de agentes que monta, a partir do dossiê da empresa do aluno, o cliente ideal e a persona, a identidade da marca completa e o tom de voz, e trata o logo que o dono entregou. Os documentos ficam em `empresa/publico/` e `empresa/marca/` e, com o "sim" do dono, vão para o banco e aparecem em Marca no sistema.
+Time de agentes que monta, a partir do dossiê da empresa do aluno, da pesquisa pública e da lista de clientes dele (se houver), o cliente ideal e a persona, a identidade da marca completa e o tom de voz, e trata o logo que o dono entregou. Os documentos ficam em `empresa/publico/` e `empresa/marca/` e, com o "sim" do dono, vão para o banco e aparecem em Marca no sistema.
 
 ## Skills e subagente
 
 | Nome | O que faz |
 |---|---|
-| `marketing-persona` | Ponto de entrada. Lê o dossiê gravado e monta o cliente ideal e a persona SEM pedir persona pronta: cada linha cita a pergunta do dossiê de onde veio, o que falta vira pergunta ao dono (no máximo 3) e nada é inventado. A persona nasce como proto-persona, a validar com clientes reais. Grava `empresa/publico/persona.md`; com o "sim" do dono, aprova no Mapa e publica. |
+| `marketing-persona` | Ponto de entrada. Age como especialista em persona: lê o dossiê gravado, chama o pesquisador para o que é público só se o dono pedir "persona completa", resume a planilha de clientes do dono (se ele tiver) e monta o cliente ideal e a persona por dimensão, com o nível de consciência de cada segmento, SEM pedir persona pronta. Cada linha cita de onde veio (dossiê, relato do dono, pesquisa com link, dados de clientes); o que falta vira pergunta ao dono (no máximo 3 no modo rápido, padrão e sem pesquisa na internet; 4 no completo) e nada é inventado. A persona nasce como proto-persona e sai com o roteiro de conversa para validar com clientes reais. Grava `empresa/publico/persona.md`; com o "sim" do dono, aprova no Mapa e publica. Sem busca ou sem planilha o fluxo segue e diz o que faltou. |
 | `marketing-identidade` | Faz uma pergunta só (site, Instagram, apresentação, logo; tudo opcional), audita o que o dono já tem e monta `empresa/marca/identidade-visual.md` (plataforma, personalidade e arquétipo, logo, cores, tipografia, imagem, aplicações, regras de ouro, fontes) e `empresa/marca/tom-de-voz.md` (como a marca fala), cada um com o bloco `marca-dados` que a tela Marca mostra por divisão. Gera `empresa/marca/tokens.json` (DTCG) para a etapa de aplicar a marca no sistema. O que o dono já tem manda; onde ele não tem nada, o time propõe duas opções e ele escolhe. O contraste das cores é calculado, não visto a olho. |
 | `marketing-logo` | Trata o logo que o dono entregou: PNG com fundo transparente, ícone quadrado, variantes clara e escura (só se ele pedir) e, se quiser, um SVG que apenas embute o PNG (não é vetor). Nunca cria nem redesenha logo. |
-| `marketing-revisor` (subagente) | Confere cada documento contra o dossiê antes de o dono ver, só lendo, sem ter escrito: responde `APPROVED` ou `BLOCKED` com achados `arquivo:linha`. Persona sem origem em cada linha, cliente inventado, proto-persona vendida como confirmada, par de cores que não se lê e logo gerado por IA bloqueiam. |
+| `marketing-pesquisador` (subagente) | Pesquisa páginas públicas sobre o cliente (alternativas, linguagem, objeções, anúncios de concorrentes) e devolve só fichas com link `https://` da página aberta, data e trecho copiado. Só lê e busca; sem busca devolve vazio. |
+| `marketing-revisor` (subagente) | Confere cada documento contra o dossiê (e, na persona, contra as fichas da pesquisa e o resumo da planilha) antes de o dono ver, só lendo e sem internet, sem ter escrito: responde `APPROVED` ou `BLOCKED` com achados `arquivo:linha`. Persona sem origem em cada linha, cliente inventado, proto-persona vendida como confirmada, par de cores que não se lê e logo gerado por IA bloqueiam. |
 
 ## Como o fluxo anda
 
 1. O dossiê (`polozi-registrar-dossie`) vem primeiro.
-2. `marketing-persona` monta a persona; o dono responde sim; ela é aprovada e publicada.
+2. `marketing-persona` (sem pesquisa na internet, a não ser que o dono peça "persona completa") usa a planilha se houver e monta a persona; o dono responde sim; ela é aprovada e publicada.
 3. `marketing-identidade` audita o site, o Instagram, a apresentação e o logo do dono e monta a identidade e o tom de voz em cima da persona e do que ele já tem.
 4. `marketing-logo`, se o dono tem um logo.
 5. Cada documento só vira "verdade da empresa" (estado `aprovado` no Mapa) com o "sim" do dono, gravado no próprio arquivo e preso ao texto que ele viu: mudou o texto depois do sim, o publicador recusa.
@@ -42,7 +43,8 @@ Scripts (Python 3.10 ou mais novo, sem dependência além do Pillow opcional; sa
 
 | Script | Faz |
 |---|---|
-| `marketing-persona/scripts/dossie_para_persona.py` | Lê o dossiê e devolve JSON por bloco (empresa, público, dor, oferta, concorrência, tom) com as lacunas; com `conferir`, confere um documento contra o dossiê (marca de origem em cada linha, pergunta que existe e foi respondida, frase entre aspas que está de verdade no dossiê, nenhum `<...>` do modelo que ficou sem preencher). |
+| `marketing-persona/scripts/dossie_para_persona.py` | Lê o dossiê e devolve JSON por bloco (empresa, público, dor, oferta, concorrência, tom) com as lacunas; com `conferir`, confere um documento contra o dossiê (marca de origem em cada linha, pergunta que existe e foi respondida, fonte `[n]` da pesquisa com link e data, data dos dados de clientes, frase entre aspas que está de verdade no dossiê ou no Anexo, nenhum `<...>` do modelo que ficou sem preencher). |
+| `marketing-persona/scripts/clientes_para_persona.py` | Planilha de clientes em CSV (modelo em `referencias/planilha-clientes-modelo.csv`) vira resumo agregado em JSON, sem dado pessoal: `modelo` grava o cabeçalho padrão, `resumir` conta, agrupa e mostra os compradores recentes. Recusa coluna de nome, e-mail, telefone, CPF e similares e troca esses dados em texto livre por `[removido]`. A planilha fica fora da pasta do projeto. |
 | `marketing-persona/scripts/aprovacao.py` | Grava e confere o "sim" do dono, preso ao texto. |
 | `marketing-persona/scripts/mapa_estado.py` | Muda o estado de um dos 3 papéis no Mapa (rascunho, em revisão, aprovado). `aprovado` só com o "sim" gravado. |
 | `marketing-persona/scripts/publicar_documento.py` | O único publicador: grava o documento aprovado (persona, marca ou o dossiê que o `polozi-registrar-dossie` manda; e a imagem do logo, no armazenamento privado) no banco da empresa, ou confere se o banco está em dia. Recusa antes de enviar: segredo no texto, texto de modelo sem preencher, "sim" que não vale mais. |

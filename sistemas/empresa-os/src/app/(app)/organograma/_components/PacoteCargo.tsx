@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, ArrowUpRight, ChevronDown } from "lucide-react";
+import { AlertTriangle, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { getOrgPacotePorCargo } from "@/lib/organograma/consultas";
@@ -10,19 +10,7 @@ import { Markdown } from "@/components/ui/Markdown";
 import { TituloSecao } from "./TituloSecao";
 import { AtribuicaoOnet } from "./AtribuicaoOnet";
 import { creditoOnet } from "@/lib/organograma/onet";
-import type { OrgDocumentoResumo, OrgNo, OrgPacote } from "@/lib/organograma/tipos";
-
-/** Dossiê e auditoria do pacote (mesmo `pacote_slug`) — o dossiê, se tiver,
- * vem antes da auditoria; entre pares do mesmo tipo, o de menor `ordem`. */
-function documentoDoPacote(
-  documentos: OrgDocumentoResumo[],
-  pacoteSlug: string,
-): OrgDocumentoResumo | null {
-  const candidatos = documentos
-    .filter((d) => d.pacote_slug === pacoteSlug && (d.tipo === "dossie" || d.tipo === "auditoria"))
-    .sort((a, b) => (a.tipo === b.tipo ? a.ordem - b.ordem : a.tipo === "dossie" ? -1 : 1));
-  return candidatos[0] ?? null;
-}
+import type { OrgNo, OrgPacote } from "@/lib/organograma/tipos";
 
 const NIVEL_LABEL: Record<string, string> = {
   junior: "júnior",
@@ -89,22 +77,15 @@ export function PacoteCargo({
   apqc,
   focarPlaybookSlug,
   onFocado,
-  documentos,
-  onAbrirDocumento,
   onFocarCargo,
 }: {
   no: OrgNo;
   apqc: Map<string, string>;
   focarPlaybookSlug?: string | null;
   onFocado?: () => void;
-  documentos?: OrgDocumentoResumo[];
-  onAbrirDocumento?: (caminho: string) => void;
   onFocarCargo?: (cargoSlug: string) => void;
 }) {
   const estado = usePacote(no.slug, !!no.pacote);
-  const documentoPacote = no.pacote
-    ? documentoDoPacote(documentos ?? [], no.pacote.slug)
-    : null;
   const [abertos, setAbertos] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -159,15 +140,6 @@ export function PacoteCargo({
           </p>
           <h2 className="h4 mt-0.5">{no.titulo}: o que a pessoa precisa saber</h2>
         </div>
-        {documentoPacote && (
-          <button
-            type="button"
-            onClick={() => onAbrirDocumento?.(documentoPacote.caminho)}
-            className="inline-flex shrink-0 items-center gap-1 text-[12px] font-medium text-acento-texto underline-offset-2 hover:underline"
-          >
-            Dossiê e auditoria na aba Documentos <ArrowUpRight size={12} />
-          </button>
-        )}
       </header>
 
       {estado.status === "carregando" && (

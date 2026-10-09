@@ -27,3 +27,4 @@ Arquivos protegidos: qualquer mudança neles vai pelo caminho 3, com a prova e a
 | `tecnologia-definir-o-que` | Chame pelo nome |
 | `tecnologia-construir-tela` | Chame pelo nome |
 | `tecnologia-conectar` | Chame pelo nome |
+| `tecnologia-aplicar-marca` | Chame pelo nome |

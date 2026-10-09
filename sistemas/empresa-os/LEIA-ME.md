@@ -26,23 +26,19 @@ Prove com
 completas na nuvem, no build. O `npm install` completo (centenas de MB) só vale
 para a prévia local do passo 4 ou para mexer no código (lint, tsc, test).
 
-**2. Mockup (opcional, só com marca pronta).** Se `empresa/marca/identidade-visual.md`
-já existe, pergunte ao dono: *"quer ver 2-3 conceitos visuais do seu sistema
-antes de montar?"* Gere os conceitos com a identidade visual de `empresa/marca/`
-e deixe ele aprovar UM. O mockup é descartável: ele dita a CARA, nunca a
-estrutura das telas. Na ordem da aula a marca vem DEPOIS do sistema no ar: sem
-`identidade-visual.md`, pule este passo.
+**2. Mockup (opcional, só com marca pronta).** O mockup do sistema com a marca é
+da skill `tecnologia-aplicar-marca`, depois da identidade aprovada: ela mostra as
+telas principais em claro e escuro e o dono aprova ANTES de qualquer arquivo
+mudar. Aqui não se gera conceito visual. Na ordem da aula a marca vem DEPOIS do
+sistema no ar: sem `identidade-visual.md`, pule este passo.
 
-**3. Aplicar a marca.** Edite SÓ estes 3 arquivos (o `DESIGN.md` explica cada
-token):
+**3. Aplicar a marca.** Edite SÓ `config/empresa.ts` (o `DESIGN.md` explica o resto):
 - `config/empresa.ts` — nome, slug, descrição, nome/email do dono (substitua
   todos os `{{PLACEHOLDERS}}`; o slug é `minusculas-numeros-hifen`)
-- `src/app/theme.css` — cores/tipografia/arredondamento traduzidos do mockup
-  aprovado (ou direto da `identidade-visual.md`, se o dono pulou o passo 2).
-  Sem marca ainda, fica o tema padrão do molde; a marca entra depois, como
-  mudança normal do sistema (pedido, prévia, QA, produção)
-- `public/marca/logo.svg` (+ `favicon.svg`) — a logo real da empresa
-  (sem logo ainda, fica a do molde)
+- Tema (`src/app/theme.css`), logo (`public/marca/`) e ícone (`src/app/icon.*`)
+  são da skill `tecnologia-aplicar-marca`, nunca à mão. Sem marca ainda, fica o
+  tema padrão do molde; a marca entra depois, como mudança normal do sistema
+  (pedido, prévia, "aprovado" do dono, produção).
 O nome exibido do sistema é sempre `<Nome da Empresa> OS` — vem pronto do
 `config/empresa.ts`, não montar na mão.
 
@@ -104,17 +100,18 @@ outros nomes e duplica as variáveis. A IA só PROVA por `vercel env ls` que os 
 apareceram, nunca cadastra isso na mão no painel. O preview usa o MESMO banco da
 produção até existir homologação: um teste no preview mexe em dado real (risco aceito,
 anotado como pendência na etapa `7-banco` do instalador).
-O token de QA (`PREVIEW_TEST_TOKEN`, e o par `PREVIEW_QA_EMAIL`/
-`PREVIEW_QA_PASSWORD`) entra por CLI (`vercel env add PREVIEW_TEST_TOKEN
-preview`, valor vindo de arquivo, nunca do chat): quem faz isso é o
-`instalar_guardas.py` da skill `tecnologia-publicar` (passo 9). O par é de um
-membro só de leitura que o dono cria na tela Usuários; o script só o publica
-depois que o dono o guardou em `credenciais/.env`. Depois da primeira publicação,
+O token da conferência opcional do preview (`PREVIEW_TEST_TOKEN`) e o e-mail do dono (`PREVIEW_OWNER_EMAIL`,
+lido do `operacao/INSTALACAO.md`) entram por CLI (`vercel env add ... preview`,
+valor vindo de arquivo, nunca do chat): quem faz isso é o `instalar_guardas.py` da
+skill `tecnologia-publicar`, sem pedir nada ao dono. Com o token, o preview entra
+como o dono por link mágico gerado no servidor (chave de serviço, sem e-mail e sem
+senha guardada); produção ignora o token. Depois da primeira publicação,
 a `tecnologia-conectar` (subcomando `auth-urls`) grava no Supabase o Site URL e as
 Redirect URLs `https://<dominio>/**` e `https://*-<time-da-vercel>.vercel.app/**`
 (previews; `<time-da-vercel>` é o apelido do time da Vercel, não o nome do projeto),
-sem apagar as que já existem. Deploy de preview → QA exercita como usuário (regra no AGENTS.md)
-→ aprovado → produção. Com o sistema publicado, rode o setup do passo 6 de novo com o
+sem apagar as que já existem. Mudança de tela: CI verde → link do preview → o dono olha a tela que mudou
+e responde "aprovado" → produção (regra no AGENTS.md). Na instalação, a 1ª publicação vai
+direto, sem QA de tela nem usuário de teste. Com o sistema publicado, rode o setup do passo 6 de novo com o
 `SITE_URL` definitivo: é ele que conclui o passo "sistema no ar". Convite já
 enviado só sai de novo com `REENVIAR_CONVITE=1`.
 
@@ -149,9 +146,11 @@ esse token nos Secrets do GitHub (`deploy-db.yml`, `backup-db.yml` e
 ainda não estiver em `credenciais/.env`, o dono cria no painel da Supabase
 (Account > Access Tokens) e a IA captura por `$polozi-registrar-conexao`. Na
 criação: validade **"Never"** (nunca expira), senão a automação para sozinha no
-dia do vencimento; escopo mínimo (é um token pessoal da Supabase, então crie com
-a conta que só tem os projetos da empresa); risco: quem pegar o token usa até
-ser revogado, e se vazar o dono revoga e cria outro. (A Vercel não entra aqui: o
+dia do vencimento; **acesso total** (o token clássico, sem escolher organização
+nem permissão: o escopado fez a Action `deploy-db` falhar com 403 no teste de
+08/10/2026). Por isso crie com a conta que só tem os projetos da empresa; risco:
+quem pegar o token usa até ser revogado, e se vazar o dono revoga e cria outro.
+Depois de gerar, só o botão Copiar: ninguém lê a página. (A Vercel não entra aqui: o
 kit usa o login da CLI, não pede token dela. Se um dia pedir, vale a mesma
 regra: "No Expiration", escopo só no time da empresa.)
 
@@ -164,6 +163,6 @@ bem: é só seguir os passos.
 ## Depois da instalação
 
 Evolução do sistema = ciclo normal da Casa: pedido vira task → branch → preview
-→ QA → produção (regras técnicas no `AGENTS.md` desta pasta). Módulo novo
+→ "aprovado" do dono → produção (regras técnicas no `AGENTS.md` desta pasta). Módulo novo
 (CRM, eventos, financeiro) é trabalho do time Tecnologia (`tecnologia-construir-tela`
 e `tecnologia-mudar-banco`), encaixando no menu.

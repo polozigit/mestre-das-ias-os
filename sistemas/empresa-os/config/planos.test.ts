@@ -32,9 +32,9 @@ test("toda atividade tem instrução (NOT NULL no banco)", () => {
   for (const e of m.etapas) for (const a of e.atividades) assert.ok(a.instrucao?.trim(), a.chave);
 });
 
-// --- Passo a passo da instalação: os 10 passos abrem o Dia 1, nesta ordem ---
+// --- Passo a passo da instalação: os 11 passos abrem o Dia 1, nesta ordem ---
 type Atividade = { chave: string; ordem: number; titulo: string; instrucao: string; prova?: string; depende_de?: string; feita_na_instalacao?: boolean };
-const PASSOS = ["contas", "conectores", "config-codex", "clonar-repo", "instalador", "banco", "sistema-no-ar", "dossie-persona-marca", "whatsapp", "times"];
+const PASSOS = ["contas", "conectores", "config-codex", "clonar-repo", "instalador", "banco", "sistema-no-ar", "dossie-persona-marca", "sistema-com-marca", "whatsapp", "times"];
 const FEITOS_PELA_INSTALACAO = PASSOS.slice(0, 6); // contas ... banco; "sistema no ar" só com a prova do /login (plano-reconciliar: siteNoAr)
 const d1: Atividade[] = m.etapas.find((e: { fase: string; trilha: string }) => e.trilha === "curso" && e.fase === "D1").atividades;
 const todas: Atividade[] = m.etapas.flatMap((e: { atividades: Atividade[] }) => e.atividades);
@@ -42,24 +42,28 @@ const todas: Atividade[] = m.etapas.flatMap((e: { atividades: Atividade[] }) => 
 test("a versão do modelo subiu: a 1, a 2 e a 3 já foram carregadas com outro hash e o banco recusa mudar versão carregada", () => {
   // 6 = o comando do dossiê, persona e marca passou a chamar o instalador e a pasta do clone ganhou o nome do sistema
   // (2ª rodada da revisão final, 08/10). 7 = o comando do clone cita a URL exata do repositório-modelo (09/10).
+  // 8 = o passo "Configurar o Codex" liga o Acesso total, o Computer Use e o Chrome como navegador padrão (08/10).
+  // 9 = o instalador cria e segue sozinho, sem esperar "pode criar" (teste real, 08/10).
   // Quem muda o conteúdo do plano sobe a versão E este número, junto.
-  assert.ok(m.versao >= 7);
+  // 10 = "Configurar o Codex" é com o professor, antes do instalador, e o sistema no ar não tem QA de tela (08/10).
+  // 11 = atividade sistema-com-marca: mockup claro e escuro aprovado antes de aplicar a marca (09/10).
+  assert.ok(m.versao >= 11);
 });
 
-test("os 10 passos da instalação são os 10 primeiros do Dia 1, na ordem do manual", () => {
+test("os 11 passos da instalação são os 11 primeiros do Dia 1, na ordem do manual", () => {
   assert.deepEqual([...d1].sort((a, b) => a.ordem - b.ordem).slice(0, PASSOS.length).map((a) => a.chave), PASSOS);
   const ordemDe = (c: string) => d1.find((a) => a.chave === c)!.ordem;
-  assert.ok(ordemDe("times") < ordemDe("primeiro-time"), "os passos atuais do D1 vêm depois dos 10");
+  assert.ok(ordemDe("times") < ordemDe("primeiro-time"), "os passos atuais do D1 vêm depois dos 11");
 });
 
 test("passo da instalação não é duplicado: nenhum item antigo (casa, dossie) sobrou e o WhatsApp não está mais no Dia 2", () => {
   const chaves = todas.map((a) => a.chave);
-  for (const velha of ["casa", "dossie"]) assert.ok(!chaves.includes(velha), `${velha} foi fundido num dos 10 passos`);
+  for (const velha of ["casa", "dossie"]) assert.ok(!chaves.includes(velha), `${velha} foi fundido num dos 11 passos`);
   assert.equal(chaves.filter((c) => c === "whatsapp").length, 1);
   assert.ok(d1.some((a) => a.chave === "whatsapp"));
 });
 
-test("cada um dos 10 passos tem título curto, instrução de 1 a 2 frases e prova", () => {
+test("cada um dos 11 passos tem título curto, instrução de 1 a 2 frases e prova", () => {
   for (const c of PASSOS) {
     const a = d1.find((x) => x.chave === c)!;
     assert.ok(a.titulo.length <= 40, `${c}: título longo (${a.titulo.length})`);
@@ -83,7 +87,7 @@ test("cada passo depende do anterior (a ordem do manual vira a ordem das depend�
   });
 });
 
-test("a instalação prova só contas até banco (6 passos); sistema no ar, dossiê/persona/marca, WhatsApp e times ficam abertos", () => {
+test("a instalação prova só contas até banco (6 passos); sistema no ar, dossiê/persona/marca, sistema com a marca, WhatsApp e times ficam abertos", () => {
   assert.deepEqual(todas.filter((a) => a.feita_na_instalacao === true).map((a) => a.chave), FEITOS_PELA_INSTALACAO);
 });
 
@@ -244,4 +248,39 @@ test("dossiê, persona e marca: registra o dossiê e publica, depois persona, id
   for (const aba of Object.values(ROTULO_ABA)) assert.match(d.prova!, new RegExp(`aba ${aba}`), `a prova não cita a aba ${aba}`);
   assert.match(d.prova!, /os 3 documentos/);
   assert.match(d.passos!.at(-1)!, /Dossiê, Persona e Identidade e voz/);
+});
+
+test("Configurar o Codex liga o Acesso total, o Computer Use e o Chrome como padrão (decisão de 08/10/2026)", () => {
+  const a = todas.find((x) => x.chave === "config-codex") as Explicada;
+  const texto = [a.instrucao, a.comando, a.prova, ...(a.passos ?? [])].join("\n");
+  for (const termo of ["Acesso total", "Computer Use", "Google Chrome", "navegador padrão"]) assert.ok(texto.includes(termo), termo);
+  assert.doesNotMatch(texto, /só dentro da pasta|pedindo a sua aprovação/);
+});
+
+test("o instalador não espera licença do aluno: cria e segue sozinho (achado A14 do teste real, 08/10/2026)", () => {
+  const a = todas.find((x) => x.chave === "instalador") as Explicada;
+  assert.doesNotMatch([a.instrucao, a.comando].join("\n"), /pode criar|quando eu disser|quando você disser/);
+  assert.match(a.comando!, /sem pedir licença/);
+});
+
+test("Configurar o Codex é com o professor antes do instalador, e o sistema no ar não tem QA de tela (08/10/2026)", () => {
+  const c = todas.find((x) => x.chave === "config-codex") as Explicada;
+  assert.match(c.instrucao, /professor/);
+  assert.match(c.instrucao, /antes do instalador/);
+  const s = todas.find((x) => x.chave === "sistema-no-ar") as Explicada;
+  assert.doesNotMatch([s.instrucao, s.comando, ...(s.passos ?? [])].join("\n"), /testa como usuário|teste como usuário|testar a prévia/);
+});
+
+test("sistema com a marca: o comando chama a skill e manda mostrar o mockup em claro e escuro e o aluno aprovar ANTES de aplicar e de mandar o link de teste", () => {
+  const a = atividade("sistema-com-marca");
+  assert.match(a.comando!, /^\$tecnologia-aplicar-marca /);
+  assert.match(a.comando!, /mockup/);
+  assert.match(a.comando!, /mockup[^;]*em claro e escuro,? para eu aprovar/);
+  const aprov = a.comando!.indexOf("aprov", a.comando!.indexOf("mockup")); // "aprovada" da identidade vem antes e não conta
+  assert.ok(aprov >= 0, "o comando não pede a aprovação do mockup");
+  assert.ok(aprov < a.comando!.indexOf("link de teste"), "a aprovação do mockup tem de vir antes do link de teste");
+  assert.ok(a.comando!.indexOf("mockup") < aprov, "o mockup tem de vir antes da aprovação");
+  assert.match(a.comando!, /publique quando eu disser sim/);
+  assert.match(textoDoAluno(a), /mockup/);
+  assert.match(a.passos!.join("\n"), /mockup das telas em claro e escuro/);
 });

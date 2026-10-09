@@ -8,8 +8,16 @@
       "descricao": "Confere persona e marca contra o dossiê",
       "quando": "Use antes de publicar persona, identidade visual, tom de voz ou logo, chamado pelas skills marketing-persona, marketing-identidade e marketing-logo com o documento e o dossiê",
       "instrucoes": "agentes/marketing-revisor.md",
-      "claude": {"model": "opus", "effort": "high", "tools": ["Read", "Grep", "Glob"]},
-      "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "high", "sandbox_mode": "read-only"}
+      "claude": {"model": "opus", "effort": "medium", "tools": ["Read", "Grep", "Glob"]},
+      "codex": {"model": "gpt-6-luna", "model_reasoning_effort": "medium", "sandbox_mode": "read-only"}
+    },
+    {
+      "name": "marketing-pesquisador",
+      "descricao": "Pesquisa pública do cliente para a persona",
+      "quando": "Use só quando a skill marketing-persona pedir pesquisa pública; devolve fichas com link, data e trecho literal",
+      "instrucoes": "agentes/marketing-pesquisador.md",
+      "claude": {"model": "sonnet", "effort": "medium", "tools": ["Read", "Grep", "Glob", "WebSearch", "WebFetch"]},
+      "codex": {"model": "gpt-6-luna", "model_reasoning_effort": "medium", "sandbox_mode": "read-only"}
     }
   ],
   "skills": [

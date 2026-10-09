@@ -65,6 +65,7 @@ O script preserva a fonte original, cria o dossiê canônico e o relatório. Em 
 3. Confirmar a atualização de `STATUS-ATUAL.md`, `CHANGELOG.md`, `PENDENCIAS.md` (nova linha na tabela) e `PROXIMA-SESSAO.md`.
 4. Informar ao dono, pelo código e texto da pergunta, as que ficaram sem resposta, mais duplicadas, ambíguas e trechos não classificados, para revisão humana.
 5. Informar que o próximo trabalho é revisar lacunas e validar quais documentos empresariais podem ser derivados.
+6. Rodar `<PY> .codex/hooks/registro_trabalho.py reconciliar` (`<PY>` = `comando_python` de `operacao/INSTALACAO.md`): conclui no quadro a atividade do dossiê. Rodar de novo depois de publicar na tela.
 
 ## Publicar na tela
 

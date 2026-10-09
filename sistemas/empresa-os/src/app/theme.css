@@ -70,7 +70,7 @@
   /* --- Sombra e foco --- */
   --sombra-sm: 0 2px 4px rgba(17, 17, 20, 0.05), 0 1px 2px rgba(17, 17, 20, 0.04);
   --sombra-md: 0 4px 12px rgba(17, 17, 20, 0.07), 0 2px 4px rgba(17, 17, 20, 0.04);
-  --anel-foco: 0 0 0 3px color-mix(in srgb, var(--marca-500) 40%, transparent);
+  --anel-foco: 0 0 0 2px var(--bg), 0 0 0 4px var(--acento);
 }
 
 /* --- Escuro ---
@@ -90,6 +90,7 @@
     --acento-hover: var(--marca-300);
     --acento-suave: color-mix(in srgb, var(--marca-500) 16%, var(--neutro-900));
     --acento-texto: var(--marca-300);
+    --fg-sobre-acento: var(--neutro-900);
     --ok-suave:    color-mix(in srgb, var(--ok) 18%, var(--neutro-900));
     --alerta-suave: color-mix(in srgb, var(--alerta) 18%, var(--neutro-900));
     --erro-suave:  color-mix(in srgb, var(--erro) 18%, var(--neutro-900));
@@ -110,6 +111,7 @@
     --acento-hover: var(--marca-300);
     --acento-suave: color-mix(in srgb, var(--marca-500) 16%, var(--neutro-900));
     --acento-texto: var(--marca-300);
+    --fg-sobre-acento: var(--neutro-900);
     --ok-suave:    color-mix(in srgb, var(--ok) 18%, var(--neutro-900));
     --alerta-suave: color-mix(in srgb, var(--alerta) 18%, var(--neutro-900));
     --erro-suave:  color-mix(in srgb, var(--erro) 18%, var(--neutro-900));

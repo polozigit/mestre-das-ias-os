@@ -19,6 +19,10 @@ function harness({
   stale = false,
   autostart = { supported: true, installed: true },
   client = "claude",
+  origem = "path",
+  available = [],
+  oldStack = false,
+  motorFailures = 0,
   mcp = "instalado",
   pids = [4242],
   fail = {},
@@ -42,7 +46,12 @@ function harness({
     sleep: async () => {},
     dependenciesStale: async () => stale,
     installDependencies: record("npm-ci"),
-    setupEngine: record("motor", () => config),
+    setupEngine: async () => {
+      calls.push("motor");
+      if (fail.motor) throw new Error(fail.motor);
+      if (count(calls, "motor") <= motorFailures) throw new Error("O que responde em http://127.0.0.1:8082 nao e o motor local");
+      return config;
+    },
     getStatus: async () => { calls.push("status"); return queue.length > 1 ? queue.shift() : queue[0]; },
     resetSession: record("reset"),
     pair: async (_config, { onReady }) => {
@@ -52,8 +61,17 @@ function harness({
     },
     autostartState: () => autostart,
     autostartLigar: record("autostart-ligar"),
-    detectClient: () => client,
-    installMcp: record("mcp", () => mcp),
+    resolveClient: () => ({ client, origem }),
+    availableClients: () => available,
+    savePreference: async (chosen) => { calls.push(`grava:${chosen}`); },
+    installMcp: async (target) => {
+      calls.push("mcp", `mcp:${target}`);
+      if (fail[`mcp:${target}`] || fail.mcp) throw new Error(fail[`mcp:${target}`] || fail.mcp);
+      return typeof mcp === "object" ? mcp[target] : mcp;
+    },
+    oldStackRunning: async () => oldStack,
+    retireEvolution: record("retire-evolution"),
+    stopAssistant: (pid) => { calls.push(`stop:${pid}`); },
     assistantPid: async () => { calls.push("pid"); return pidQueue.length > 1 ? pidQueue.shift() : pidQueue[0]; },
     startAssistant: record("assistente"),
     registroConfigurado: async () => registro,
@@ -62,7 +80,9 @@ function harness({
 }
 
 const run = (h, argv = []) => conectar(argv, h.overrides);
-const count = (h, name) => h.calls.filter((call) => call === name).length;
+function count(target, name) {
+  return (Array.isArray(target) ? target : target.calls).filter((call) => call === name).length;
+}
 
 test("ja conectado: pula o QR, nao reinstala nada e imprime so o resultado", async () => {
   const h = harness();
@@ -277,7 +297,7 @@ test("--dry-run lista as etapas e nao executa nada", async () => {
   assert.equal(etapas.length, 7);
   assert.match(h.text(), /dependencias: npm ci/);
   assert.match(h.text(), /inicio automatico: liga/);
-  assert.match(h.text(), /mcp: instala no claude/);
+  assert.match(h.text(), /mcp: instala em claude se nao existir \(IA=claude origem=path\)/);
 });
 
 test("--dry-run respeita --sem-autostart, --sem-mcp e pula o que ja esta pronto", async () => {
@@ -428,4 +448,64 @@ test("a primeira coisa que o conectar faz e o npm ci: nenhum import estatico del
   visita(path.join(raiz, "conectar.mjs"));
   assert.ok(visitados.size > 5, "o grafo de imports foi percorrido");
   assert.deepEqual(pacotes, [], "no primeiro uso o node_modules ainda nao existe: a pagina do QR e carregada so depois do npm ci");
+});
+
+test("--cliente: valida, grava a escolha e repassa ao inicio automatico (ja ligado = regrava)", async () => {
+  assert.equal(parseFlags(["--cliente", "codex"]).cliente, "codex");
+  assert.equal(parseFlags(["--cliente=CLAUDE"]).cliente, "claude");
+  assert.equal(parseFlags([], { npm_config_cliente: "codex" }).cliente, "codex");
+  assert.equal(parseFlags([]).cliente, null);
+  assert.throws(() => parseFlags(["--cliente", "vscode"]), /Cliente invalido/);
+  assert.throws(() => parseFlags(["--cliente"]), /Cliente invalido/);
+
+  const h = harness({ client: "claude", autostart: { supported: true, installed: true }, pids: [77, 0] });
+  assert.equal(await run(h, ["--cliente", "codex"]), 0);
+  assert.ok(h.calls.includes("grava:codex"));
+  assert.equal(h.overrides.environment.POLOZI_IA_CLIENTE, "codex", "o plist herda a escolha");
+  assert.equal(count(h, "autostart-ligar"), 1, "ja ligado: regrava com a escolha nova");
+  assert.ok(h.calls.includes("stop:77"), "assistente antigo para");
+  assert.equal(count(h, "assistente"), 1, "e sobe de novo com o cliente novo");
+  assert.match(h.text(), /MCP=codex:ok/);
+});
+
+test("escolha vinda do PATH ou de quem roda agora e gravada; variavel e escolha gravada nao regravam", async () => {
+  for (const origem of ["path", "rodando_agora"]) {
+    const h = harness({ client: "codex", origem });
+    await run(h);
+    assert.ok(h.calls.includes("grava:codex"), origem);
+  }
+  for (const origem of ["variavel", "escolha_gravada", "padrao_os_dois"]) {
+    const h = harness({ client: "codex", origem });
+    await run(h);
+    assert.ok(!h.calls.some((call) => call.startsWith("grava:")), origem);
+  }
+});
+
+test("MCP: com os dois clientes instalados, registra nos dois; um falhando nao derruba", async () => {
+  const dois = harness({ client: "codex", available: ["codex", "claude"], mcp: { codex: "instalado", claude: "ja_existia" } });
+  assert.equal(await run(dois), 0);
+  assert.ok(dois.calls.includes("mcp:codex") && dois.calls.includes("mcp:claude"));
+  assert.match(dois.text(), /MCP=codex:ok,claude:ja_existia/);
+
+  const umFalha = harness({ client: "codex", available: ["codex", "claude"], fail: { "mcp:claude": "spawn claude ENOENT" } });
+  assert.equal(await run(umFalha), 0);
+  assert.match(umFalha.text(), /MCP=codex:ok,claude:erro/);
+
+  const todosFalham = harness({ client: "claude", fail: { mcp: "spawn claude ENOENT" } });
+  assert.equal(await run(todosFalham), 1);
+  assert.match(todosFalham.text(), /CONECTAR=ERRO etapa=mcp motivo=spawn claude ENOENT/);
+  assert.match(todosFalham.text(), /--cliente codex/);
+});
+
+test("porta 8082 tomada pela pilha Docker antiga: desmonta sozinho e tenta o motor de novo", async () => {
+  const antiga = harness({ oldStack: true, motorFailures: 1 });
+  assert.equal(await run(antiga), 0);
+  assert.equal(count(antiga, "retire-evolution"), 1);
+  assert.equal(count(antiga, "motor"), 2);
+  assert.ok(antiga.lines.includes("EVOLUTION_ANTIGA=DESMONTADA"));
+
+  const outro = harness({ oldStack: false, motorFailures: 1 });
+  assert.equal(await run(outro), 1);
+  assert.equal(count(outro, "retire-evolution"), 0, "sem a pilha antiga nao desmonta nada");
+  assert.match(outro.text(), /CONECTAR=ERRO etapa=motor/);
 });

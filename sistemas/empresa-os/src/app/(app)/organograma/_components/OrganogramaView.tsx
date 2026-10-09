@@ -3,17 +3,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { montarArvore, resumo } from "@/lib/organograma/arvore";
-import type { OrgApqc, OrgDocumentoResumo, OrgNo, OrgOnda, OrgPasso, OrgRaia } from "@/lib/organograma/tipos";
+import type { OrgApqc, OrgNo, OrgPasso, OrgRaia } from "@/lib/organograma/tipos";
 import { ocupacaoPorCargo } from "@/lib/organograma/ocupacao";
 import type { Ocupante } from "@/lib/organograma/ocupacao";
 import { Palco } from "./Palco";
 import { PainelCargo } from "./PainelCargo";
 import { PacoteCargo } from "./PacoteCargo";
-import { FluxoOndas } from "./FluxoOndas";
-import { Documentos } from "./Documentos";
+import { Workflows } from "./Workflows";
 import { IndiceCargo } from "./IndiceCargo";
 
-type Vista = "organograma" | "fluxo" | "documentos";
+type Vista = "organograma" | "workflows";
 
 function Stat({ valor, rotulo }: { valor: string | number; rotulo: string }) {
   return (
@@ -28,17 +27,13 @@ export function OrganogramaView({
   nos,
   raias,
   passos,
-  ondas,
   apqc,
-  documentos,
   ocupacao,
 }: {
   nos: OrgNo[];
   raias: OrgRaia[];
   passos: OrgPasso[];
-  ondas: OrgOnda[];
   apqc: OrgApqc[];
-  documentos: OrgDocumentoResumo[];
   ocupacao: Ocupante[];
 }) {
   const ocupacaoMap = useMemo(() => ocupacaoPorCargo(ocupacao), [ocupacao]);
@@ -49,10 +44,8 @@ export function OrganogramaView({
   const [vista, setVista] = useState<Vista>("organograma");
   const [focoId, setFocoId] = useState<string>(indice.raiz?.no_id ?? "");
   const [playbookAlvo, setPlaybookAlvo] = useState<string | null>(null);
-  const [documentoAlvo, setDocumentoAlvo] = useState<string | null>(null);
-  // referências estáveis: os efeitos de PacoteCargo/Documentos dependem delas
+  // referência estável: o efeito de PacoteCargo depende dela
   const limparPlaybookAlvo = useCallback(() => setPlaybookAlvo(null), []);
-  const limparDocumentoAlvo = useCallback(() => setDocumentoAlvo(null), []);
 
   const foco = indice.porId.get(focoId) ?? indice.raiz;
 
@@ -71,11 +64,6 @@ export function OrganogramaView({
     setPlaybookAlvo(slug);
   }
 
-  function abrirDocumento(caminho: string) {
-    setVista("documentos");
-    setDocumentoAlvo(caminho);
-  }
-
   if (!indice.raiz) {
     return null; // page.tsx já trata a lista vazia com o Empty state
   }
@@ -86,8 +74,7 @@ export function OrganogramaView({
         <SegmentedControl
           options={[
             { value: "organograma", label: "Organograma" },
-            { value: "fluxo", label: "Fluxo e ondas" },
-            { value: "documentos", label: "Documentos" },
+            { value: "workflows", label: "Workflows" },
           ]}
           value={vista}
           onChange={setVista}
@@ -101,7 +88,6 @@ export function OrganogramaView({
         <Stat valor={stats.processos} rotulo="processos" />
         <Stat valor={stats.horasMes.toLocaleString("pt-BR")} rotulo="h/mês" />
         <Stat valor={`${stats.comSalario}/${stats.cargos}`} rotulo="com salário de mercado" />
-        <Stat valor={documentos.length} rotulo="documentos" />
       </div>
 
       {vista === "organograma" && (
@@ -112,12 +98,8 @@ export function OrganogramaView({
             <PainelCargo
               no={foco}
               apqc={apqcMap}
-              documentos={documentos}
-              ondas={ondas}
               ocupacao={ocupacaoMap.get(foco.slug)}
-              onAbrirDocumento={abrirDocumento}
               onAbrirPlaybook={abrirPlaybook}
-              onIrParaFluxo={() => setVista("fluxo")}
             />
           )}
           {foco && (
@@ -127,30 +109,18 @@ export function OrganogramaView({
               apqc={apqcMap}
               focarPlaybookSlug={playbookAlvo}
               onFocado={limparPlaybookAlvo}
-              documentos={documentos}
-              onAbrirDocumento={abrirDocumento}
               onFocarCargo={focarCargoSlug}
             />
           )}
         </div>
       )}
 
-      {vista === "fluxo" && (
-        <FluxoOndas
+      {vista === "workflows" && (
+        <Workflows
           raias={raias}
           passos={passos}
-          ondas={ondas}
           onVerCargo={focarCargoSlug}
           onAbrirPlaybook={abrirPlaybook}
-        />
-      )}
-
-      {vista === "documentos" && (
-        <Documentos
-          documentos={documentos}
-          documentoAlvo={documentoAlvo}
-          onDocumentoAlvoConsumido={limparDocumentoAlvo}
-          onFocarCargo={focarCargoSlug}
         />
       )}
     </div>

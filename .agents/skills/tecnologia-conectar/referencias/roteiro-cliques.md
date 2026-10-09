@@ -1,6 +1,6 @@
 # Roteiro clique a clique (plano B)
 
-Use só quando a skill `tecnologia-conectar` falhou 2 vezes no mesmo passo. Cada seção tem o endereço, os passos numerados com o nome do botão entre aspas e o resultado esperado. Os nomes de botão podem mudar: as marcas `<!-- rotulo: confirmar no ensaio -->` dizem onde conferir. Quem clica é o dono; a IA espera o "pronto".
+Use só quando a skill `tecnologia-conectar` falhou 2 vezes no mesmo passo. Cada seção tem o endereço, os passos numerados com o nome do botão entre aspas e o resultado esperado. Os nomes de botão podem mudar: as marcas `<!-- rotulo: confirmar no ensaio -->` dizem onde conferir. A IA abre a página no Chrome do dono e clica (Computer Use) e roda os comandos de terminal; só o que ela não alcança (senha, código, confirmação) é do dono, e então a IA espera o "pronto".
 
 ## Projeto na Vercel a mão
 

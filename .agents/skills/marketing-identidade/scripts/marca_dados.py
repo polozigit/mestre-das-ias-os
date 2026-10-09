@@ -501,7 +501,7 @@ def conferir_texto(texto: str, casa: Path, dossie: dict) -> tuple[list[str], dic
                             problemas.append(f"linha {n}: a marca ({tipo} [{num}]) aponta a fonte [{num}], que não está em Fontes")
                         elif achada[0] != tipo:
                             problemas.append(f"linha {n}: a marca ({tipo} [{num}]) diz {tipo}, mas a fonte [{num}] é {achada[0]}")
-    mecanicos, _ = dp.conferir_documento(_sem_dados(corpo), dossie, False)
+    mecanicos, _ = dp.conferir_documento(_sem_dados(corpo), dossie, False, pesquisa_e_dados=False)  # [n] tipadas: conferidas acima
     todas = _lf(corpo).split("\n")
     for p in mecanicos:
         m = RE_PROBLEMA_ASPAS.match(p)

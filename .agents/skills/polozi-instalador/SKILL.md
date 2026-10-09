@@ -120,22 +120,28 @@ conversa nova (o Windows só enxerga o programa novo numa conversa nova) e
 
 ## ETAPA 0 — `0-preflight` (antes de tudo)
 
-1. Rodar, com o caminho absoluto localizado em "Preparar":
+Retomada numa Casa já instalada: rode uma vez
+`<PY> .codex/hooks/registro_trabalho.py ligar` (liga o registro de tarefas dos pedidos).
+
+1. ANTES de tudo, a conferência do acesso total e do Computer Use (item 4,
+   segunda parte): faltou um dos dois, mostre o passo e PARE ali. Depois rodar,
+   com o caminho absoluto localizado em "Preparar":
    ```
    <PY> <SKILL_DIR>/scripts/preflight.py --pasta "<PASTA_ABERTA>" --json
    ```
 2. **Faltou programa (`py`, `node`, `git` ou `gh` em `bloqueio`).** Antes de
    parar, rode `<PY> <SKILL_DIR>/scripts/instalar_requisitos.py --plano`,
-   mostre a lista do que falta e pergunte UMA vez: "Posso instalar agora?
-   Responda sim ou não." Com o "sim": um por um, na ordem (Mac: `git` primeiro,
+   diga em 1 linha o que vai instalar e instale, sem perguntar (instalar o
+   que o sistema precisa é autorização permanente da Casa): um por um, na ordem (Mac: `git` primeiro,
    que traz as Command Line Tools, depois `py`, `node`, `gh`; Windows: `py`,
    `git`, `node`, `gh`), rode `<PY> <SKILL_DIR>/scripts/instalar_requisitos.py --instalar <id>`
    e repasse ao aluno a linha `ACAO_DO_ALUNO` (a senha do Mac é digitada por ele
-   NA JANELA DO SISTEMA; a IA nunca digita senha). Computer Use NÃO é preciso:
-   no Windows a janela de permissão fica numa área protegida que ele não
-   alcança; no Mac pode ajudar a clicar Continuar, é opcional. Se o Codex
-   recusar o download ou a abertura pela sandbox, aceite a aprovação que ele
-   oferece (é o mesmo comando). Terminado cada instalador, mostre o `DEPOIS`:
+   NA JANELA DO SISTEMA; a IA nunca digita senha). Com o Computer Use ligado
+   (conferido no item 4), a IA clica sozinha nas janelas comuns do instalador (Continuar);
+   a janela de senha e a de permissão do sistema (no Windows, a área protegida)
+   ficam com o aluno, porque o Computer Use não aprova permissão do sistema nem
+   age como administrador. Se o Codex pedir aprovação pra baixar ou abrir, o
+   acesso total não está ligado na tela: volte à conferência do item 4. Terminado cada instalador, mostre o `DEPOIS`:
    no Mac rode o preflight de novo nesta mesma conversa; no Windows peça uma
    conversa nova e `$polozi-instalador` de novo (o PATH novo só vale em processo
    novo). "Não" = PARE com o `como_resolver` de cada item, como no passo
@@ -159,7 +165,7 @@ conversa nova (o Windows só enxerga o programa novo numa conversa nova) e
      Node 22 LTS ou mais novo, sem bloquear.
    - `casa_git`: conta se a Casa é clonada do repositório-modelo ou do zip.
      Nunca bloqueia: `.git` com `origin` do modelo não é erro.
-4. **Confiar na pasta.** Instruir o aluno a marcar esta pasta como confiada
+4. **Confiar na pasta e conferir acesso total e Computer Use.** Instruir o aluno a marcar esta pasta como confiada
    no Codex — sem isso o `.codex/config.toml` E o `.codex/rules/` do projeto
    são ignorados EM SILÊNCIO [24a:config/f2, hooks/f05]. Dizer, com todas as
    letras, que NÃO existe hoje comando publicado que prove que o config do
@@ -167,9 +173,25 @@ conversa nova (o Windows só enxerga o programa novo numa conversa nova) e
    confiou na pasta e se o rodapé do Codex mostra o modelo `gpt-5.6-terra`.
    No app, o seletor de modelo do chat e a permissão escolhida na tela podem
    valer mais que o `.codex/config.toml` [24a:config/n65]: rodapé com outro
-   modelo, ou "Acesso total" ligado? Peça pra escolher o GPT-5.6 Terra no
-   seletor do chat e pra conferir em Configurações, Geral, que o "Acesso
-   total" está desligado; só então peça o "sim".
+   modelo? Peça pra escolher o GPT-5.6 Terra no seletor do chat.
+   **Acesso total e Computer Use NÃO são ligados por este instalador:** são
+   a configuração que o professor faz junto com o aluno, no telão, ANTES do
+   instalador (atividade "Configurar o Codex" do plano), porque sem o
+   Computer Use a IA nem consegue operar o computador. O `.codex/config.toml`
+   da Casa já pede `danger-full-access` e `approval_policy = "never"`, mas a
+   tela vale mais. Aqui a IA só CONFERE: a permissão desta conversa, que ela
+   vê no próprio ambiente, é sem sandbox e sem pedir aprovação (o chat mostra
+   o selo "Acesso completo"), e as ferramentas do Computer Use estão
+   disponíveis. Faltou um dos dois? Mostre o passo exato e PARE, sem seguir
+   a instalação: acesso total = Configurações, Geral, ligar "Acesso total", e
+   no seletor de permissão do chat escolher o acesso total ("Full access";
+   ligar nas Configurações não troca o chat já aberto); Computer Use =
+   Plugins, Computer Use, instalar o plugin, ligar o servidor e a skill, "Try
+   now" (no Mac, conceder Gravação de Tela e Acessibilidade). A IA não liga
+   nenhum dos dois: o Computer Use não opera o próprio ChatGPT. Não liga
+   (conta de empresa, política do administrador)? Chame o professor. As
+   guardas da Casa continuam valendo em acesso total: o hook que recusa ação
+   perigosa roda igual [24a:hooks/n66]. Só então peça o "sim".
    SÓ com o "sim" dele gravar `projeto_confiado: sim` no frontmatter — nunca
    gravar `sim` por conta própria. Sem comando que prove, o que vale é o que
    ele vê no rodapé. A confiança dos HOOKS é outra coisa e vem no FIM da
@@ -180,7 +202,32 @@ conversa nova (o Windows só enxerga o programa novo numa conversa nova) e
    ferramenta, e confiar antes do arquivo definitivo derruba a confiança em
    silêncio (a confiança de hook não-gerenciado é rastreada pelo HASH da
    definição: mudou o arquivo, o hash muda, a confiança some).
-5. Fechar a ETAPA 0, com o mesmo caminho absoluto:
+5. **Chrome.** A IA usa o Chrome do aluno, já logado, pra
+   todo site sem CLI nem conector (cadastro, painel, OAuth, copiar chave),
+   pelo Computer Use; nunca o navegador embutido do app nem o da nuvem. Toda
+   página abre por comando no Chrome, nunca por link clicado no chat (o app
+   não tem opção pra mandar link pro navegador externo): no Mac
+   `open -a "Google Chrome" "<url>"`, no Windows `start chrome "<url>"`. Chrome
+   ainda não é o navegador padrão? A IA faz sozinha: abre o Chrome (sem Chrome, baixa e abre o instalador oficial
+   de google.com/chrome; a janela do sistema é do aluno) e, nas
+   configurações do Chrome, "Navegador padrão", clica em tornar padrão (a
+   confirmação do sistema é do aluno). Senha, código de SMS e 2FA são sempre
+   do aluno: a IA nunca digita nem pede.
+6. **Acesso total também no outro agente de código.** A Casa também abre
+   noutro agente de código que lê o mesmo `AGENTS.md`; nele o acesso total só
+   vale se vier do arquivo de configuração do USUÁRIO, não do da Casa. O
+   script detecta se esse agente está na máquina e diz o nome. A IA liga
+   sozinha, avisando em 1 linha:
+   ```
+   <PY> <SKILL_DIR>/scripts/ligar_acesso_total.py --gravar
+   ```
+   `NAO_SE_APLICA` = o outro agente não está nesta máquina, siga. `FEITO` ou
+   `JA_ESTAVA`: repasse a linha `ACAO_DO_ALUNO` (o aviso do modo na primeira
+   conversa é do aluno). `TRAVA` = o próprio arquivo trava o modo: respeite e
+   siga. `PAREI` (saída 2) = o arquivo do aluno não é JSON válido: mostre e
+   corrija com ele, nunca sobrescreva. As regras `deny` da Casa continuam
+   valendo em acesso total.
+7. Fechar a ETAPA 0, com o mesmo caminho absoluto:
    ```
    <PY> <SKILL_DIR>/scripts/preflight.py --pasta "<PASTA_ABERTA>" --gravar
    ```
@@ -225,8 +272,9 @@ respostas se repetem, e `projeto_confiado` volta a `pendente` até ele confirmar
 de novo). Ele prefere manter o nome da pasta? Siga sem insistir: é o único dos 4
 nomes que pode ficar diferente sem quebrar nada.
 
-Rodar primeiro com `--dry-run`, mostrar a prévia ao aluno (ela traz o nome do
-sistema e o que o git vai fazer), e só então repetir sem `--dry-run`, usando o
+Rodar primeiro com `--dry-run`, mostrar a prévia ao aluno em 1 bloco (ela traz o
+nome do sistema e o que o git vai fazer) e, sem esperar resposta, repetir sem
+`--dry-run` (o nome da pasta, acima, é a única coisa que espera o aluno), usando o
 caminho absoluto da skill irmã localizado em "Preparar":
 
 ```
@@ -313,11 +361,11 @@ da tabela.
 |---|---|
 | `0-preflight` | Seção "ETAPA 0 — preflight" acima. |
 | `3-casa` | Seção "3-casa" acima. |
-| `4-github` | Delegar em `polozi-criar-github`: cria o repositório PRIVADO com o nome do sistema (`slug_os:` de `operacao/INSTALACAO.md`). Casa clonada: troca o `origin` do modelo pelo repositório do aluno ANTES do primeiro push (push no modelo nunca). Aluno que já tem um repositório dele com outro nome: `gh repo rename` no repositório DELE, nunca no modelo. |
+| `4-github` | Delegar em `polozi-criar-github`: login do `gh` JÁ com `--scopes workflow`, autor dos commits da Casa = e-mail da conta GitHub do aluno (`identidade_git.py`, A39) e cria o repositório PRIVADO com o nome do sistema (`slug_os:` de `operacao/INSTALACAO.md`). Casa clonada: troca o `origin` do modelo pelo repositório do aluno ANTES do primeiro push (push no modelo nunca). Aluno que já tem um repositório dele com outro nome: `gh repo rename` no repositório DELE, nunca no modelo. |
 | `7-banco` | Delegar em `polozi-registrar-conexao` (Supabase do sistema, projeto `<slug_os>`) e fechar o banco como na seção "7-banco" abaixo: Secrets do GitHub gravados e migrations aplicadas pela Action `deploy-db.yml`, disparada à mão, nunca por `supabase db push`. Sem o time Tecnologia na Casa ou sem o repositório do aluno no `origin`: **PARAR**. |
-| `8-sistema` | Delegar na skill `tecnologia-publicar` (publica o sistema; o projeto na Vercel se chama como o sistema, `<slug_os>`) e seguir o roteiro `sistemas/empresa-os/LEIA-ME.md` pelos passos abaixo. Exige a `7-banco` `concluida` (banco no ar, migrations aplicadas pela Action, schemas expostos); senão volte à `7-banco`. O sistema já está em `sistemas/empresa-os/`: o passo 1 do roteiro sobre descompactar não vale, o passo 5 (migrations) foi a `7-banco` e o passo 2 (mockup) e o tema e a logo do passo 3 são da `6-marca`. Na ordem: (a) só o pacote do setup dentro de `sistemas/empresa-os` (passo 1): `npm install --prefix scripts --no-save "@supabase/supabase-js@2"`, nunca o `npm install` completo (a Vercel instala tudo na nuvem; ~500 MB por aluno na rede da sala); (b) preencher a identidade em `sistemas/empresa-os/config/empresa.ts` (a parte do passo 3 que o setup exige) com as respostas da `3-casa`, sem perguntar de novo: `nome` é o nome da empresa, `nomeMaster` e `emailMaster` são o nome e o e-mail do dono, `slug` é o `slug_os:` de `operacao/INSTALACAO.md` e `descricao` é uma frase curta que você escreve com o nome da empresa; (c) passo 4 (preview local), só se o dono quiser ver antes: aí sim o `npm install` completo; (d) passo 6: o `scripts/setup-inicial.mjs` do sistema cria a empresa e o dono, carrega o plano e manda o e-mail de convite (as chaves vêm de `credenciais/.env` sem aparecer no chat; na 1ª vez com `SITE_URL=http://localhost:3000`) e para sem o pacote do setup instalado e sem o `config/empresa.ts` preenchido; (e) passo 7 (Vercel), com a `tecnologia-publicar` e a `tecnologia-conectar`, nesta ordem: (e1) a IA cria o projeto `<slug_os>` pelo conector da Vercel (`create_git_project`, pasta raiz `sistemas/empresa-os`, `deploy=false`; sem o conector, o roteiro "Projeto na Vercel a mão" da `tecnologia-conectar`); (e2) `<PY> "<PASTA_ABERTA>/.agents/skills/tecnologia-publicar/scripts/instalar_guardas.py" --casa "<PASTA_ABERTA>"` (link com `--project <slug_os>`, git, QA, guardas, Secrets e Dependabot); (e3) `$tecnologia-conectar` `projeto` (prova o link) e `vercel-env` (as variáveis do banco na Vercel, antes da primeira publicação); (e4) a primeira publicação, pela `tecnologia-publicar`; (e5) `$tecnologia-conectar` `auth-urls`, `provar` (só segue com `TUDO LIGADO`) e `vault`; e então o `setup-inicial.mjs` de novo com o `SITE_URL` definitivo: é ele que marca "sistema no ar" no plano (e6); (f) passo 8 (primeiro login): o dono abre o e-mail de convite, define a senha e entra, de preferência pelo celular; (g) passo 9 (guardas): as guardas já ligaram no (e2), então só confira o bloco `DEPLOY` de `operacao/INSTALACAO.md`. Se `.agents/skills/tecnologia-publicar/` ou `.agents/skills/tecnologia-conectar/` não existir (Casa clonada antes da skill nova: atualizar o time Tecnologia): instruir a instalar o time Tecnologia e **PARAR**. |
+| `8-sistema` | Delegar na skill `tecnologia-publicar` (publica o sistema; o projeto na Vercel se chama como o sistema, `<slug_os>`) e seguir o roteiro `sistemas/empresa-os/LEIA-ME.md` pelos passos abaixo. Exige a `7-banco` `concluida` (banco no ar, migrations aplicadas pela Action, schemas expostos); senão volte à `7-banco`. O sistema já está em `sistemas/empresa-os/`: o passo 1 do roteiro sobre descompactar não vale, o passo 5 (migrations) foi a `7-banco` e o passo 2 (mockup) e o tema e a logo do passo 3 são da `6-marca`. Na ordem: (a) só o pacote do setup dentro de `sistemas/empresa-os` (passo 1): `npm install --prefix scripts --no-save "@supabase/supabase-js@2"`, nunca o `npm install` completo (a Vercel instala tudo na nuvem; ~500 MB por aluno na rede da sala); (b) preencher a identidade em `sistemas/empresa-os/config/empresa.ts` (a parte do passo 3 que o setup exige) com as respostas da `3-casa`, sem perguntar de novo: `nome` é o nome da empresa, `nomeMaster` e `emailMaster` são o nome e o e-mail do dono, `slug` é o `slug_os:` de `operacao/INSTALACAO.md` e `descricao` é uma frase curta que você escreve com o nome da empresa; (c) passo 4 (preview local), só se o dono quiser ver antes: aí sim o `npm install` completo; (d) passo 6: o `scripts/setup-inicial.mjs` do sistema cria a empresa e o dono, carrega o plano e manda o e-mail de convite (as chaves vêm de `credenciais/.env` sem aparecer no chat; na 1ª vez com `SITE_URL=http://localhost:3000`) e para sem o pacote do setup instalado e sem o `config/empresa.ts` preenchido; (e) passo 7 (Vercel), com a `tecnologia-publicar` e a `tecnologia-conectar`, nesta ordem: (e0) antes de criar: o conector da Vercel é da conta do ChatGPT, então a IA mostra o time dele (`list_teams`) e PARA se não for o do aluno (religar o plugin só vale em CONVERSA NOVA); o app "Vercel" instalado no GitHub do aluno com acesso a TODOS os repositórios (`tecnologia-conectar`, passo e1); (e1) a IA cria o projeto `<slug_os>` pelo conector da Vercel (`create_git_project`, pasta raiz `sistemas/empresa-os`, `deploy=false`; sem o conector, o roteiro "Projeto na Vercel a mão" da `tecnologia-conectar`); (e2) `<PY> "<PASTA_ABERTA>/.agents/skills/tecnologia-publicar/scripts/instalar_guardas.py" --casa "<PASTA_ABERTA>"` (link com `--project <slug_os>`, git, QA, bypass de automação da prévia, guardas, Secrets e Dependabot; a CLI da Vercel a IA instala e loga pelo Chrome antes); (e3) `$tecnologia-conectar` `projeto` (prova o link) e `vercel-env` (as variáveis do banco na Vercel, antes da primeira publicação); (e4) a primeira publicação, pela `tecnologia-publicar`, SEM QA de tela: na instalação não há usuário "Teste de QA", não se pede um 2º e-mail e o `polozi-sistema-qa` não roda (é o sistema do modelo, sem mudança de tela; o QA por preview é das mudanças de tela depois, pela `tecnologia-construir-tela` e a `tecnologia-publicar`); (e5) `$tecnologia-conectar` `auth-urls`, `provar` (só segue com `TUDO LIGADO`) e `vault`; e então o `setup-inicial.mjs` de novo com o `SITE_URL` definitivo: é ele que marca "sistema no ar" no plano (e6); (f) passo 8 (primeiro login): o dono abre o e-mail de convite, define a senha e entra, de preferência pelo celular; (g) passo 9 (guardas): as guardas já ligaram no (e2), então só confira o bloco `DEPLOY` de `operacao/INSTALACAO.md` (o `usuario_qa` em `NAO-MEDIDO` é o esperado). Prova da `8-sistema`, e só ela: `/login` do endereço de produção responde 200, as variáveis do banco estão na Vercel (`vercel-env`), as Auth URLs gravadas (`auth-urls`), o convite enviado e o 1º login do dono feito. Se `.agents/skills/tecnologia-publicar/` ou `.agents/skills/tecnologia-conectar/` não existir (Casa clonada antes da skill nova: atualizar o time Tecnologia): instruir a instalar o time Tecnologia e **PARAR**. |
 | `5-dossie` | Delegar em `polozi-registrar-dossie` (só quando o usuário tiver a transcrição pronta). Vem depois do sistema no ar: o dossiê é gravado no banco e aparece na aba Dossiê da tela Marca. |
-| `6-marca` | Exige a `5-dossie` concluída e o time Marketing na Casa (`.agents/skills/marketing-persona/` existe). Presente: delegar, uma por vez e nesta ordem, em `marketing-persona` (cliente ideal e persona a partir do dossiê), `marketing-identidade` (cores, letra e tom de voz) e, só se o dono tem o arquivo do logo, `marketing-logo` (opcional; usa o Pillow, e a skill pede o "sim" do dono antes de instalá-lo); cada uma pede o "sim" do dono antes de publicar na tela Marca. Conclui quando `empresa/publico/persona.md`, `empresa/marca/identidade-visual.md` e `empresa/marca/tom-de-voz.md` estão `aprovado` no `MAPA-DA-EMPRESA-IA.md`. Publicar na tela Marca NÃO é condição (o banco e o sistema já estão no ar, etapas 7 e 8, e cada skill publica ao ser aprovada): a skill que terminar com `FALTA` deixa o documento aprovado na pasta e a publicação sai depois, quando o dono pedir "publica a persona e a marca" (a `marketing-persona` publica o que ficou pendente) ou pela atividade `dossie-persona-marca` do plano. Dossiê ausente (`contexto/dossie/dossie-completo.md` não existe, ou a `5-dossie` está `pulada`): instruir a `5-dossie` e **PARAR**; se o dono prefere deixar a marca para depois, vale "Pular uma etapa" (a `6-marca` fica `pulada`, com o motivo em `operacao/DECISOES.md`). Time ausente (`.agents/skills/marketing-persona/` ou `.agents/skills/marketing-identidade/` não existe): o time Marketing não está nesta Casa, instruir a instalá-lo com a skill `polozi-instalar-time` (ou clonar de novo o repositório-modelo, que já vem com ele) e **PARAR**: não marcar como `pulada`, não improvisar persona nem identidade visual sozinho. |
+| `6-marca` | Exige a `5-dossie` concluída e o time Marketing na Casa (`.agents/skills/marketing-persona/` existe). Presente: delegar, uma por vez e nesta ordem, em `marketing-persona` (cliente ideal e persona a partir do dossiê), `marketing-identidade` (cores, letra e tom de voz) e, só se o dono tem o arquivo do logo, `marketing-logo` (opcional; usa o Pillow, que a skill instala sem perguntar); cada uma pede o "sim" do dono antes de publicar na tela Marca. Conclui quando `empresa/publico/persona.md`, `empresa/marca/identidade-visual.md` e `empresa/marca/tom-de-voz.md` estão `aprovado` no `MAPA-DA-EMPRESA-IA.md`. Publicar na tela Marca NÃO é condição (o banco e o sistema já estão no ar, etapas 7 e 8, e cada skill publica ao ser aprovada): a skill que terminar com `FALTA` deixa o documento aprovado na pasta e a publicação sai depois, quando o dono pedir "publica a persona e a marca" (a `marketing-persona` publica o que ficou pendente) ou pela atividade `dossie-persona-marca` do plano. Dossiê ausente (`contexto/dossie/dossie-completo.md` não existe, ou a `5-dossie` está `pulada`): instruir a `5-dossie` e **PARAR**; se o dono prefere deixar a marca para depois, vale "Pular uma etapa" (a `6-marca` fica `pulada`, com o motivo em `operacao/DECISOES.md`). Time ausente (`.agents/skills/marketing-persona/` ou `.agents/skills/marketing-identidade/` não existe): o time Marketing não está nesta Casa, instruir a instalá-lo com a skill `polozi-instalar-time` (ou clonar de novo o repositório-modelo, que já vem com ele) e **PARAR**: não marcar como `pulada`, não improvisar persona nem identidade visual sozinho. Ao concluir, NÃO aplique a marca no sistema aqui: aponte a atividade seguinte do plano, `sistema-com-marca`, para o dono rodar em conversa nova (skill `tecnologia-aplicar-marca`: mostra primeiro um mockup das telas principais em claro e escuro, ele aprova, e só então aplica, manda o link de teste e publica com o sim dele). |
 
 #### 7-banco
 
@@ -349,17 +397,24 @@ Antes de começar, confirme (qualquer falha = **PARAR**, sem improvisar):
 Nesta seção, `<SKILL_PUBLICAR>` é `<PASTA_ABERTA>/.agents/skills/tecnologia-publicar`.
 
 1. **Conexão e valores.** O projeto `<slug_os>` ainda não existe no Supabase?
-   O dono o cria no painel, com esse nome, e guarda a senha do banco que
-   definir (ela vai para o `.env` pelo mesmo caminho, nunca pelo chat).
+   A IA o cria no painel, com esse nome, pelo Chrome do dono (Computer Use);
+   a senha do banco é a única parte do dono: ele digita na tela e guarda (ela
+   vai para o `.env` pelo mesmo caminho, nunca pelo chat).
+   Depois de gerar uma chave, a IA NÃO lê a página (nem captura de tela, nem
+   árvore de acessibilidade: no teste de 08/10 o token vazou assim); clica em
+   Copiar e usa o comando de chave de uma linha.
    Delegar em `polozi-registrar-conexao`: registre o
    Supabase (conector do app, com a prova do script dela) e traga para o
    `credenciais/.env` os valores do projeto `<slug_os>`, um por vez, pelo
-   comando de chave de uma linha da própria skill: o dono copia o valor no
-   painel do Supabase e o comando o cola direto no arquivo. O valor nunca
+   comando de chave de uma linha da própria skill: a IA copia o valor no
+   painel do Supabase, pelo Chrome do dono (botão de copiar do painel), e o
+   comando o cola direto no arquivo. O valor nunca
    passa pelo chat e a IA nunca abre o arquivo (o hook recusa). Nomes:
    - para a Action: `SUPABASE_PROJECT_ID` (o ref: o trecho antes de
      `.supabase.co` na URL do projeto), `SUPABASE_ACCESS_TOKEN` (Account,
-     Access Tokens; validade "Never", escopo mínimo) e `SUPABASE_DB_PASSWORD`
+     Access Tokens; token de ACESSO TOTAL, o clássico, sem escolher organização nem
+     permissão, validade "Never"; a IA cria sozinha, sem perguntar; depois de gerar
+     NUNCA lê a página, só clica em Copiar) e `SUPABASE_DB_PASSWORD`
      (a senha do banco; esqueceu, o dono troca em Database, Reset database
      password);
    - para o sistema: `NEXT_PUBLIC_SUPABASE_URL`,
@@ -416,7 +471,8 @@ Nesta seção, `<SKILL_PUBLICAR>` é `<PASTA_ABERTA>/.agents/skills/tecnologia-p
    workflow, o repositório do aluno não tem `.github/workflows/deploy-db.yml`
    na `main` (Casa mais antiga que o modelo atual): **PARAR**, sem copiar o
    arquivo na mão.
-4. **Expor os schemas.** O dono, no painel do Supabase do projeto `<slug_os>`:
+4. **Expor os schemas.** A IA, no painel do Supabase do projeto `<slug_os>`, pelo
+   Chrome do dono:
    Project Settings, Data API, Exposed schemas; acrescentar `tarefas` e
    `organograma` à lista (manter os que já estão) e salvar. Sem isso o
    `setup-inicial.mjs` da `8-sistema` para com `PGRST106` (e repete esta
@@ -463,9 +519,12 @@ publicação sai quando o sistema estiver no ar.
 1. Etapa entregue pela skill delegada → atualizar
    `operacao/INSTALACAO.md`: estado `concluida` + data de hoje na linha da
    etapa; mover `etapa_atual` para a próxima pendente (ou manter `6-marca`, a
-   última da ordem, quando tudo fechou).
-2. Perguntar ao usuário se segue pra próxima etapa ou para por aqui. Só
-   avançar depois de um "sim" explícito — nunca encadear etapas sozinho.
+   última da ordem, quando tudo fechou). Em seguida rodar
+   `<PY> .codex/hooks/registro_trabalho.py reconciliar` (conclui no quadro a
+   atividade do plano que a etapa provou).
+2. Seguir direto pra próxima etapa, avisando em 1 linha o que terminou e o
+   que vem; parar só se o dono pedir, ou numa etapa que espera algo que só
+   ele faz (senha, código, 2FA, janela do sistema, a transcrição do dossiê).
 3. Se todas as etapas estiverem `concluida`/`pulada`, informar que a
    instalação terminou. Os times do kit já vêm instalados na Casa (conferir
    com `polozi-instalar-time`) e time novo é com o time Native AI: ficam fora
@@ -485,7 +544,7 @@ Ele já vem na Casa — não é gravado por esta skill — e serve pro git ficar
 invisível pro aluno (D24-15). SÓ carrega com a pasta confiada
 [24a:config/n08]; `rules` é EXPERIMENTAL e pode mudar [24a:config/n08].
 
-**NUNCA escreva em ~/.codex/rules/** — é lá que o TUI grava o allow-list do
+**Em ~/.codex/rules/ só acrescente, nunca sobrescreva** — é lá que o TUI grava o allow-list do
 próprio aluno; sobrescrever apaga o que é dele.
 
 Interruptor: se o Codex reclamar do arquivo, renomear pra
@@ -508,7 +567,8 @@ volta a pedir aprovação [24a:config/n07].
   de ser o repositório-modelo quando a `4-github` termina.
 - Nunca gravar `projeto_confiado: sim` sem o aluno confirmar.
 - Nunca marcar `0-preflight` concluída com item em bloqueio.
-- `instalar_requisitos.py` só roda com o "sim" do aluno, uma pergunta só para a lista inteira; nunca com senha digitada pela IA.
+- `instalar_requisitos.py` roda sem perguntar, avisando em 1 linha; nunca com senha digitada pela IA.
+- Acesso total e Computer Use conferidos ligados antes do preflight (faltou = a ETAPA 0 parou com o passo exato); `ligar_acesso_total.py --gravar` rodou (qualquer saída menos `PAREI`).
 
 ## Limites
 
@@ -527,10 +587,8 @@ volta a pedir aprovação [24a:config/n07].
   GitHub e conexão, nunca deste instalador.
 - Nunca reescrever uma etapa já `concluida` de volta pra `pendente` sozinho;
   regressão só a pedido explícito do usuário.
-- Nunca avançar pra etapa seguinte sem o "sim" do usuário ao fim da etapa
-  anterior.
 - Nunca executar etapa fora da ordem fixa, mesmo a pedido — explique a
   dependência.
 - Nunca gravar `projeto_confiado: sim` sem o aluno confirmar.
 - Nunca marcar `0-preflight` concluída havendo item em bloqueio.
-- Nunca digitar senha (a do Mac é do aluno, na janela do sistema) e nunca instalar programa sem o "sim" do aluno; a pergunta é uma só para a lista inteira.
+- Nunca digitar senha (a do Mac é do aluno, na janela do sistema). Instalar programa que o sistema precisa não pede "sim": é autorização permanente da Casa.

@@ -6,12 +6,13 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { runningAssistantPid } from "./assistant-process.mjs";
 import { autostartInstalled, runAutostart } from "./autostart.mjs";
 import { isConnected, logout, openLogForAppend, ownPhone, waitForConnection } from "./engine-client.mjs";
-import { detectClient, resolveCasaDir } from "./ia-empresa.mjs";
+import { availableClients, normalizeClient, resolveClient, writePreference } from "./cliente-ia.mjs";
 import { installMcp } from "./install-mcp.mjs";
 import { getStateDirectory } from "./local-paths.mjs";
 import { summarizePreflight } from "./preflight.mjs";
 import { run } from "./process.mjs";
 import { loadSupabaseCredentials } from "./registro-supabase.mjs";
+import { oldStackRunning, retireEvolution } from "./retire-evolution.mjs";
 import { setupEngine } from "./setup.mjs";
 import { startBackground } from "./start-background.mjs";
 
@@ -23,26 +24,46 @@ import { startBackground } from "./start-background.mjs";
 // (a pagina do QR usa `qrcode`, entao e carregada depois, sob demanda).
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-export const USO = "Uso: npm run conectar [-- --reconectar --sem-autostart --sem-mcp --dry-run]";
+export const USO = "Uso: npm run conectar [-- --cliente codex|claude --reconectar --sem-autostart --sem-mcp --dry-run]";
 export const PROXIMO = 'Pergunte "@ia ..." na conversa com voce mesmo; para testar o envio, peca para a IA mandar uma mensagem de teste (ela pede ENVIAR)';
 export const FLAGS = ["reconectar", "sem-autostart", "sem-mcp", "dry-run"];
 
 const ASSISTANT_WAIT_MS = 12000;
+const STOP_WAIT_MS = 5000;
 const OWNER_RETRIES = 5;
 const MOTIVO_MAX = 160;
 
 // `npm run conectar --reconectar` (sem o `--`) o npm come a flag e a entrega como npm_config_*.
+// `--cliente codex|claude` (ou `--cliente=codex`) escolhe a IA e grava a escolha neste computador.
 export function parseFlags(argv = [], environment = process.env) {
-  const flags = {};
+  const flags = { cliente: null };
   for (const name of FLAGS) {
     flags[name] = environment[`npm_config_${name.replace(/-/g, "_")}`] === "true";
   }
-  for (const arg of argv) {
-    const name = String(arg).replace(/^--/, "");
-    if (!String(arg).startsWith("--") || !FLAGS.includes(name)) throw new Error(`Opcao desconhecida: ${arg}`);
+  if (environment.npm_config_cliente) flags.cliente = parseClient(environment.npm_config_cliente);
+  const args = argv.map(String);
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === "--cliente" || arg.startsWith("--cliente=")) {
+      flags.cliente = parseClient(arg.includes("=") ? arg.slice("--cliente=".length) : args[(index += 1)]);
+      continue;
+    }
+    const name = arg.replace(/^--/, "");
+    if (!arg.startsWith("--") || !FLAGS.includes(name)) throw new Error(`Opcao desconhecida: ${arg}`);
     flags[name] = true;
   }
   return flags;
+}
+
+function parseClient(value) {
+  const client = normalizeClient(value);
+  if (!client) throw new Error(`Cliente invalido: ${value ?? "(vazio)"}. Use --cliente codex ou --cliente claude.`);
+  return client;
+}
+
+// MCP no cliente escolhido e em todo outro que estiver instalado (o aluno pode abrir qualquer um).
+export function mcpTargets(client, available = []) {
+  return [...new Set([client, ...available])];
 }
 
 // Uma linha, sem chave/hex longo e sem quebra: a saida vai para a conversa da IA.
@@ -137,9 +158,16 @@ export function defaultDependencies(environment = process.env) {
       const code = await runAutostart("ligar", { environment, log });
       if (code !== 0) throw new Error(lines.find((line) => line.startsWith("AUTOSTART_ERRO=")) || "nao foi possivel ligar o inicio automatico");
     },
-    detectClient: () => detectClient(resolveCasaDir(environment), environment),
+    resolveClient: () => resolveClient({ environment }),
+    availableClients: () => availableClients({ environment }),
+    savePreference: (client) => writePreference(client, environment),
     installMcp: (client) => installMcp(client, { quiet: true }),
+    oldStackRunning: () => oldStackRunning(),
+    async retireEvolution() {
+      await retireEvolution({ log: () => {} });
+    },
     assistantPid: () => runningAssistantPid({ environment }),
+    stopAssistant: (pid) => { try { process.kill(pid, "SIGTERM"); } catch {} },
     async startAssistant() {
       const { lines, log } = collectLines();
       const code = await startBackground({ environment, log });
@@ -149,7 +177,7 @@ export function defaultDependencies(environment = process.env) {
   };
 }
 
-function dryRunLines({ flags, stale, client, autostart }) {
+function dryRunLines({ flags, stale, escolha, targets, autostart }) {
   return [
     "CONECTAR=DRY_RUN",
     "ETAPA 1 preflight: confere Node 20+",
@@ -157,7 +185,7 @@ function dryRunLines({ flags, stale, client, autostart }) {
     "ETAPA 3 motor: cria a chave local se faltar e sobe o motor",
     `ETAPA 4 whatsapp: se ja conectado pula; senao abre a pagina do QR e espera ate 15 min${flags.reconectar ? " (--reconectar: reseta sessao pareada e desconectada)" : ""}`,
     `ETAPA 5 inicio automatico: ${flags["sem-autostart"] ? "pulado (--sem-autostart)" : !autostart.supported ? "indisponivel neste sistema" : autostart.installed ? "pula (ja ligado)" : "liga"}`,
-    `ETAPA 6 mcp: ${flags["sem-mcp"] ? "pulado (--sem-mcp)" : `instala no ${client} se nao existir`}`,
+    `ETAPA 6 mcp: ${flags["sem-mcp"] ? "pulado (--sem-mcp)" : `instala em ${targets.join(" e ")} se nao existir`} (IA=${escolha.client} origem=${escolha.origem})`,
     "ETAPA 7 assistente: sobe se nao estiver rodando",
   ];
 }
@@ -186,19 +214,39 @@ export async function conectar(argv = [], overrides = {}) {
   }
 
   try {
+    // Qual IA: --cliente > POLOZI_IA_CLIENTE > escolha gravada > PATH > quem roda agora (src/cliente-ia.mjs).
+    const escolha = flags.cliente ? { client: flags.cliente, origem: "opcao" } : d.resolveClient();
+    const client = escolha.client;
+    const targets = mcpTargets(client, d.availableClients());
+
     if (flags["dry-run"]) {
       const stale = await d.dependenciesStale();
-      const client = d.detectClient();
       const autostart = d.autostartState();
-      for (const line of dryRunLines({ flags, stale, client, autostart })) say(line);
+      for (const line of dryRunLines({ flags, stale, escolha, targets, autostart })) say(line);
       return 0;
     }
+
+    // Grava a escolha: o assistente sobe pelo login (launchd/Inicializar), sem saber quem rodou o conectar.
+    if (["opcao", "path", "rodando_agora"].includes(escolha.origem)) {
+      await step("cliente", "Rode npm run conectar -- --cliente codex (ou claude) de novo.", () => d.savePreference(client));
+    }
+    if (flags.cliente) d.environment.POLOZI_IA_CLIENTE = client;
 
     await step("dependencias", "Confira a internet e o log indicado; depois rode npm run conectar de novo.", async () => {
       if (await d.dependenciesStale()) await d.installDependencies();
     });
 
-    const config = await step("motor", "Porta 8082 ocupada, pilha Docker antiga (npm run retire:evolution) ou motor.log na pasta de estado; tabela de erros no GUIA-AGENTE-CODEX-CLAUDE.md.", () => d.setupEngine());
+    // Porta 8082 tomada pela pilha Docker antiga (Evolution): desmonta sozinho e tenta de novo.
+    const config = await step("motor", "Porta 8082 ocupada por outro programa ou motor.log na pasta de estado; tabela de erros no GUIA-AGENTE-CODEX-CLAUDE.md.", async () => {
+      try {
+        return await d.setupEngine();
+      } catch (error) {
+        if (!(await d.oldStackRunning())) throw error;
+        await d.retireEvolution();
+        say("EVOLUTION_ANTIGA=DESMONTADA");
+        return d.setupEngine();
+      }
+    });
 
     let status = await step("whatsapp", "Rode npm run conectar de novo.", () => d.getStatus(config));
     if (!isConnected(status)) {
@@ -230,24 +278,47 @@ export async function conectar(argv = [], overrides = {}) {
     let justEnabled = false;
     if (!autostart.supported) {
       autostartLabel = "indisponivel";
-    } else if (autostart.installed) {
+    } else if (autostart.installed && !(flags.cliente && !flags["sem-autostart"])) {
       autostartLabel = "ligado";
     } else if (!flags["sem-autostart"]) {
+      // --cliente com o inicio automatico ja ligado: regrava para o login repetir a escolha.
       await step("autostart", "O WhatsApp ja esta conectado. Rode npm run autostart:ligar e veja o erro.", () => d.autostartLigar());
       autostartLabel = "ligado";
-      justEnabled = true;
+      justEnabled = !autostart.installed;
     }
 
-    const client = d.detectClient();
     let mcpLabel = `${client}:pulado`;
     if (!flags["sem-mcp"]) {
-      const result = await step("mcp", `O WhatsApp ja esta conectado. Rode npm run install:${client} e veja o erro (o comando ${client} precisa estar instalado).`, () => d.installMcp(client));
-      mcpLabel = `${client}:${result === "ja_existia" ? "ja_existia" : "ok"}`;
+      const labels = [];
+      let errors = 0;
+      let lastError = null;
+      for (const target of targets) {
+        try {
+          labels.push(`${target}:${(await d.installMcp(target)) === "ja_existia" ? "ja_existia" : "ok"}`);
+        } catch (error) {
+          errors += 1;
+          lastError = error;
+          labels.push(`${target}:erro`);
+        }
+      }
+      if (errors === targets.length) {
+        throw new StepError("mcp", curto(lastError?.message || lastError), `O WhatsApp ja esta conectado. Rode npm run install:${client} e veja o erro (o comando ${client} precisa estar instalado; se for o outro, rode npm run conectar -- --cliente ${client === "codex" ? "claude" : "codex"}).`);
+      }
+      mcpLabel = labels.join(",");
     }
 
     // Recem ligado, o login ja sobe o assistente: espera antes de subir outro (evita duplicar).
     await step("assistente", "O WhatsApp ja esta conectado. Rode npm run start:background e veja o erro.", async () => {
       let pid = await d.assistantPid();
+      // Escolha nova (--cliente): o assistente que ja roda guardou a antiga; reinicia.
+      if (pid && flags.cliente) {
+        d.stopAssistant(pid);
+        for (let waited = 0; pid && waited < STOP_WAIT_MS; waited += 500) {
+          await d.sleep(500);
+          pid = await d.assistantPid();
+        }
+        if (pid) throw new Error(`o assistente antigo (pid ${pid}) nao parou`);
+      }
       for (let waited = 0; !pid && justEnabled && waited < ASSISTANT_WAIT_MS; waited += 1000) {
         await d.sleep(1000);
         pid = await d.assistantPid();

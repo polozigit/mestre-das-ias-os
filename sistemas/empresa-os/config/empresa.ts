@@ -1,6 +1,6 @@
 /**
- * Identidade da empresa — ÚNICO arquivo de dados que a IA edita na instalação
- * (junto com src/app/theme.css e public/marca/logo.svg — ver LEIA-ME.md).
+ * Identidade da empresa — ÚNICO arquivo de dados que a IA edita na instalação.
+ * Tema, logo e ícone não moram aqui: são da skill tecnologia-aplicar-marca (ver DESIGN.md).
  * Os {{PLACEHOLDERS}} são preenchidos na Etapa "aplicar marca"; um teste do CI
  * acusa placeholder esquecido.
  */
@@ -14,8 +14,6 @@ export const empresa = {
   /** Dono da empresa — vira o usuário master no seed. */
   nomeMaster: "{{NOME_DO_DONO}}",
   emailMaster: "{{EMAIL_DO_DONO}}",
-  /** Caminho do logo dentro de public/. */
-  logo: "/marca/logo.svg",
 } as const;
 
 /** Antes da etapa "aplicar marca" o campo ainda tem {{placeholder}}: a tela mostra o padrão. */

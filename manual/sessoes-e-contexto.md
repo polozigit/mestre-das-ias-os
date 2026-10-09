@@ -4,6 +4,7 @@ Use uma conversa para cada resultado distinto. Continue na mesma conversa enquan
 
 ## Abra outra conversa quando
 
+- começou uma nova etapa do curso (regra fixa: cada etapa, conversa nova);
 - a entrega atual terminou;
 - o próximo pedido tem outro objetivo;
 - muitos arquivos e assuntos não relacionados foram acumulados;
@@ -12,6 +13,8 @@ Use uma conversa para cada resultado distinto. Continue na mesma conversa enquan
 - o trabalho chegou a um ponto natural de validação.
 
 Não existe uma porcentagem universal que indique o momento exato. Use os sinais de clareza e continuidade.
+
+Por que isso pesa no seu limite: a cada mensagem o Codex reenvia o histórico da conversa. Uma conversa que atravessa várias etapas fica enorme e consome o limite semanal do plano muito mais rápido (no teste de 08/10/2026, uma conversa única de um dia inteiro passou de 150 milhões de tokens). A OpenAI orienta "um chat por unidade de trabalho" e lista usar um chat para o projeto inteiro como erro comum (learn.chatgpt.com/guides/best-practices, lida em 09/10/2026).
 
 ## Antes de encerrar
 
@@ -29,7 +32,8 @@ app, pra rodar sozinha sem alguém abrir o chat. Passo a passo:
 3. Modo de execução: **Local** — a outra opção cria uma cópia separada da pasta, e o que ela escrever lá não aparece na sua Casa.
 4. Repetição: toda segunda, 07:00.
 5. Prompt: exatamente `$polozi-retrospectiva`.
-6. Permissão: gravação na pasta do projeto, nunca acesso total.
+6. Permissão: gravação na pasta do projeto. A rotina roda sem ninguém olhando e só
+   escreve na Casa; o acesso total fica pras conversas com o dono.
 7. O computador precisa estar ligado, com o app aberto e a pasta no disco
    na hora marcada.
 8. Depois que ela rodar, a próxima sessão vai achar a Casa com um arquivo

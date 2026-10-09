@@ -63,7 +63,7 @@ Só fato lido no arquivo. Cada item traz `arquivo:linha`. Não confie em número
 
 ## 8. Variáveis e segredos (só nomes)
 
-- Variáveis do sistema (catálogo sem valores): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SITE_URL`, `CURSO_INICIO`, `PREVIEW_TEST_TOKEN`, `PREVIEW_QA_EMAIL`, `PREVIEW_QA_PASSWORD`. `conexao.md:8-14`. Variável nova de módulo = linha nova no `conexao.md` no mesmo commit. `conexao.md:18`.
+- Variáveis do sistema (catálogo sem valores): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SITE_URL`, `CURSO_INICIO`, `PREVIEW_TEST_TOKEN`, `PREVIEW_OWNER_EMAIL` (e-mail do dono, só preview). `conexao.md:8-14`. Variável nova de módulo = linha nova no `conexao.md` no mesmo commit. `conexao.md:18`.
 - Segredos de Action no GitHub: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID`. `conexao.md:26-28`.
 - Homologação usa o par `SUPABASE_DB_PASSWORD_HOMOLOG` e `SUPABASE_PROJECT_ID_HOMOLOG` (não estão no `conexao.md`, só nos workflows). `.github/workflows/deploy-db-homologacao.yml:8,41-42` e `.github/workflows/keep-alive.yml:60-61`.
 - Valores moram em `credenciais/.env` da Casa; produção mora no painel da Vercel; nunca no repo nem no chat. `AGENTS.md:34-35`.
@@ -72,7 +72,7 @@ Só fato lido no arquivo. Cada item traz `arquivo:linha`. Não confie em número
 
 - `params` e `searchParams` são Promise e `cookies()` é async: use `await`. `AGENTS.md:44-45`.
 - Testes: `npm test` roda `node --test` (`package.json:11`); lint `npm run lint` (`package.json:10`); tipos `npx tsc --noEmit`; os três verdes antes de todo push. `AGENTS.md:21-22`.
-- Preview da Vercel: `?preview_token=`, válido só no ambiente de preview (`VERCEL_ENV`), nunca em produção. `AGENTS.md:29-31`; `src/lib/supabase/proxy.ts:49-52,66`; `conexao.md:13,16`. A senha do dono nunca é digitada pela IA. `AGENTS.md:31`.
+- Preview da Vercel: `?preview_token=`, válido só no ambiente de preview (`VERCEL_ENV`), nunca em produção; a IA entra como o dono (link de entrada gerado no servidor para `PREVIEW_OWNER_EMAIL`), sem usuário extra e sem senha. O preview usa o banco de produção: a conferência pela IA (opcional, só da tela alterada) só navega e olha. Quem libera mudança de tela é o "aprovado" do dono depois de abrir o link. `AGENTS.md:29-31`; `src/lib/supabase/proxy.ts`; `conexao.md:13,16`. A senha do dono nunca é digitada pela IA. `AGENTS.md:31`.
 - Deploy: branch gera preview, merge gera produção. `AGENTS.md:49-50`.
 
 ## 10. Hook da Casa (`Casa:.codex/hooks/guarda.py`)

@@ -89,15 +89,44 @@ nada relativo, não copie script pra dentro da Casa.
    usuário, senha e e-mail é sempre o dono, você só aponta o próximo campo.
    Assim que a conta nascer, oriente a ativar 2FA por app autenticador (não
    SMS).
-5. Login do CLI: `gh auth status`. Não logado → `gh auth login` escolhendo
-   **GitHub.com → HTTPS → Login with a web browser**. O navegador abre com um
-   código de 8 letras; o dono digita o código e clica em Authorize — **você
-   nunca vê nem pede senha ou token**.
-6. Nome do repositório: ler `slug_os:` no frontmatter de `operacao/INSTALACAO.md`
+5. Login do CLI, JÁ com o escopo `workflow`: a Casa tem `.github/workflows/` e,
+   sem esse escopo, o GitHub recusa o primeiro push (teste real de 08/10/2026,
+   que precisou de um 2º código). `gh auth status`. Não logado:
+   ```
+   gh auth login --hostname github.com --git-protocol https --web --scopes workflow
+   ```
+   Logado, mas sem `workflow` na linha "Token scopes":
+   ```
+   gh auth refresh --hostname github.com --scopes workflow
+   ```
+   O comando espera o dono autorizar: rode numa sessão de terminal que fica
+   aberta até ele terminar, sem rodar outro comando nem deixar o código
+   expirar. Abra a página do código no Chrome do dono
+   (`open -a "Google Chrome" "https://github.com/login/device"`; Windows
+   `start chrome "https://github.com/login/device"`); o código de 8 letras
+   quem digita é o dono, lendo da tela, e ele clica em Authorize — **você
+   nunca vê nem pede senha ou token**. ANTES do primeiro push, `gh auth status`
+   tem que mostrar `workflow` em "Token scopes"; sem ele, refaça o `refresh`
+   e não suba nada.
+6. **Autor dos commits = o dono no GitHub (A39).** A Casa nasce com o autor
+   `empresa-ia@local`, e a Vercel Hobby só faz deploy de commit cujo e-mail é o
+   da conta GitHub dona do projeto (teste de 08/10/2026: a prévia ficou
+   bloqueada antes de compilar). Logo depois do login, sem perguntar, rode (o
+   script mora nesta skill: `<SKILL_GITHUB>` é a pasta `polozi-criar-github`
+   que fica ao lado da `<SKILL_IRMA>`, no mesmo diretório de skills):
+   ```
+   <PY> "<SKILL_GITHUB>/scripts/identidade_git.py" --casa "<PASTA_ABERTA>"
+   ```
+   Ele grava só no git da Casa (`--local`) o e-mail principal verificado da
+   conta (ou o noreply `ID+login@users.noreply.github.com`). `FEITO` ou
+   `JA_ESTAVA` = siga; `PAREI` = mostre a mensagem. Se a Vercel ainda bloquear
+   um commit antigo, a causa é o e-mail: confira em github.com/settings/emails
+   que o e-mail gravado é um deles.
+7. Nome do repositório: ler `slug_os:` no frontmatter de `operacao/INSTALACAO.md`
    (o nome do sistema, ex.: `clima-os`, gravado pela etapa da Casa). Ausente ou
    `pendente` → parar e mandar rodar a etapa da Casa no `polozi-instalador`;
    nunca inventar o nome aqui.
-7. De onde a Casa veio: `git remote get-url origin`. Sem `origin` (o comando
+8. De onde a Casa veio: `git remote get-url origin`. Sem `origin` (o comando
    responde `No such remote 'origin'`) é a Casa do zip: siga. Termina em
    `polozigit/mestre-das-ias-os`? Então a Casa foi CLONADA do repositório-modelo, e
    esse `origin` é do modelo, não do dono: **NUNCA `git push` nem `gh repo rename`
@@ -109,7 +138,7 @@ nada relativo, não copie script pra dentro da Casa.
    push, inclusive o primeiro (falha fechada: na dúvida, bloqueia). Hook
    bloqueou = corrigir o que ele apontou antes de continuar — push que
    "passou mesmo assim" não existe.
-2. Criar o repositório PRIVADO com o nome do sistema (`<slug_os>`, lido no passo 6
+2. Criar o repositório PRIVADO com o nome do sistema (`<slug_os>`, lido no passo 7
    de Preparar: minúsculo, sem espaço, sem acento, sem dado sensível). Três casos:
    - **Casa clonada do repositório-modelo** (`origin` do modelo): troca o `origin`
      pelo repositório do dono ANTES do primeiro push. `git remote remove origin` só
@@ -141,8 +170,8 @@ nada relativo, não copie script pra dentro da Casa.
      oferece essa proteção de graça em repositório público, então aqui a
      proteção fica nos hooks da Casa e na Action gitleaks. Nunca prometer a
      proteção do GitHub em repositório privado.
-4. Teste de fogo: abrir o link no navegador do dono e ver o `EMPRESA-IA.md`
-   lá.
+4. Teste de fogo: a IA abre o link no Chrome do dono (Computer Use) e confere o
+   `EMPRESA-IA.md` lá.
 5. Registrar chamando o script da skill irmã `polozi-registrar-conexao`
    (caminho resolvido em "Antes de qualquer comando"), que só grava a linha
    depois que `gh auth status` provar:
@@ -167,8 +196,8 @@ nada relativo, não copie script pra dentro da Casa.
 
 ## Fallback sem gh
 
-Criar o repositório em github.com (New repository → Private, com o nome do
-sistema), copiar a URL e: `git remote add origin <url>` (se já houver um `origin`
+A IA abre github.com no Chrome do dono (Computer Use), cria o repositório (New
+repository → Private, com o nome do sistema), copia a URL e então: `git remote add origin <url>` (se já houver um `origin`
 do modelo, `git remote set-url origin <url>`) + `git push -u origin main`. A senha do push é
 gerenciada pelo Git Credential Manager (janela do navegador) — nunca colada
 no chat. A varredura pré-subida (passo 1 de Executar) acontece do mesmo jeito,

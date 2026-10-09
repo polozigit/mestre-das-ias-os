@@ -9,7 +9,7 @@
       "quando": "Use antes de todo merge de mudança em sistemas/ (tela, banco, rota), chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito",
       "instrucoes": "agentes/tecnologia-revisor-seguranca.md",
       "claude": {"model": "opus", "effort": "high", "tools": ["Read", "Grep", "Glob"]},
-      "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "high", "sandbox_mode": "read-only"}
+      "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "medium", "sandbox_mode": "read-only"}
     }
   ],
   "skills": [
@@ -20,6 +20,7 @@
     {"name": "tecnologia-acessos", "dir": ".agents/skills/tecnologia-acessos"},
     {"name": "tecnologia-definir-o-que", "dir": ".agents/skills/tecnologia-definir-o-que"},
     {"name": "tecnologia-construir-tela", "dir": ".agents/skills/tecnologia-construir-tela"},
-    {"name": "tecnologia-conectar", "dir": ".agents/skills/tecnologia-conectar"}
+    {"name": "tecnologia-conectar", "dir": ".agents/skills/tecnologia-conectar"},
+    {"name": "tecnologia-aplicar-marca", "dir": ".agents/skills/tecnologia-aplicar-marca"}
   ]
 }

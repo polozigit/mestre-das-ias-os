@@ -272,6 +272,30 @@ def test_actions_pinadas_por_major():
 
 
 # ---------------------------------------------------------------------------
+# G12 — CLI do Supabase em versão EXATA e IGUAL em todos os workflows.
+# "latest" quebrou o CI do aluno em 08/10/2026 (imagem nova do Postgres local
+# e formato novo do `gen types`) sem ele ter mudado nada.
+# ---------------------------------------------------------------------------
+
+
+def test_cli_supabase_pinada_na_mesma_versao_exata():
+    versoes: dict[str, str] = {}
+    for wf in TODOS_WORKFLOWS:
+        texto = _texto_sem_comentarios(wf)
+        for m in re.finditer(r"uses:\s*supabase/setup-cli@\S+\s*\n\s*with:\s*\n\s*version:\s*(\S+)", texto):
+            versao = m.group(1).strip("\"'")
+            assert re.fullmatch(r"\d+\.\d+\.\d+", versao), (
+                f"{wf.name}: setup-cli com version: {versao} (precisa versão exata X.Y.Z, nunca latest)"
+            )
+            versoes[f"{wf.name}:{m.start()}"] = versao
+        n_setup = len(re.findall(r"uses:\s*supabase/setup-cli@", texto))
+        n_com_versao = sum(1 for k in versoes if k.startswith(f"{wf.name}:"))
+        assert n_setup == n_com_versao, f"{wf.name}: setup-cli sem version: logo abaixo"
+    assert versoes, "nenhum workflow usa supabase/setup-cli"
+    assert len(set(versoes.values())) == 1, f"versões da CLI divergem entre workflows: {sorted(set(versoes.values()))}"
+
+
+# ---------------------------------------------------------------------------
 # G11 — TEMPLATE_DEV nunca pode entrar no kit que viaja pro aluno.
 # ---------------------------------------------------------------------------
 

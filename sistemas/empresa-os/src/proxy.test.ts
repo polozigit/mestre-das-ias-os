@@ -25,12 +25,19 @@ test("a rota /marca (e subcaminhos) passa pelo gate de login", () => {
   assert.equal(passaPeloGate("/marca/qualquer"), true);
 });
 
-test("o logo e o favicon de public/marca ficam fora do gate (carregam no /login)", () => {
+test("o logo de public/marca fica fora do gate (carregam no /login)", () => {
   assert.equal(passaPeloGate("/marca/logo.svg"), false);
   assert.equal(passaPeloGate("/marca/favicon.svg"), false);
   assert.equal(passaPeloGate("/marca/logo.png"), false);
   assert.equal(passaPeloGate("/marca/icone.ico"), false);
   assert.equal(passaPeloGate("/favicon.ico"), false);
+});
+
+test("o ícone da aba e o logo do fundo escuro também ficam fora do gate", () => {
+  assert.equal(passaPeloGate("/icon.svg"), false);
+  assert.equal(passaPeloGate("/icon.png"), false);
+  assert.equal(passaPeloGate("/apple-icon.png"), false);
+  assert.equal(passaPeloGate("/marca/logo-fundo-escuro.png"), false);
 });
 
 test("estáticos do Next ficam fora e as telas do app ficam dentro do gate", () => {

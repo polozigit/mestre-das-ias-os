@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import { createBrowserClient } from "@supabase/ssr";
-import { empresa, nomeSistema } from "../../../../../config/empresa";
+import { nomeSistema } from "../../../../../config/empresa";
 import type { Database } from "@/types/database";
 import { configPublicaDoNavegador } from "@/lib/supabase/env";
 
@@ -96,15 +96,7 @@ export default function DefinirSenhaPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-bg p-6">
       <div className="w-full max-w-sm rounded-lg border border-borda bg-bg-elevada p-8 shadow-[var(--sombra-md)]">
-        <Image
-          src={empresa.logo}
-          alt={nomeSistema}
-          width={140}
-          height={36}
-          priority
-          unoptimized
-          className="mb-6 h-9 w-auto"
-        />
+        <LogoMarca alt={nomeSistema} width={140} height={36} priority className="mb-6 h-9 w-auto" />
 
         {estado === "carregando" && (
           <p className="text-sm text-fg-2">Validando o link...</p>

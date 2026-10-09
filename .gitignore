@@ -12,6 +12,8 @@ operacao/backups/
 operacao/vigilancia/entrada.json
 # Copia de trabalho do PMO (tarefas lidas do banco, com nome de pessoa): refeita a cada leitura
 operacao/pmo/tarefas.json
+# Estado local do registro do trabalho (1 conversa = 1 arquivo): refeito a cada pedido
+operacao/tasks/.sessoes/
 # o repo do kit ignora .codex/ e .agents/; aqui eles PRECISAM subir (Casa pronta no zip)
 !.codex/
 !.agents/

@@ -4,7 +4,8 @@
 Por CLI, liga tudo que faz o caminho seguro de publicação existir: vincula o
 projeto Vercel pelo nome do sistema (`vercel link --yes --project <slug_os>`, com
 o `slug_os:` de `operacao/INSTALACAO.md`), conecta o git, gera e publica o token
-de QA, publica o par de login do usuário de QA (quando o dono já o criou),
+de QA, publica o e-mail do dono (PREVIEW_OWNER_EMAIL) no preview,
+cria o "Protection Bypass for Automation" da prévia (segredo no `credenciais/.env`),
 confere pelos NOMES que as variáveis do Supabase estão na Vercel (quem as grava
 é a skill `tecnologia-conectar`, subcomando `vercel-env`), copia os workflows e o
 dependabot para a raiz da Casa, grava os secrets do GitHub e liga o Dependabot.
@@ -26,11 +27,12 @@ observado, não a ação tomada nesta rodada; por isso rodar duas vezes deixa os
 arquivos byte-idênticos. "pulado" só aparece no stdout desta execução, nunca no
 arquivo persistido.
 
-O usuário de QA (PREVIEW_QA_EMAIL e PREVIEW_QA_PASSWORD) NÃO é criado por este
-script: ele nasce na tela Usuários do sistema, por convite, e a senha é definida
-por quem abre o e-mail (o `invite` do sistema não aceita senha). O script só
-publica na Vercel o par que o dono já guardou em `credenciais/.env`; sem o par,
-o passo `usuario_qa` fica `NAO-MEDIDO` com a instrução, e a instalação segue.
+O preview entra como o DONO (sem usuário extra e sem senha): o servidor gera um
+magic link com a service role para o e-mail em PREVIEW_OWNER_EMAIL. Este script
+só publica essa variável na Vercel (só preview), lendo `email_dono:` do
+frontmatter de `operacao/INSTALACAO.md`. Sem e-mail válido (ausente, vazio ou
+placeholder `{{EMAIL_DONO}}`), o passo `owner_email` fica `NAO-MEDIDO` com a
+instrução e a instalação segue. Nada pede ação do dono.
 
 Exit 0 = tudo provado (ou registrado como "não medido" quando a medição é
 aberta). Exit 2 = parou num passo com mensagem acionável em stderr; nada além
@@ -51,6 +53,7 @@ import os
 import re
 import secrets
 import shutil
+import string
 import subprocess
 import sys
 import tempfile
@@ -58,8 +61,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 NOME_TOKEN_QA = "PREVIEW_TEST_TOKEN"
-NOME_EMAIL_QA = "PREVIEW_QA_EMAIL"
-NOME_SENHA_QA = "PREVIEW_QA_PASSWORD"
+NOME_EMAIL_DONO = "PREVIEW_OWNER_EMAIL"
+# Segredo do "Protection Bypass for Automation" da Vercel (existe em todos os planos,
+# Hobby incluso; doc vercel.com/docs/deployment-protection/methods-to-bypass-deployment-protection/
+# protection-bypass-automation, lida em 09/10/2026). Vai no header `x-vercel-protection-bypass`
+# de quem confere a prévia por script. A proteção da prévia continua ligada.
+NOME_BYPASS = "VERCEL_AUTOMATION_BYPASS_SECRET"
+EVIDENCIA_BYPASS = f"ok: Protection Bypass for Automation ativo na Vercel; {NOME_BYPASS} em credenciais/.env"
 
 NOMES_SUPABASE_ESPERADOS = (
     "NEXT_PUBLIC_SUPABASE_URL",
@@ -273,6 +281,18 @@ def _ler_slug_os(ctx: Contexto) -> str:
     return slug if re.fullmatch(r"[a-z0-9][a-z0-9-]*", slug) else ""
 
 
+def _ler_email_dono(ctx: Contexto) -> str:
+    """`email_dono:` do frontmatter de `operacao/INSTALACAO.md`, ou "" se faltar, estiver
+    vazio, for placeholder (`{{EMAIL_DONO}}`) ou não parecer um e-mail."""
+    caminho = ctx.casa / "operacao" / "INSTALACAO.md"
+    if not caminho.is_file():
+        return ""
+    frontmatter = re.match(r"---\r?\n(.*?)\r?\n---", caminho.read_text(encoding="utf-8-sig"), re.S)
+    achado = re.search(r"(?m)^email_dono:[ \t]*(\S+)[ \t]*$", frontmatter.group(1)) if frontmatter else None
+    email = achado.group(1).strip("\"'") if achado else ""
+    return email if re.fullmatch(r"[^@\s{}]+@[^@\s{}]+\.[^@\s{}]+", email) else ""
+
+
 def vincular_projeto(ctx: Contexto) -> Resultado:
     if not ctx.projeto.is_dir():
         return Resultado(False, "", mensagem_erro=f"pasta do projeto não existe: {ctx.projeto}")
@@ -355,32 +375,72 @@ def publicar_token_na_vercel(ctx: Contexto) -> Resultado:
 # Passo 6
 
 
-def publicar_usuario_qa_na_vercel(ctx: Contexto) -> Resultado:
-    """Publica o par de login do usuário de QA (membro só de leitura criado pelo
-    dono na tela Usuários) no ambiente preview. Sem o par em `credenciais/.env`
-    não há o que publicar: registra NAO-MEDIDO com a instrução e deixa a
-    instalação seguir (o QA do preview vira prova só por teste até o par existir).
-    Os valores nunca são impressos nem vão em argumento."""
-    env = _ler_env(ctx)
-    faltando = [nome for nome in (NOME_EMAIL_QA, NOME_SENHA_QA) if not env.get(nome)]
-    if faltando:
+def publicar_email_dono_na_vercel(ctx: Contexto) -> Resultado:
+    """Publica o e-mail do dono (`email_dono:` de operacao/INSTALACAO.md) como
+    PREVIEW_OWNER_EMAIL no ambiente preview. Sem e-mail válido registra NAO-MEDIDO
+    com a instrução e deixa a instalação seguir. O valor nunca é impresso nem vai
+    em argumento."""
+    email = _ler_email_dono(ctx)
+    if not email:
         return Resultado(
             True,
-            f"nao medido: falta {' e '.join(faltando)} em credenciais/.env "
-            "(o dono cria o membro de teste na tela Usuários; veja \"Primeira vez neste sistema\" "
-            "na skill tecnologia-publicar)",
+            f"nao medido: sem e-mail do dono em operacao/INSTALACAO.md (campo email_dono); "
+            f"rode o instalador até o e-mail do dono estar lá e depois `--so owner_email` ({NOME_EMAIL_DONO})",
             nao_medido=True,
         )
-    todas_existiam = True
-    for nome in (NOME_EMAIL_QA, NOME_SENHA_QA):
-        erro, ja_existia = _publicar_variavel_preview(ctx, nome, env[nome])
-        if erro:
-            return Resultado(False, "", mensagem_erro=erro)
-        todas_existiam = todas_existiam and ja_existia
-    return Resultado(
-        True, f"ok: {NOME_EMAIL_QA} e {NOME_SENHA_QA} publicados no ambiente preview da Vercel",
-        pulado=todas_existiam,
+    erro, ja_existia = _publicar_variavel_preview(ctx, NOME_EMAIL_DONO, email)
+    if erro:
+        return Resultado(False, "", mensagem_erro=erro)
+    return Resultado(True, f"ok: {NOME_EMAIL_DONO} publicado no ambiente preview da Vercel", pulado=ja_existia)
+
+
+# ---------------------------------------------------------------------------
+# Passo 6b
+
+
+def gravar_bypass_automacao(ctx: Contexto) -> Resultado:
+    """Cria o "Protection Bypass for Automation" do projeto na Vercel e guarda o
+    segredo em `credenciais/.env`. A prévia da Vercel nasce protegida (login da
+    Vercel); com o segredo, a conferência da prévia por script entra sem desligar
+    a proteção, que NUNCA é desligada. O segredo nasce aqui (32 letras e números,
+    o formato que a API aceita), vai para a API por STDIN (`vercel api --input -`)
+    e só entra no `.env` depois que a Vercel aceitou. Falhou (CLI antiga, sem
+    login, plano sem a opção): NAO-MEDIDO e a instalação segue; a prévia continua
+    abrindo no Chrome do dono, já logado na Vercel."""
+    env = _ler_env(ctx)
+    if env.get(NOME_BYPASS):
+        return Resultado(True, EVIDENCIA_BYPASS, pulado=True)
+    project_json = ctx.projeto / ".vercel" / "project.json"
+    try:
+        dados = json.loads(project_json.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        dados = {}
+    projeto_id = str(dados.get("projectId", ""))
+    org_id = str(dados.get("orgId", ""))
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", projeto_id):
+        return Resultado(False, "", mensagem_erro="`.vercel/project.json` sem `projectId`: rode vincular_projeto antes.")
+    endpoint = f"/v1/projects/{projeto_id}/protection-bypass"
+    if re.fullmatch(r"team_[A-Za-z0-9]+", org_id):
+        endpoint += f"?teamId={org_id}"
+    segredo = "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
+    corpo = json.dumps({"generate": {"secret": segredo, "note": "conferencia da previa (tecnologia-publicar)"}})
+    resultado = _com_valor_em_arquivo(
+        "tecnologia-bypass-", corpo,
+        ["vercel", "api", endpoint, "-X", "PATCH", "--input", "-", "--silent"], ctx.projeto,
     )
+    if resultado is None or resultado.returncode != 0:
+        motivo = _saida(resultado).replace(segredo, "***")[:300] or "CLI da Vercel ausente ou sem resposta"
+        return Resultado(
+            True,
+            f"nao medido: a Vercel recusou criar o bypass ({motivo}); a prévia abre no Chrome do dono "
+            "já logado na Vercel e a proteção continua ligada",
+            nao_medido=True,
+        )
+    texto = ctx.env_path.read_text(encoding="utf-8") if ctx.env_path.is_file() else ""
+    texto_novo = (texto if texto.endswith("\n") or not texto else texto + "\n") + f"{NOME_BYPASS}={segredo}\n"
+    escrever_atomico(ctx.env_path, texto_novo)
+    aplicar_permissao_600(ctx.env_path)
+    return Resultado(True, EVIDENCIA_BYPASS)
 
 
 # ---------------------------------------------------------------------------
@@ -501,7 +561,8 @@ PASSOS: list[tuple[str, str, "callable"]] = [
     ("conectar_git", "Conectar git", conectar_git),
     ("gerar_token_qa", "Gerar token de QA", gerar_token_qa),
     ("publicar_token_na_vercel", "Publicar token na Vercel (preview)", publicar_token_na_vercel),
-    ("usuario_qa", "Publicar o usuário de QA na Vercel (preview)", publicar_usuario_qa_na_vercel),
+    ("owner_email", "Publicar o e-mail do dono na Vercel (preview)", publicar_email_dono_na_vercel),
+    ("bypass_automacao", "Criar o bypass de automação da prévia (proteção continua ligada)", gravar_bypass_automacao),
     ("conferir_integracao_supabase", "Conferir variáveis do Supabase na Vercel", conferir_integracao_supabase),
     ("copiar_guardas", "Copiar workflows/dependabot para .github/ da raiz", copiar_guardas),
     ("gravar_secrets", "Gravar secrets do GitHub", gravar_secrets),

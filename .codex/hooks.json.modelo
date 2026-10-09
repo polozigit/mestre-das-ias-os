@@ -39,7 +39,31 @@
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"{{CASA_ABS}}/.codex/hooks/registro_trabalho.py\" inicio",
+            "commandWindows": "py -3 \"{{CASA_ABS}}\\.codex\\hooks\\registro_trabalho.py\" inicio",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
     "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"{{CASA_ABS}}/.codex/hooks/registro_trabalho.py\" fim",
+            "commandWindows": "py -3 \"{{CASA_ABS}}\\.codex\\hooks\\registro_trabalho.py\" fim",
+            "timeout": 20
+          }
+        ]
+      },
       {
         "matcher": ".*",
         "hooks": [

@@ -1,10 +1,10 @@
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { detectClient, isMissingCommand, otherClient } from "./cliente-ia.mjs";
 import { needsShell, quote } from "./process.mjs";
 
 // Responde o @ia com a IA da propria empresa: roda o Codex ou o Claude Code na raiz
@@ -46,13 +46,6 @@ export const CLAUDE_FERRAMENTAS_PADRAO = [
 // A Casa e dois niveis acima de sistemas/whatsapp/; POLOZI_CASA_DIR sobrescreve.
 export function resolveCasaDir(environment = process.env, root = ROOT) {
   return environment.POLOZI_CASA_DIR || path.resolve(root, "..", "..");
-}
-
-// Mesma regra do guia: CLAUDE.md ou .claude/ na Casa = Claude Code; senao Codex.
-export function detectClient(casaDir, environment = process.env, exists = existsSync) {
-  const forced = String(environment.POLOZI_IA_CLIENTE || "").toLowerCase();
-  if (forced === "codex" || forced === "claude") return forced;
-  return exists(path.join(casaDir, "CLAUDE.md")) || exists(path.join(casaDir, ".claude")) ? "claude" : "codex";
 }
 
 export function buildCompanyPrompt(history, question, anexo = null) {
@@ -101,32 +94,47 @@ export function buildIaCommand(client, { outputPath, environment = process.env, 
   };
 }
 
-export async function askCompanyAI(history, question, { environment = process.env, run = spawn, anexo = null } = {}) {
+function runClient(client, { casaDir, outputPath, environment, run, anexo, prompt }) {
+  const { command, args } = buildIaCommand(client, { outputPath, environment, anexo });
+  return new Promise((resolvePromise, reject) => {
+    const shell = needsShell(command);
+    // O prompt vai pelo stdin nos dois clientes: no Windows o argumento passa por shell.
+    const child = run(command, shell ? args.map(quote) : args, { cwd: casaDir, shell, windowsHide: true, stdio: ["pipe", "pipe", "pipe"] });
+    let out = "";
+    let stderr = "";
+    const timeout = setTimeout(() => child.kill("SIGTERM"), IA_TIMEOUT_MS);
+    child.stdout.on("data", (chunk) => { out += chunk; });
+    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.on("error", (error) => { clearTimeout(timeout); reject(error); });
+    child.on("close", (code) => {
+      clearTimeout(timeout);
+      code === 0 ? resolvePromise(out) : reject(new Error(stderr.trim().slice(-300) || `${command} encerrou com codigo ${code}.`));
+    });
+    // Executavel ausente: o stdin tambem falha (EPIPE); o erro que vale e o do processo.
+    child.stdin.on?.("error", () => {});
+    child.stdin.end(prompt);
+  });
+}
+
+export async function askCompanyAI(history, question, { environment = process.env, run = spawn, anexo = null, detect = detectClient } = {}) {
   const casaDir = resolveCasaDir(environment);
-  const client = detectClient(casaDir, environment);
+  const first = detect(environment);
   const temporaryDirectory = await mkdtemp(path.join(os.tmpdir(), "polozi-ia-empresa-"));
   const outputPath = path.join(temporaryDirectory, "answer.txt");
-  const { command, args } = buildIaCommand(client, { outputPath, environment, anexo });
+  const prompt = buildCompanyPrompt(history, question, anexo);
 
   try {
-    const stdout = await new Promise((resolvePromise, reject) => {
-      const shell = needsShell(command);
-      // O prompt vai pelo stdin nos dois clientes: no Windows o argumento passa por shell.
-      const child = run(command, shell ? args.map(quote) : args, { cwd: casaDir, shell, windowsHide: true, stdio: ["pipe", "pipe", "pipe"] });
-      let out = "";
-      let stderr = "";
-      const timeout = setTimeout(() => child.kill("SIGTERM"), IA_TIMEOUT_MS);
-      child.stdout.on("data", (chunk) => { out += chunk; });
-      child.stderr.on("data", (chunk) => { stderr += chunk; });
-      child.on("error", reject);
-      child.on("close", (code) => {
-        clearTimeout(timeout);
-        code === 0 ? resolvePromise(out) : reject(new Error(stderr.trim().slice(-300) || `${command} encerrou com codigo ${code}.`));
-      });
-      child.stdin.end(buildCompanyPrompt(history, question, anexo));
-    });
-    const answer = client === "codex" ? await readFile(outputPath, "utf8") : stdout;
-    return answer.trim().slice(0, MAX_REPLY_LENGTH);
+    // Cliente escolhido nao instalado (spawn X ENOENT): tenta o outro antes de desistir.
+    for (const client of [first, otherClient(first)]) {
+      try {
+        const stdout = await runClient(client, { casaDir, outputPath, environment, run, anexo, prompt });
+        const answer = client === "codex" ? await readFile(outputPath, "utf8") : stdout;
+        return answer.trim().slice(0, MAX_REPLY_LENGTH);
+      } catch (error) {
+        if (client !== first || !isMissingCommand(error)) throw error;
+      }
+    }
+    throw new Error("nenhum cliente de IA respondeu");
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });
   }

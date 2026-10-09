@@ -131,8 +131,14 @@ select is_empty($$ select x.s || '.' || x.t || '.' || a.attname
 select is_empty($$ select n.nspname from pg_namespace n
   where n.nspowner = (select oid from pg_roles where rolname = 'postgres')
     and n.nspname !~ '^pg_' and n.nspname not in ('public', 'analitico', 'arquivo')
-    -- schema de controle do Supabase CLI: no projeto hospedado nasce com dono postgres (homolog, 06/10/2026)
-    and n.nspname <> 'supabase_migrations'
+    -- schemas tecnicos do Supabase com dono postgres, por nome EXATO. Fonte: lista
+    -- InternalSchemas da CLI (supabase/cli apps/cli-go/pkg/migration/dump.go,
+    -- v2.120.0, bloco "Initialised by supabase/postgres image and owned by
+    -- postgres role"). supabase_migrations: projeto hospedado (homolog, 06/10/2026);
+    -- _realtime: imagem postgres 17.11 da CLI 2.120 (teste do aluno, 08/10/2026).
+    -- Os "owned by extensions" ja saem pelo filtro de pg_extension abaixo.
+    and n.nspname not in ('_analytics', '_realtime', '_supavisor', 'auth', 'etl', 'extensions',
+                          'pgbouncer', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations')
     and not exists (select 1 from pg_extension e where e.extnamespace = n.oid)
     and not exists (select 1 from public.modulo m where m.schema_nome = n.nspname and length(trim(m.dono)) > 0) $$,
   'GA-08: todo schema proprio tem linha em public.modulo com dono');

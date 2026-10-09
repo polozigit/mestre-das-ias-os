@@ -1,7 +1,7 @@
 {
   "kit": "mestre-das-ias-os",
-  "gerado_em": "2026-10-09T03:18:10Z",
-  "origem_git_sha": "950a30544",
+  "gerado_em": "2026-10-09T08:41:48Z",
+  "origem_git_sha": "7de1a056c",
   "fundacao_skills": [
     "polozi-aplicar-regra",
     "polozi-arrumar-a-casa",
@@ -41,7 +41,8 @@
         "tecnologia-acessos",
         "tecnologia-definir-o-que",
         "tecnologia-construir-tela",
-        "tecnologia-conectar"
+        "tecnologia-conectar",
+        "tecnologia-aplicar-marca"
       ]
     },
     {
@@ -60,7 +61,8 @@
     {
       "nome": "marketing",
       "agentes": [
-        "marketing-revisor"
+        "marketing-revisor",
+        "marketing-pesquisador"
       ],
       "skills": [
         "marketing-persona",

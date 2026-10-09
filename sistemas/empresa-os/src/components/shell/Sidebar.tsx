@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { LogoMarca } from "@/components/marca/LogoMarca";
 import { useEffect, useSyncExternalStore } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { empresa, nomeSistema } from "../../../config/empresa";
+import { nomeSistema } from "../../../config/empresa";
 import { usePermissions } from "@/lib/auth/PermissionsProvider";
 import { NAV_GRUPOS, filtrarNav, itemAtivo } from "@/lib/nav";
 import { grupoDaBusca } from "@/lib/tarefas/grupos";
@@ -97,15 +97,7 @@ export function Sidebar() {
         inert={gavetaInerte(open, desktop)}
       >
         <div className="sidebar-header flex h-[var(--topbar-h)] items-center gap-2 border-b border-borda-suave px-4">
-          <Image
-            src={empresa.logo}
-            alt=""
-            width={112}
-            height={28}
-            priority
-            unoptimized
-            className="h-6 w-auto shrink-0"
-          />
+          <LogoMarca alt="" width={112} height={28} priority className="h-6 w-auto shrink-0" />
           <span className="sidebar-wordmark truncate text-sm font-semibold text-fg-1">
             {nomeSistema}
           </span>

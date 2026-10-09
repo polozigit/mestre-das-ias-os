@@ -49,9 +49,9 @@ os padroes. Construtor: teto_construcao, padrao 250k, maximo 600k. Avaliador:
 teto_avaliador {criterio, casos, parecer}, padrao 80k, 100k e 40k, maximos 150k, 200k e
 300k. Acima do maximo o check_ficha reprova e o w15 ignora (volta ao padrao).
 Parecer (v1.3): o teto vale POR RODADA de veredito, chave native-ai-avaliador:parecer#n
-(sem # = rodada 1); no maximo 3 rodadas; rodada n>1 so vale com prova (gate provar:*
+(sem # = rodada 1); no maximo 2 rodadas; rodada n>1 so vale com prova (gate provar:*
 acerto) gravada depois do veredito da rodada n-1. Tarefa inteira: max(700k, construtor
-+ criterio + casos + parecer x rodadas usadas), no maximo 1,85M. Passou do teto ou
++ criterio + casos + parecer x rodadas usadas), no maximo 1,55M. Passou do teto ou
 rodada invalida: a linha vira "erro" e o detalhe diz qual regra.
 
 Python so stdlib, sem rede.
@@ -95,11 +95,11 @@ TETOS_TOKENS = {
 }
 TETO_TAREFA_TOKENS = 700_000  # piso da tarefa inteira
 # v1.3: o teto do parecer vale por rodada de veredito (Casa v4: 185k + 133k = 319k contra
-# 250k aprovado). Maximo 3 rodadas: 1 + 2 voltas, o laco do Arquiteto 4.3.
+# 250k aprovado). Maximo 2 rodadas: 1 + 1 volta de correcao (A41, teto do kit: sem laco).
 CHAVE_PARECER = f"{AVALIADOR}:parecer"
-MAX_RODADAS_VEREDITO = 3
+MAX_RODADAS_VEREDITO = 2
 # maximo absoluto da tarefa: construtor, criterio e casos no maximo, mais o parecer no
-# maximo em cada rodada (600k + 150k + 200k + 300k x 3 = 1,85M)
+# maximo em cada rodada (600k + 150k + 200k + 300k x 2 = 1,55M)
 TETO_TAREFA_MAXIMO = (TETO_CONSTRUCAO_MAXIMO + TETO_AVALIADOR_MAXIMO["criterio"]
                       + TETO_AVALIADOR_MAXIMO["casos"]
                       + TETO_AVALIADOR_MAXIMO["parecer"] * MAX_RODADAS_VEREDITO)
@@ -569,7 +569,7 @@ def _teto_tarefa(construtor, avaliador, rodadas):
 def teto_tarefa(raiz, tarefa, rodadas=None):
     """Teto da tarefa inteira: max(700k, construtor + criterio + casos + parecer x rodadas
     de veredito usadas), todos efetivos. Sem rodadas, conta as ja gravadas na tarefa (no
-    minimo 1). Nunca passa de TETO_TAREFA_MAXIMO (1,85M): cada parcela para no maximo."""
+    minimo 1). Nunca passa de TETO_TAREFA_MAXIMO (1,55M): cada parcela para no maximo."""
     if rodadas is None:
         rodadas = len(rodadas_de(tokens_acumulados(raiz, tarefa)))
     return _teto_tarefa(teto_construcao(raiz, tarefa), teto_avaliador(raiz, tarefa), rodadas)

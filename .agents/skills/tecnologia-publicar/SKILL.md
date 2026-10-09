@@ -65,7 +65,7 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
 
 4. **Testes locais.** Se a lista toca `sistemas/empresa-os/`, rode num subshell para não mudar a pasta de trabalho: `(cd sistemas/empresa-os && npm run lint && npx tsc --noEmit && npm test)`. Sem `sistemas/empresa-os/node_modules` (a instalação só baixa o pacote do setup), rode `npm install` ali uma vez antes. Vermelho = pare, corrija, commite de novo (passo 2) e repita desde o passo 3.
 
-5. **Revisão independente.** Só se a lista do passo 2 toca `sistemas/` ou o 3a deu saída 1 (arquivo protegido); senão pule este passo (o subagente começa sem contexto e custa tokens; documento e operação não passam por ele). Chame o subagente `tecnologia-revisor-seguranca` passando `chamado_por: tecnologia-publicar`, a lista do passo 2, o texto do diff (`git diff --no-renames origin/main...HEAD`), a saída do `arquivos_protegidos.py` (passo 3a, campo `arquivos_protegidos`), o `ok_do_dono` do 3a quando houver, e, para cada migration da lista, o caminho, a classificação (`classificar_migration.py`) e a saída, com o código de saída, do `veredito.py conferir` do passo 3b. O revisor só lê e não roda comando: sem esses dados ele devolve BLOCKED. BLOCKED = corrija, commite de novo e repita os passos 3, 4 e 5 (a correção pode mudar o sha da migration e quebrar o veredito). Nunca siga com BLOCKED.
+5. **Revisão independente.** Só se a lista do passo 2 toca `sistemas/` ou o 3a deu saída 1 (arquivo protegido); senão pule este passo (o subagente começa sem contexto e custa tokens; documento e operação não passam por ele). Chame o subagente `tecnologia-revisor-seguranca` passando `chamado_por: tecnologia-publicar`, a lista do passo 2, o texto do diff (`git diff --no-renames origin/main...HEAD`), a saída do `arquivos_protegidos.py` (passo 3a, campo `arquivos_protegidos`), o `ok_do_dono` do 3a quando houver, e, para cada migration da lista, o caminho, a classificação (`classificar_migration.py`) e a saída, com o código de saída, do `veredito.py conferir` do passo 3b. O revisor só lê e não roda comando: sem esses dados ele devolve BLOCKED. BLOCKED = UMA correção: corrija, commite de novo, repita os passos 3 e 4 (a correção pode mudar o sha da migration e quebrar o veredito) e chame o mesmo revisor UMA vez só para conferir os achados corrigidos. BLOCKED de novo = PARE, não faça merge, registre o motivo em `operacao/PENDENCIAS.md` e conte ao dono em 1 linha. Nunca faça uma 3ª chamada ao revisor (teto do kit: 1 revisão + 1 correção por etapa, nunca em loop). Nunca siga com BLOCKED.
 
 6. **Push, PR e checks.**
    - `git push -u origin HEAD`.
@@ -81,7 +81,13 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
      Saída 0 = todos verdes. Ainda "no checks reported" depois das 6 tentativas = os testes automáticos do GitHub não começaram: não faça merge; diga ao dono "os testes automáticos do GitHub não começaram; estou olhando".
    - Check vermelho: pegue o id da execução que falhou com `gh run list --branch <branch> --status failure --limit 1 --json databaseId --jq '.[0].databaseId'` e leia com `gh run view <id> --log-failed`. Corrija, commite (passo 2) e volte ao passo 3. Só avance com todos verdes.
 
-7. **Avisar o dono.** Sem esperar resposta, diga em 1 frase, com o link do preview da Vercel (comentário do bot na PR: `gh pr view <branch> --json comments`): "Estou colocando no ar. Se quiser ver antes, o link de teste é: <link>". Exceção: se a mudança veio de `tecnologia-construir-tela`, a chamada dela informa o `TASK-N`. Então pare aqui e devolva o controle a ela: ela exercita o link de teste contra os critérios de `operacao/tasks/TASK-N/requisito.md` e, com todos em sim, devolve a você para seguir do passo 8, sem esperar resposta do dono.
+7. **Link do preview e "aprovado" do dono.** Pegue o link do preview da Vercel (comentário do bot na PR: `gh pr view <branch> --json comments`).
+   - **Mudança que mexe em tela:** o dono vê o resultado antes de ir ao ar. Primeira resposta, em linguagem simples: "Abra este link, olhe a tela que mudou e responda aprovado se estiver certo: <link>". Espere o "aprovado" escrito no chat e só então siga ao passo 8. Se o dono pedir ajuste, volte ao passo 2 na mesma PR (o link se atualiza). Nunca peça para criar usuário, convidar membro de teste ou guardar senha: o preview entra como o dono, sem senha.
+   - **Abrir o link (a prévia da Vercel é protegida e pede login da Vercel):** você mesma a abre no Chrome do dono, já logado na Vercel, por comando (Mac `open -a "Google Chrome" "<link>"`, Windows `start chrome "<link>"`), nunca no navegador do app. Conferir por script: `(cd sistemas/empresa-os && vercel curl /login --deployment "<link>")` (a CLI passa pela proteção com o bypass de automação criado na primeira vez, passo `bypass_automacao`). Nunca desligue a proteção da prévia para conseguir abrir.
+   - **Mudança que não mexe em tela** (documento, operação, automação): não espere o dono. Diga em 1 frase "Estou colocando no ar." e siga ao passo 8.
+   - **Conferência pela IA (opcional).** Se ajudar, a IA pode abrir o link de teste e olhar só a tela que a mudança alterou, nunca o sistema inteiro. Ela só navega e olha: o preview usa o banco de PRODUÇÃO, então não salva, não exclui e não convida; teste que precisa gravar usa um registro "[TESTE]" e apaga depois. Se a conferência não rodar (login do preview falhou ou o agente está fora), nada trava: entregue o link ao dono do mesmo jeito.
+
+   Exceção: se a mudança veio de `tecnologia-construir-tela`, a chamada dela informa o `TASK-N`. Então pare aqui e devolva o controle a ela: ela pede o "aprovado" do dono para a tela e, com ele, devolve a você para seguir do passo 8.
 
 8. **Foto da produção e merge.**
 
@@ -157,6 +163,7 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
     - "Salvo" com a branch ainda sem merge: `git status --porcelain` vazio e `git log origin/<branch>..HEAD` vazio (diga "salvei, falta colocar no ar").
     - "No ar": o deploy desse commit com `state` `success` (passo 9.3) e `checar_producao.py` com saída 0 depois disso.
     - Sem a prova, diga o que falta em palavras simples: "Ainda estou esperando o site atualizar".
+    - Com a prova ("no ar" ou "salvo" depois do merge): rode `python3 .codex/hooks/registro_trabalho.py reconciliar` (no Windows, `py -3`): conclui no quadro a atividade que isto provou.
 
 ## Primeira vez neste sistema
 
@@ -169,7 +176,7 @@ Faça isto uma vez, quando o sistema ainda não foi ao ar (não existe `sistemas
 - `vercel` e `gh` instalados e `gh auth status` logado. O script confere e para com a instrução se faltar.
 - O sistema montado em `sistemas/empresa-os/` e o banco ligado (passo de ligar o projeto da `tecnologia-mudar-banco`); sem isso o passo dos secrets para pedindo a chave.
 - A árvore limpa: salve o que estiver pendente antes (seção "Salvar"). Depois do vínculo com a Vercel o `salvar.py` recusa a `main` (saída 3).
-- O `SUPABASE_ACCESS_TOKEN`, a senha do banco e a referência do projeto em `credenciais/.env`. Faltou algum: chame `tecnologia-acessos` (chave de API, pela área de transferência) e volte aqui. Quem cria o token é o dono, no painel da Supabase (Account, Access Tokens), com validade "Never" e escopo mínimo.
+- O `SUPABASE_ACCESS_TOKEN`, a senha do banco e a referência do projeto em `credenciais/.env`. Faltou algum: chame `tecnologia-acessos` (chave de API, pela área de transferência) e volte aqui. A IA cria o token no painel da Supabase (Account, Access Tokens), no Chrome do dono (Computer Use), sem perguntar: token de ACESSO TOTAL (o clássico, sem escolher organização nem permissão; no teste de 08/10/2026 o token escopado fez a Action `deploy-db` falhar 2 vezes com 403) e validade "Never". Gerado o token, a IA NÃO lê mais a página (nem captura de tela, nem árvore de acessibilidade: o valor vem junto e vaza no chat): clica no botão Copiar e o comando de chave de uma linha leva o valor direto para o `credenciais/.env`.
 
 **1. Ensaio, que só lê:**
 
@@ -186,7 +193,8 @@ Use o Python de `operacao/INSTALACAO.md` (campo `comando_python`; no Windows cos
 | `vincular_projeto` | `vercel link --yes --project <slug_os>` em `sistemas/empresa-os` (o `slug_os:` vem de `operacao/INSTALACAO.md`; sem ele o passo para). Cria o `.vercel/project.json`, o sinal de "sistema publicado". |
 | `conectar_git` | `vercel git connect`: branch gera link de teste, `main` gera produção. |
 | `gerar_token_qa`, `publicar_token_na_vercel` | Gera o `PREVIEW_TEST_TOKEN`, guarda em `credenciais/.env` (modo 600) e publica no ambiente preview da Vercel, com o valor num arquivo temporário. |
-| `usuario_qa` | Publica `PREVIEW_QA_EMAIL` e `PREVIEW_QA_PASSWORD` no preview, do mesmo jeito, SE o dono já guardou o par em `credenciais/.env`. Sem o par o passo fica `NAO-MEDIDO` e a instalação segue. |
+| `owner_email` | Publica `PREVIEW_OWNER_EMAIL` (o e-mail do dono, lido do `email_dono:` de `operacao/INSTALACAO.md`) no preview, com o valor num arquivo temporário. Sem e-mail válido o passo fica `NAO-MEDIDO` e a instalação segue; rode o instalador de novo quando o e-mail do dono estiver no `INSTALACAO.md`. |
+| `bypass_automacao` | Cria o "Protection Bypass for Automation" do projeto pela API da Vercel (`vercel api ... --input -`, segredo por STDIN) e guarda `VERCEL_AUTOMATION_BYPASS_SECRET` em `credenciais/.env`. A prévia continua protegida: a proteção nunca é desligada. A Vercel recusou: `NAO-MEDIDO` e a prévia abre no Chrome do dono, logado na Vercel. |
 | `conferir_integracao_supabase` | Confere pelos NOMES (`vercel env ls`) que as três variáveis do banco estão na Vercel; quem as grava é a `tecnologia-conectar` (`vercel-env`). Nunca imprime valor. |
 | `copiar_guardas` | Copia os workflows e o `dependabot.yml` de `sistemas/empresa-os/.github/` para o `.github/` da raiz, o único lugar onde o GitHub os lê (`ci`, `deploy-db`, `deploy-db-homologacao`, `gitleaks`, `keep-alive`, `backup-db`). |
 | `gravar_secrets` | `gh secret set` dos três segredos da automação, sempre por arquivo temporário. |
@@ -198,13 +206,13 @@ As variáveis do banco na Vercel são da `tecnologia-conectar` (`vercel-env`), n
 
 **3. O que só o dono faz**, em palavras simples, sem esperar uma resposta para seguir com o resto:
 
-- **Usuário de teste do preview.** O preview entra com um membro só de leitura, que só o dono cria: "No sistema, abra Usuários, convide um membro chamado Teste de QA com um e-mail que você consiga abrir, dê só as permissões de leitura e defina a senha pelo link do e-mail. Depois me diga pronto." O convite do sistema não aceita senha (quem abre o e-mail a define), por isso este script não cria esse usuário. Quando o dono disser pronto, guarde o par em `credenciais/.env` pelo mesmo caminho de chave de uma linha da `tecnologia-acessos` (passo 3 de "Conectar"): o dono copia o e-mail, você roda o comando da área de transferência para `PREVIEW_QA_EMAIL`; o mesmo para `PREVIEW_QA_PASSWORD`. Você nunca digita, cola nem lê a senha. Em seguida rode `--so usuario_qa`, confira os três nomes (`vercel env ls preview | grep -E "PREVIEW_TEST_TOKEN|PREVIEW_QA_EMAIL|PREVIEW_QA_PASSWORD"`) e grave `PREVIEW_QA: configurado em AAAA-MM-DD` em `operacao/sistema.md`, como descreve o passo 9a da `tecnologia-construir-tela`. Enquanto o par não existe, o QA do preview vira prova só por teste e isso não trava nada.
+- **Entrada do preview.** Nada a pedir ao dono: o preview entra como o dono, sem usuário extra e sem senha, e o instalador publica o e-mail do dono sozinho (passo `owner_email`). Se esse passo ficou `NAO-MEDIDO`, a conferência pela IA no preview não roda, e isso não trava nada: o dono abre o link e diz "aprovado".
 
 **4. Salvar o que o script mudou.** O script grava `.github/` e `operacao/INSTALACAO.md`, e como a Casa já tem produção publicada o caminho é o dos `## Passos`: branch curta, commit só desses caminhos, PR e merge. `.github/` é arquivo protegido: faça o passo 3a (diga que são "os testes automáticos e a publicação do GitHub" e pergunte "Posso mudar isso? Responda sim ou não."). Sem o "sim" gravado, não publique esses arquivos.
 
 **5. Provar o backup uma vez**, depois do merge: `gh workflow run backup-db.yml`, depois `gh run list --workflow backup-db.yml --limit 1` e `gh run watch <id>`. O workflow recusa repositório público (a cópia tem dado de cliente) e só guarda o arquivo como artefato por 14 dias. Run vermelho: o motivo está no log (`gh run view <id> --log-failed`), conte ao dono sem prometer cópia que não existe. O `deploy-db.yml` ainda NÃO chama o backup antes de migrar; isso entra só depois de um run verde.
 
-Não faz: criar o usuário de teste, mexer em ruleset ou proteção de branch (o plano grátis do repositório privado não impõe check; por isso o passo 6 dos `## Passos` espera os checks sozinho), girar chave e publicar em produção.
+Não faz: mexer em ruleset ou proteção de branch (o plano grátis do repositório privado não impõe check; por isso o passo 6 dos `## Passos` espera os checks sozinho), girar chave e publicar em produção.
 
 ## Nunca
 
@@ -212,6 +220,7 @@ Não faz: criar o usuário de teste, mexer em ruleset ou proteção de branch (o
 - `git reset --hard`.
 - Push na `main` com sistema publicado (o `salvar.py` já recusa, saída 3).
 - `vercel --prod`, `vercel promote`, `vercel rollback`.
+- Desligar a proteção da prévia (Deployment Protection, Vercel Authentication) ou mandar o dono desligar.
 - `supabase db push` (só a Action aplica migration).
 - Seguir com o revisor em BLOCKED.
 - `git add -A` ou `git add .`. Única exceção: `salvar.py --tudo`.

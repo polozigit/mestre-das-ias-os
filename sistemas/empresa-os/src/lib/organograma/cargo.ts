@@ -1,10 +1,9 @@
 /**
  * Funções puras do PainelCargo (tudo que o banco tem sobre um cargo) — sem
- * React, sem I/O. Consomem `OrgNo`, `OrgDocumentoResumo[]` (public.v_org_documento)
- * e `OrgOnda[]` (public.v_org_onda), já carregados pela página.
+ * React, sem I/O. Consomem `OrgNo`, já carregado pela página.
  */
 
-import type { OrgDocumentoResumo, OrgNo, OrgOnda, OrgProcesso } from "./tipos.ts";
+import type { OrgNo, OrgProcesso } from "./tipos.ts";
 
 export type FatoCargo = { rotulo: string; valor: string };
 
@@ -24,21 +23,6 @@ export function fatosCargo(no: OrgNo): FatoCargo[] {
     fatos.push({ rotulo: "Vagas de referência", valor: String(no.vagas) });
   }
   return fatos;
-}
-
-/** Documentos cujo `cargo_slug` é o do cargo pedido — mesma ordem de entrada
- * (a listagem já vem ordenada por `ordem` da query de v_org_documento). */
-export function documentosDoCargo(
-  documentos: OrgDocumentoResumo[],
-  cargoSlug: string,
-): OrgDocumentoResumo[] {
-  return documentos.filter((d) => d.cargo_slug === cargoSlug);
-}
-
-/** Onda (public.v_org_onda) em que o cargo é formado, ou `null` se não
- * aparece em nenhuma — a carga não repete cargo em 2 ondas. */
-export function ondaDoCargo(ondas: OrgOnda[], cargoSlug: string): OrgOnda | null {
-  return ondas.find((o) => o.cargos.some((c) => c.cargo_slug === cargoSlug)) ?? null;
 }
 
 /** Códigos APQC do processo que NÃO aparecem já citados em `p.notas` — evita

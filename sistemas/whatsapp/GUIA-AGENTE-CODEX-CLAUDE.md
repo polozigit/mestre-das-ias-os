@@ -2,7 +2,7 @@
 
 ## Caminho rápido (use este; o resto do guia é referência e erros)
 
-1. Dentro de `sistemas/whatsapp/` da Casa, rode `npm run conectar` (para "reconecta": `npm run conectar -- --reconectar`). Um comando faz tudo (Node, dependências, motor, QR, início automático, MCP, assistente `@ia`), é idempotente e imprime só linhas `CHAVE=valor`.
+1. Dentro de `sistemas/whatsapp/` da Casa, rode `npm run conectar` (para "reconecta": `npm run conectar -- --reconectar`; para fixar a IA: `-- --cliente codex|claude`). Um comando faz tudo (Node, dependências, motor, QR, início automático, MCP, assistente `@ia`), é idempotente e imprime só linhas `CHAVE=valor`.
 2. `CONECTAR=ESCANEIE_O_QR`: a página do QR já abriu, peça ao aluno para escanear (o comando espera até 15 min; se o terminal estourar o tempo antes, rode de novo). `CONECTAR=OK`: repasse ao aluno só o resultado (WhatsApp, número final, início automático, MCP, banco) e a linha `PROXIMO`.
 3. `CONECTAR=ERRO etapa=<x>` ou `CONECTAR=FALTA_NODE`: use só a seção "Erros do `npm run conectar`" logo abaixo (leia até o próximo `##`). Teste de envio só se o aluno pedir, e só depois do `ENVIAR` dele (`npm run send:own-test`).
 
@@ -14,11 +14,12 @@ A saída de erro tem 2 linhas: `CONECTAR=ERRO etapa=<x> motivo=<curto>` e `SUGES
 |---|---|
 | `CONECTAR=FALTA_NODE` | Node.js 20+ ausente. Explique e, se o aluno aprovar, instale pela fonte oficial do sistema dele; reabra o terminal e rode de novo. Comando `node` ou `npm` não encontrado é o mesmo caso. |
 | `etapa=dependencias` | `npm ci` falhou (internet, disco). Leia o fim de `conectar-npm.log` na pasta de estado (caminho no `motivo`), corrija e rode de novo. |
-| `etapa=motor` | Motor não subiu ou a porta 8082 responde outra coisa. Leia `motor.log` na pasta de estado. Pilha Docker antiga: `npm run retire:evolution`. Porta ocupada: defina `WHATSAPP_LOCAL_PORT` com outra porta. |
+| `etapa=motor` | Motor não subiu ou a porta 8082 responde outra coisa. Leia `motor.log` na pasta de estado. A pilha Docker antiga (Evolution) o comando desmonta sozinho (`EVOLUTION_ANTIGA=DESMONTADA`). Outro programa na porta: defina `WHATSAPP_LOCAL_PORT` com outra porta. |
 | `etapa=whatsapp` | Sessão salva sem conexão (celular sem internet ou aparelho removido). Confira a internet do celular e rode de novo; se persistir, `npm run conectar -- --reconectar` (apaga a sessão local e pede QR novo). |
 | `etapa=qr` | QR não escaneado em 15 min, ou porta 8787 ocupada por outro `start:qr`/`conectar`. Rode de novo com o celular em mãos. |
 | `etapa=autostart` | `launchctl` ou a pasta Inicializar falhou. Rode `npm run autostart:ligar` e leia o erro; ou use `--sem-autostart`. |
-| `etapa=mcp` | `codex`/`claude` fora do PATH ou recusou. Rode `npm run install:codex` ou `npm run install:claude` e leia o erro; ou use `--sem-mcp`. |
+| `etapa=cliente` | Não conseguiu gravar a escolha de IA na pasta de estado. Rode `npm run conectar -- --cliente codex` (ou `claude`) e leia o erro. |
+| `etapa=mcp` | Nenhum cliente aceitou o MCP (`codex`/`claude` fora do PATH ou recusou). Rode `npm run conectar -- --cliente codex` (ou `claude`), ou `npm run install:codex`/`install:claude`, e leia o erro; ou use `--sem-mcp`. |
 | `etapa=assistente` | Assistente `@ia` não subiu. Rode `npm run start:background`; log em `live-assistant.log` na pasta de estado. |
 | `etapa=argumentos` | Opção inválida. Aceitas: `--reconectar`, `--sem-autostart`, `--sem-mcp`, `--dry-run`. |
 
@@ -52,14 +53,13 @@ Antes de qualquer comando, confirme que o chat está aberto dentro de uma Casa (
 2. Se não existir (Casa antiga, criada antes de o pacote vir junto), é preciso o `whatsapp-local.zip` anexado no chat. Crie `sistemas/whatsapp/` (se não existir) e extraia todo o conteúdo do zip ali dentro: os arquivos do pacote (`GUIA-AGENTE-CODEX-CLAUDE.md`, `package.json`, `src/`, `tests/` etc.) ficam soltos direto em `sistemas/whatsapp/`, sem uma subpasta `whatsapp-local/` no meio. Sem zip anexado, pare e peça ao aluno para anexar `whatsapp-local.zip`.
 3. A partir daqui, todo comando `npm run ...` deste guia roda com `cwd` (diretório de trabalho) igual a `sistemas/whatsapp/` dentro da Casa, nunca na raiz da Casa, nunca em Downloads.
 
-## Passo 2 — Detectar Codex ou Claude Code
+## Passo 2 — Qual IA está rodando (Codex ou Claude Code)
 
-Mesma regra do instalador da fundação:
+**Nunca decida por arquivo da Casa:** a Casa do kit tem `AGENTS.md`/`.codex/` E `CLAUDE.md`/`.claude/`, então arquivo não diz quem está executando (teste real de 09/10: no Codex, a regra antiga escolheu `claude` e deu `spawn claude ENOENT`).
 
-- **Claude Code**: existe uma ferramenta `Skill` na lista de ferramentas disponíveis, ou a raiz da Casa tem `CLAUDE.md`/`.claude/`.
-- **Codex**: nenhum dos sinais acima e a raiz da Casa tem `.codex/`. Na dúvida, `codex` é o padrão.
+O `npm run conectar` decide sozinho, nesta ordem: `--cliente codex|claude` > `POLOZI_IA_CLIENTE` > escolha já gravada (arquivo `cliente-ia` na pasta de estado) > o que existe no PATH (só um = esse) > os dois: quem está executando agora (`CLAUDECODE=1` = Claude Code, `CODEX_THREAD_ID`/`CODEX_SESSION_ID` = Codex) > `codex`. A linha `MCP=` mostra onde registrou; o MCP vai para o escolhido e para o outro cliente se ele estiver instalado.
 
-Guarde essa detecção — ela decide, lá no fim, entre `npm run install:codex` e `npm run install:claude`.
+Para forçar: `npm run conectar -- --cliente codex` (ou `claude`). Isso grava a escolha, regrava o início automático com ela e reinicia o `@ia`. Se o cliente escolhido sumir do PATH, o `@ia` tenta o outro antes de errar.
 
 ## Roteiro de "Conecta meu WhatsApp" (o que o `npm run conectar` faz, para fazer na mão se uma etapa falhar)
 

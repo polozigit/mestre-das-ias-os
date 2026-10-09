@@ -26,10 +26,22 @@ link — a UI é cosmética, nunca a defesa).
 - **Migration nova**: seguir o molde de `supabase/migrations/` (RLS + REVOKE +
   GRANT mínimo + policy + smoke que prova o GRANT). O especialista de banco do
   time de sistema valida ANTES de aplicar; nunca aplicar direto em produção.
-- **Nada mergeia sem QA**: preview da Vercel com `?preview_token=`, exercitar
-  como usuário (todas as telas + console limpo + cheque de página-vazia-por-RLS)
-  e APPROVED. A senha do dono NUNCA é digitada pela IA.
-- **Visual**: mexa SÓ em `src/app/theme.css` (catálogo em `DESIGN.md`).
+- **Mudança de tela vai ao ar com o "aprovado" do dono**: CI verde (os testes
+  automáticos continuam obrigatórios) → link do preview da Vercel → o DONO abre
+  o link, olha a tela que mudou e responde "aprovado" → produção. Não existe QA
+  de tela obrigatório, usuário de teste, agente de QA no caminho nem ciclo
+  extra. A primeira resposta da IA no preview diz ao dono o único passo dele:
+  abrir o link, olhar a tela que mudou e responder "aprovado". Nunca peça para
+  criar usuário, convidar membro de teste ou guardar senha.
+- **Conferir a tela é opcional e só a tela alterada**: quando a IA quiser
+  conferir, usa `?preview_token=` (entra como o DONO por link mágico gerado no
+  servidor, sem senha) e olha SÓ a tela que a mudança alterou, nunca todas as
+  telas do sistema. Se não rodar, nada trava. O preview usa o banco de
+  PRODUÇÃO: a IA só navega e olha (não salva, não exclui, não convida); teste
+  que precisa gravar usa um registro `[TESTE]` e apaga no fim. A senha do dono
+  NUNCA é digitada pela IA.
+- **Visual**: marca no sistema (cores, fontes, logo, ícone) = skill
+  `tecnologia-aplicar-marca`, nunca à mão (catálogo em `DESIGN.md`).
   Estrutura de tela não muda sem task aprovada pelo dono.
 - **Segredo nunca no repo**: produção = painel da Vercel; catálogo de quais
   variáveis existem = `conexao.md`; valores = `credenciais/.env` da Casa.

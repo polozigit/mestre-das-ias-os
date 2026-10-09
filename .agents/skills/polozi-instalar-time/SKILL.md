@@ -193,7 +193,8 @@ Pra só conferir o que iria, sem enviar nada: acrescente `--dry-run`.
 ### P6 — Fechar
 
 Uma linha pro dono: o que ficou instalado e como chamar
-(`$polozi-chamar-time`).
+(`$polozi-chamar-time`). Depois de instalar, rode
+`<PY> .codex/hooks/registro_trabalho.py reconciliar` (conclui a atividade do plano que o time provou).
 
 ## Se travar (caminho ALTERNATIVO, não o fluxo do D1)
 
@@ -247,7 +248,7 @@ time do kit a origem é o que o `time.json` gera, e as skills continuam em
 instalado, dentro do **CLI plugin browser** [24a:plugins/n18] — a doc
 escopa esse gesto a esse browser da CLI; não existe hoje gesto documentado
 de desligar plugin pela Plugins Directory do app (gap aberto, registrado).
-NUNCA edite `~/.codex/config.toml` a mão nem grave a chave `enabled` como
+Pode editar `~/.codex/config.toml` (backup antes), mas nunca grave a chave `enabled` como
 `false` em lugar nenhum: a doc confirma o ARQUIVO onde o app grava o estado
 on/off, NUNCA a chave [24a:plugins/n18].
 

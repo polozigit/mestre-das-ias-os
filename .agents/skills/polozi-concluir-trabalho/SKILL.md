@@ -151,6 +151,7 @@ Pedir uma única confirmação antes de gravar.
 2. TASK fechada — no banco (confirmação do `polozi-gerente-de-trabalho`) ou em `operacao/tasks/TASK-N/TASK.md`, com `Commit:` preenchido.
 3. `STATUS-ATUAL.md`, `CHANGELOG.md`, `DECISOES.md`, `PENDENCIAS.md` e `PROXIMA-SESSAO.md` atualizados conforme a prévia.
 4. Informar ao usuário o que foi registrado e o próximo passo, fechando com a frase que o script imprimiu — nunca uma frase escrita de próprio punho.
+5. Rodar `<PY> .codex/hooks/registro_trabalho.py reconciliar` e dizer que a tarefa do quadro (ligada pelo `- Quadro:` do `TASK.md`) fecha sozinha no fim do turno; não feche à mão.
 
 ## Limites
 

@@ -3,67 +3,17 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/Card";
-import type { OrgOnda, OrgPasso, OrgRaia } from "@/lib/organograma/tipos";
+import type { OrgPasso, OrgRaia } from "@/lib/organograma/tipos";
 
 type Props = {
   raias: OrgRaia[];
   passos: OrgPasso[];
-  ondas: OrgOnda[];
   onVerCargo: (cargoSlug: string) => void;
   onAbrirPlaybook: (pacoteSlug: string, slug: string) => void;
 };
 
 function temGateReal(gate: string | null): boolean {
   return !!gate && !/^nenhum$/i.test(gate.trim());
-}
-
-function OndaCard({ onda, onVerCargo }: { onda: OrgOnda; onVerCargo: (slug: string) => void }) {
-  const tecnica = /^E/i.test(onda.codigo);
-  return (
-    <article
-      className={cn(
-        "flex flex-col gap-1.5 rounded-lg border border-borda bg-bg-elevada p-3 shadow-[var(--sombra-sm)]",
-        tecnica && "border-dashed",
-      )}
-    >
-      <div className="flex items-baseline gap-2">
-        <span className="rounded-md bg-acento px-1.5 py-0.5 font-mono text-xs font-semibold text-fg-sobre-acento">
-          {onda.codigo}
-        </span>
-        <span className="text-[13.5px] font-semibold leading-tight text-fg-1">{onda.time}</span>
-      </div>
-      <div className="flex flex-wrap gap-1">
-        {onda.cargos.map((c, i) =>
-          c.cargo_slug ? (
-            <button
-              key={i}
-              type="button"
-              onClick={() => onVerCargo(c.cargo_slug!)}
-              className="rounded-full border border-acento bg-acento-suave px-2 py-0.5 text-[11.5px] text-acento-texto"
-            >
-              {c.texto}
-            </button>
-          ) : (
-            <span key={i} className="rounded-full border border-borda bg-bg-sutil px-2 py-0.5 text-[11.5px] text-fg-3">
-              {c.texto}
-            </span>
-          ),
-        )}
-      </div>
-      {onda.porque && (
-        <p className="text-xs text-fg-3">
-          <b className="font-semibold text-fg-2">Por quê: </b>
-          {onda.porque}
-        </p>
-      )}
-      {onda.depende && (
-        <p className="text-xs text-fg-3">
-          <b className="font-semibold text-fg-2">Depende de: </b>
-          {onda.depende}
-        </p>
-      )}
-    </article>
-  );
 }
 
 type Wire = { d: string; tipo: "normal" | "loop" | "caio" };
@@ -422,28 +372,13 @@ function PassoDetalhe({
   );
 }
 
-export function FluxoOndas({ raias, passos, ondas, onVerCargo, onAbrirPlaybook }: Props) {
+export function Workflows({ raias, passos, onVerCargo, onAbrirPlaybook }: Props) {
   const passosOrdenados = useMemo(() => [...passos].sort((a, b) => a.ordem - b.ordem), [passos]);
   const [selecionado, setSelecionado] = useState<string | null>(passosOrdenados[0]?.codigo ?? null);
   const passoAtual = passosOrdenados.find((p) => p.codigo === selecionado) ?? passosOrdenados[0] ?? null;
 
   return (
     <div className="flex flex-col gap-5">
-      {ondas.length > 0 && (
-        <section className="flex flex-col gap-2.5">
-          <h2 className="h5">Ondas: em que ordem os times são formados</h2>
-          <p className="max-w-[92ch] text-sm text-fg-3">
-            Primeiro quem forma, depois quem contrata, depois quem converte em agente; só então as áreas de
-            negócio. Clique num cargo pra abrir o cartão dele no organograma.
-          </p>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3">
-            {ondas.map((o) => (
-              <OndaCard key={o.codigo} onda={o} onVerCargo={onVerCargo} />
-            ))}
-          </div>
-        </section>
-      )}
-
       {passosOrdenados.length > 0 && (
         <section className="flex flex-col gap-2.5">
           <h2 className="h5">Workflow de modelagem de um cargo</h2>

@@ -27,9 +27,18 @@ por migration, nunca clicando numa tela de administração.
 
 ## Do commit à produção
 
-Fluxo fixo: commit → preview → `polozi-sistema-qa` testa no navegador com o
-token de preview (páginas + console + página vazia por permissão) →
-APPROVED → produção. Sem esse APPROVED, nada sobe.
+Fluxo fixo: commit → testes automáticos verdes (CI) → link do preview → o DONO
+abre o link, olha a tela que mudou e diz "aprovado" → produção. Quem libera a
+publicação de uma mudança de tela é o "aprovado" do dono, por escrito no chat.
+Mudança que não toca tela (documento, operação) não espera o dono. Os testes
+automáticos e os checks do GitHub continuam valendo.
+
+Conferência pela IA é opcional e nunca trava: se o dono pedir, o `polozi-sistema-qa`
+abre o preview com o token e confere SÓ a tela que a mudança alterou, só navegando
+(o preview usa o banco de produção: não salva, não exclui, não convida). Se essa
+conferência não rodar, siga com o link para o dono.
+
+Primeira resposta no preview: diga ao dono o único passo dele, abrir o link, olhar a tela que mudou e responder "aprovado". Nunca peça para criar usuário, convidar membro de teste ou guardar senha.
 
 ## Chaves
 
@@ -48,4 +57,4 @@ o comportamento a sinalizar:
 - Nenhuma chave de servidor aparece no diff.
 
 Isto AJUDA a revisão — não substitui teste, proteção de branch nem
-aprovação; quem aprova produção continua sendo o `polozi-sistema-qa`.
+aprovação; quem aprova a tela em produção é o dono, com o "aprovado" dele.

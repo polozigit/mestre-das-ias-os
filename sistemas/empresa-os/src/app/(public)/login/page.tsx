@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Image from "next/image";
-import { empresa, nomeSistema } from "../../../../config/empresa";
+import { LogoMarca } from "@/components/marca/LogoMarca";
+import { nomeSistema } from "../../../../config/empresa";
 import { entrar, enviarRecuperacaoSenha } from "./actions";
 
 type Modo = "login" | "recuperar";
@@ -33,15 +33,7 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-bg p-6">
       <div className="w-full max-w-sm rounded-lg border border-borda bg-bg-elevada p-8 shadow-[var(--sombra-md)]">
-        <Image
-          src={empresa.logo}
-          alt={nomeSistema}
-          width={140}
-          height={36}
-          priority
-          unoptimized
-          className="mb-4 h-9 w-auto"
-        />
+        <LogoMarca alt={nomeSistema} width={140} height={36} priority className="mb-4 h-9 w-auto" />
         <h1 className="mb-1 text-lg font-semibold text-fg-1">{nomeSistema}</h1>
         <p className="mb-6 text-sm text-fg-3">
           {modo === "login"

@@ -1,6 +1,6 @@
 {
   "chave": "mestre",
-  "versao": 7,
+  "versao": 11,
   "titulo": "Mestre das IAs: 3 dias de curso e 90 dias de trilha",
   "descricao": "O curso monta; a trilha prova. Dia 0 da trilha = fim do D3.",
   "caminho_origem": "config/planos/mestre.json",
@@ -60,17 +60,17 @@
           "chave": "config-codex",
           "ordem": 3,
           "titulo": "Configurar o Codex",
-          "objetivo": "Codex pronto para trabalhar com segurança na pasta da empresa.",
-          "instrucao": "Abra as configurações do Codex e deixe-o trabalhando só dentro da pasta da empresa, pedindo a sua aprovação antes de qualquer coisa fora dela.",
-          "por_que": "Limitar o Codex à pasta da empresa e exigir a sua aprovação para o resto evita que ele mexa em arquivos seus que não têm a ver com o trabalho.",
+          "objetivo": "Codex pronto para trabalhar sozinho, configurado com o professor antes do instalador: acesso total, Computer Use e o Google Chrome como navegador padrão.",
+          "instrucao": "Com o professor, no telão, ligue nas configurações do Codex o Acesso total e o Computer Use, e deixe o Google Chrome como navegador padrão do computador. Isso vem antes do instalador, porque sem o Computer Use a IA não consegue operar o computador.",
+          "por_que": "Com acesso total a IA instala, configura e executa sem parar para pedir aprovação a cada passo, e com o Computer Use ela faz o passo a passo dos sites no seu Chrome já logado, deixando com você só a senha, o código de SMS e a verificação em duas etapas.",
           "passos": [
-            "Abra as configurações do Codex.",
-            "Deixe o acesso só à pasta de trabalho da empresa, não ao computador inteiro.",
-            "Marque para ele pedir a sua aprovação antes de qualquer ação fora dessa pasta.",
-            "Salve e volte à tela principal para conferir."
+            "Com o professor no telão, abra as configurações do Codex (no Mac, Comando e vírgula) e, em Geral, ligue o Acesso total.",
+            "No seletor de permissão da conversa, escolha o acesso total: aparece o aviso de acesso completo.",
+            "Em Plugins, abra o Computer Use, instale e ligue; no Mac, autorize Gravação de Tela e Acessibilidade quando o sistema pedir.",
+            "Deixe o Google Chrome como navegador padrão do computador, com as suas contas já entradas nele."
           ],
-          "comando": "Quero deixar o Codex seguro. Me mostre, passo a passo, onde ficam as configurações de acesso e de aprovação no aplicativo e como deixá-lo trabalhando só dentro da pasta da empresa, pedindo a minha aprovação para qualquer coisa fora dela. Depois me peça para confirmar na tela.",
-          "prova": "Nas configurações, o Codex está limitado à pasta de trabalho e pede aprovação para o resto.",
+          "comando": "Vou configurar o Codex junto com o professor, antes do instalador. Me guie, passo a passo, para ligar o Acesso total nas configurações e no seletor da conversa, instalar e ligar o Computer Use e deixar o Google Chrome como navegador padrão. Depois confira se você está em acesso total e com o Computer Use disponível e me diga o resultado.",
+          "prova": "O Acesso total e o Computer Use estão ligados no Codex e o Google Chrome é o navegador padrão do computador.",
           "prazo_dias": 0,
           "executor_padrao": "dupla",
           "depende_de": "conectores",
@@ -102,7 +102,7 @@
           "ordem": 5,
           "titulo": "Rodar o instalador",
           "objetivo": "A estrutura da empresa criada, com o manual de instruções (AGENTS.md) e os primeiros agentes.",
-          "instrucao": "Num chat novo do projeto, digite $ e escolha polozi-instalador, depois responda o nome da empresa, o seu nome e o seu e-mail. Ele mostra o que vai criar e só segue quando você disser \"pode criar\".",
+          "instrucao": "Num chat novo do projeto, digite $ e escolha polozi-instalador, depois responda o nome da empresa, o seu nome e o seu e-mail. Ele mostra o que vai criar e segue sozinho; só chama você para o que só você pode fazer.",
           "por_que": "O instalador transforma a pasta baixada na estrutura da sua empresa e escreve as regras que a IA vai seguir daqui para a frente.",
           "passos": [
             "Abra um chat novo dentro do projeto.",
@@ -111,7 +111,7 @@
             "Leia o que ele vai criar e só diga \"pode criar\" se estiver certo.",
             "Quando ele pedir, confie na pasta no Codex; no fim da estrutura, em Configurações, Hooks, escolha \"Confiar em tudo\" para a pasta da empresa."
           ],
-          "comando": "$polozi-instalador Quero instalar a estrutura da minha empresa. Faça as três perguntas (nome da empresa, meu nome e meu e-mail), mostre o que vai criar e só crie quando eu disser \"pode criar\".",
+          "comando": "$polozi-instalador Quero instalar a estrutura da minha empresa. Faça as três perguntas (nome da empresa, meu nome e meu e-mail), mostre o que vai criar e crie em seguida, sem pedir licença: o resto você faz sozinho e só me chama para o que só eu posso fazer.",
           "prova": "A pasta ganha a estrutura da empresa, o manual de instruções (AGENTS.md) e os primeiros agentes.",
           "prazo_dias": 0,
           "executor_padrao": "dupla",
@@ -145,17 +145,17 @@
           "ordem": 7,
           "titulo": "Colocar o sistema no ar",
           "objetivo": "O sistema da empresa publicado, com login e ligado ao banco.",
-          "instrucao": "Peça ao instalador para continuar na etapa do sistema: ele cria a sua empresa e o seu login no banco, sobe uma prévia, testa como usuário e só depois coloca no ar. Você faz o primeiro login pelo e-mail de convite.",
+          "instrucao": "Peça ao instalador para continuar na etapa do sistema: ele cria a sua empresa e o seu login no banco e coloca o sistema no ar. Você faz o primeiro login pelo e-mail de convite.",
           "por_que": "Com o sistema no ar você e a sua equipe acessam a empresa de qualquer lugar, até do celular, só com login.",
           "passos": [
             "Cole o comando abaixo no chat do projeto.",
-            "Acompanhe a IA criando a sua empresa e o seu login no banco e subindo uma prévia do sistema.",
-            "Veja a IA testar a prévia como se fosse um usuário e espere ela dizer que está tudo certo antes de publicar.",
+            "Acompanhe a IA criando a sua empresa e o seu login no banco e publicando o sistema.",
+            "Espere a IA conferir que a página de login abre e mandar o e-mail de convite.",
             "Abra o e-mail de convite que chegar e defina a sua senha, duas vezes.",
             "Entre pelo celular e veja o Início com o Cronograma.",
-            "Daqui pra frente, cada mudança no sistema vai para o ar pela skill tecnologia-publicar, sempre com uma prévia testada antes."
+            "Daqui pra frente, cada mudança de tela vai para o ar pela skill tecnologia-publicar, sempre com uma prévia testada antes."
           ],
-          "comando": "$polozi-instalador Continue a instalação na etapa do sistema: crie a minha empresa e o meu login no banco, suba uma prévia, teste como usuário e só depois publique. Me avise quando o e-mail de convite for enviado e me passe o endereço do sistema.",
+          "comando": "$polozi-instalador Continue a instalação na etapa do sistema: crie a minha empresa e o meu login no banco e publique o sistema. Me avise quando o e-mail de convite for enviado e me passe o endereço do sistema.",
           "prova": "Você abre o endereço do sistema no celular, entra com o seu login e vê o Início com o Cronograma.",
           "prazo_dias": 0,
           "executor_padrao": "dupla",
@@ -183,8 +183,28 @@
           "depende_de": "sistema-no-ar"
         },
         {
-          "chave": "whatsapp",
+          "chave": "sistema-com-marca",
           "ordem": 9,
+          "titulo": "O sistema com a sua marca",
+          "objetivo": "O sistema abre com as cores, a fonte, o logo e o ícone da sua marca.",
+          "instrucao": "Peça para a IA mostrar um mockup das telas principais com a sua marca, em claro e escuro, e aprove antes de ela mexer no sistema. Depois do aprovado, ela aplica, manda o link de teste e só publica com o seu sim.",
+          "por_que": "O sistema que a equipe usa todo dia passa a ter a cara da empresa, com leitura garantida no claro e no escuro.",
+          "passos": [
+            "Abra uma conversa nova no projeto.",
+            "Cole o comando abaixo.",
+            "Olhe o mockup das telas em claro e escuro e responda sim, ou diga o que mudar (a IA ajusta uma vez e mostra de novo).",
+            "Abra o link de teste no computador e no celular.",
+            "Responda sim para publicar."
+          ],
+          "comando": "$tecnologia-aplicar-marca Aplique a identidade visual aprovada da minha marca no sistema: cores, fontes, logo (claro e escuro) e o ícone da aba. Antes de mexer no sistema, me mostre um mockup das telas principais com a minha marca, em claro e escuro, para eu aprovar; só depois do meu aprovado aplique, me mande o link de teste e publique quando eu disser sim.",
+          "prova": "O sistema abre com as cores, a fonte, o logo e o ícone da sua marca, em claro e escuro, e o DESIGN.md do sistema traz a marca.",
+          "prazo_dias": 0,
+          "executor_padrao": "dupla",
+          "depende_de": "dossie-persona-marca"
+        },
+        {
+          "chave": "whatsapp",
+          "ordem": 10,
           "titulo": "Conectar o WhatsApp",
           "objetivo": "Times recebendo e respondendo pelo WhatsApp.",
           "instrucao": "Peça ao Codex para conectar o seu WhatsApp, leia o QR Code pelo celular (Aparelhos conectados) e digite ENVIAR no primeiro teste.",
@@ -196,15 +216,15 @@
             "Quando a IA avisar que conectou, digite ENVIAR no primeiro teste.",
             "Confira se a mensagem de teste chegou no seu próprio WhatsApp."
           ],
-          "comando": "Conecte o meu WhatsApp ao sistema: rode npm run conectar na pasta sistemas/whatsapp, abra a página do QR Code e me avise quando conectar. Eu leio o QR pelo celular (WhatsApp, Aparelhos conectados) e depois confirmo o primeiro teste digitando ENVIAR. Me repasse só o resultado.",
+          "comando": "Conecte o meu WhatsApp ao sistema: rode npm run conectar na pasta sistemas/whatsapp (se eu pedir um cliente, acrescente -- --cliente codex ou claude; sem pedido, ele escolhe a IA que esta rodando), abra a página do QR Code e me avise quando conectar. Eu leio o QR pelo celular (WhatsApp, Aparelhos conectados) e depois confirmo o primeiro teste digitando ENVIAR. Me repasse só o resultado.",
           "prova": "A mensagem de teste chega no seu próprio WhatsApp.",
           "prazo_dias": 0,
           "executor_padrao": "dupla",
-          "depende_de": "dossie-persona-marca"
+          "depende_de": "sistema-com-marca"
         },
         {
           "chave": "times",
-          "ordem": 10,
+          "ordem": 11,
           "titulo": "Conferir os times e chamar o primeiro",
           "objetivo": "Os quatro times do kit (Native AI, Tecnologia, PMO e Marketing) instalados e o primeiro chamado.",
           "instrucao": "Os quatro times do kit (Native AI, Tecnologia, PMO e Marketing) já vêm instalados no repositório. Peça à IA para conferir cada um e depois chame o primeiro pelo nome.",
@@ -224,7 +244,7 @@
         },
         {
           "chave": "primeiro-time",
-          "ordem": 11,
+          "ordem": 12,
           "titulo": "Primeiro time respondendo",
           "objetivo": "Uma tarefa real feita por um time.",
           "instrucao": "Peça uma tarefa real a um dos times e registre a entrega.",
@@ -244,7 +264,7 @@
         },
         {
           "chave": "gate-d1",
-          "ordem": 12,
+          "ordem": 13,
           "titulo": "Provar o gate do Dia 1",
           "objetivo": "Eixo A no nível 2.",
           "instrucao": "Confira o gate de garantia do Dia 1 com o professor.",

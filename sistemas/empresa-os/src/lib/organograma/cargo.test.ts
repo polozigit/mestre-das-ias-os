@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { apqcSemNotas, documentosDoCargo, fatosCargo, itensIndiceCargo, ondaDoCargo } from "./cargo.ts";
-import type { OrgDocumentoResumo, OrgNo, OrgOnda, OrgPacoteResumo, OrgProcesso } from "./tipos.ts";
+import { apqcSemNotas, fatosCargo, itensIndiceCargo } from "./cargo.ts";
+import type { OrgNo, OrgPacoteResumo, OrgProcesso } from "./tipos.ts";
 
 function no(parcial: Partial<OrgNo> & { no_id: string; tipo: OrgNo["tipo"] }): OrgNo {
   return {
@@ -29,31 +29,6 @@ function no(parcial: Partial<OrgNo> & { no_id: string; tipo: OrgNo["tipo"] }): O
     processos: [],
     interfaces: [],
     pacote: null,
-    ...parcial,
-  };
-}
-
-function doc(parcial: Partial<OrgDocumentoResumo> & { caminho: string }): OrgDocumentoResumo {
-  return {
-    tipo: "frente",
-    titulo: parcial.caminho,
-    resumo: null,
-    tamanho: 0,
-    ordem: 0,
-    pacote_slug: null,
-    cargo_slug: null,
-    especialista: null,
-    ...parcial,
-  };
-}
-
-function onda(parcial: Partial<OrgOnda> & { codigo: string }): OrgOnda {
-  return {
-    ordem: 0,
-    time: parcial.codigo,
-    porque: null,
-    depende: null,
-    cargos: [],
     ...parcial,
   };
 }
@@ -91,51 +66,6 @@ test("fatosCargo: omite 'Cargo real' quando é igual ao título (não repete a m
 test("fatosCargo: vagas 0 ainda entra (0 é dado, não ausência — só null é omitido)", () => {
   const n = no({ no_id: "c:x", tipo: "cargo", vagas: 0 });
   assert.deepEqual(fatosCargo(n), [{ rotulo: "Vagas de referência", valor: "0" }]);
-});
-
-// --- documentosDoCargo ---
-
-test("documentosDoCargo: filtra só os documentos do cargo_slug pedido", () => {
-  const docs = [
-    doc({ caminho: "a", cargo_slug: "chro" }),
-    doc({ caminho: "b", cargo_slug: "gerente-de-pessoas" }),
-    doc({ caminho: "c", cargo_slug: "chro" }),
-  ];
-  assert.deepEqual(
-    documentosDoCargo(docs, "chro").map((d) => d.caminho),
-    ["a", "c"],
-  );
-});
-
-test("documentosDoCargo: cargo sem documento devolve lista vazia", () => {
-  const docs = [doc({ caminho: "a", cargo_slug: "chro" })];
-  assert.deepEqual(documentosDoCargo(docs, "rh"), []);
-});
-
-// --- ondaDoCargo ---
-
-test("ondaDoCargo: acha a onda em que o cargo aparece", () => {
-  const ondas = [
-    onda({ codigo: "W1", cargos: [{ texto: "CHRO", cargo_slug: "chro" }] }),
-    onda({
-      codigo: "W2",
-      cargos: [
-        { texto: "Coordenador", cargo_slug: "coordenador-de-dp" },
-        { texto: "playbook compartilhado", cargo_slug: null },
-      ],
-    }),
-  ];
-  assert.equal(ondaDoCargo(ondas, "coordenador-de-dp")?.codigo, "W2");
-});
-
-test("ondaDoCargo: cargo fora de qualquer onda devolve null", () => {
-  const ondas = [onda({ codigo: "W1", cargos: [{ texto: "CHRO", cargo_slug: "chro" }] })];
-  assert.equal(ondaDoCargo(ondas, "rh"), null);
-});
-
-test("ondaDoCargo: cargo_slug null nas entradas de onda não quebra (placeholder sem cargo)", () => {
-  const ondas = [onda({ codigo: "W1", cargos: [{ texto: "(frente técnica)", cargo_slug: null }] })];
-  assert.equal(ondaDoCargo(ondas, "chro"), null);
 });
 
 // --- apqcSemNotas ---

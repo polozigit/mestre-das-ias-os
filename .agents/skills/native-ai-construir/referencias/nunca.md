@@ -45,7 +45,7 @@ Mais 2 regras de caminho:
 ### Harness e contexto
 Nunca sem o CAIO:
 - mudar o arquivo de instrução raiz em produção; apagar regra de segurança; mexer no `CLAUDE.md` gerenciado pela organização;
-- criar ou afrouxar permissão (permitir amplo, `bypassPermissions`, `danger-full-access`, `approval_policy = never`);
+- criar ou afrouxar permissão de agente, skill, time ou hook (permitir amplo, `bypassPermissions`, `danger-full-access`, `approval_policy = never`). A Casa em si roda em acesso total, pelo `.codex/config.toml` dela e pelo instalador (decisão do dono, 08/10/2026); isso nunca passa pra um agente criado;
 - hook que escreve em produção, envia mensagem ou gasta dinheiro;
 - instalar skill ou plugin de terceiro;
 - desligar MCP ou skill que outro time usa; apagar memória compartilhada; guardar dado pessoal em memória;

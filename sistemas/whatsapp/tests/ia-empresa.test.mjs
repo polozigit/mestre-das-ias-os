@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
+import { writeFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
@@ -10,21 +11,12 @@ import {
   CLAUDE_FERRAMENTAS_BLOQUEADAS,
   CLAUDE_FERRAMENTAS_PADRAO,
   CODEX_MCP_WHATSAPP_DESLIGADO,
-  detectClient,
   resolveCasaDir,
 } from "../src/ia-empresa.mjs";
 
 test("a Casa e dois niveis acima do pacote, com override por POLOZI_CASA_DIR", () => {
   assert.equal(resolveCasaDir({}, "/casa/sistemas/whatsapp"), path.resolve("/casa"));
   assert.equal(resolveCasaDir({ POLOZI_CASA_DIR: "/outra" }, "/casa/sistemas/whatsapp"), "/outra");
-});
-
-test("detecta o cliente pela Casa e aceita escolha explicita", () => {
-  const has = (...names) => (candidate) => names.some((name) => candidate.endsWith(name));
-  assert.equal(detectClient("/c", {}, has("CLAUDE.md")), "claude");
-  assert.equal(detectClient("/c", {}, has(".claude")), "claude");
-  assert.equal(detectClient("/c", {}, has(".codex")), "codex");
-  assert.equal(detectClient("/c", { POLOZI_IA_CLIENTE: "codex" }, has("CLAUDE.md")), "codex");
 });
 
 test("Codex roda com sandbox somente leitura", () => {
@@ -140,4 +132,58 @@ test("askCompanyAI com anexo manda o caminho no stdin (nunca como argumento) e l
   assert.match(calls[0].input, /abc\.pdf/);
   assert.ok(!calls[0].args.some((arg) => arg.includes("abc.pdf")));
   assert.equal(calls[0].args[calls[0].args.indexOf("--add-dir") + 1], "/estado/midia-temp");
+});
+
+function fakeRun(byCommand) {
+  const calls = [];
+  const run = (command, args, options) => {
+    calls.push(command);
+    const child = new EventEmitter();
+    child.stdout = new EventEmitter();
+    child.stderr = new EventEmitter();
+    child.kill = () => {};
+    child.stdin = { end: () => setImmediate(() => byCommand[command](child, args)) };
+    return child;
+  };
+  return { calls, run };
+}
+
+const missing = (command) => (child) => child.emit("error", Object.assign(new Error(`spawn ${command} ENOENT`), { code: "ENOENT" }));
+
+test("cliente escolhido nao instalado (spawn claude ENOENT, teste de 09/10): cai no Codex e responde", async () => {
+  const { calls, run } = fakeRun({
+    claude: missing("claude"),
+    codex: (child, args) => {
+      writeFileSync(args[args.indexOf("--output-last-message") + 1], " 18 leads ontem. ");
+      child.emit("close", 0);
+    },
+  });
+  const answer = await askCompanyAI([], "leads?", { environment: { POLOZI_CASA_DIR: "/casa" }, run, detect: () => "claude" });
+  assert.equal(answer, "18 leads ontem.");
+  assert.deepEqual(calls, ["claude", "codex"]);
+});
+
+test("ENOENT nos dois: devolve o erro do primeiro, sem laco", async () => {
+  const { calls, run } = fakeRun({ codex: missing("codex"), claude: missing("claude") });
+  await assert.rejects(askCompanyAI([], "oi", { environment: { POLOZI_CASA_DIR: "/casa" }, run, detect: () => "codex" }), /spawn claude ENOENT/);
+  assert.deepEqual(calls, ["codex", "claude"]);
+});
+
+test("erro que nao e ENOENT (ex.: cota, timeout) nao troca de cliente", async () => {
+  const { calls, run } = fakeRun({
+    codex: (child) => { child.stderr.emit("data", "limite de uso"); child.emit("close", 1); },
+    claude: (child) => { child.stdout.emit("data", "nao devia"); child.emit("close", 0); },
+  });
+  await assert.rejects(askCompanyAI([], "oi", { environment: { POLOZI_CASA_DIR: "/casa" }, run, detect: () => "codex" }), /limite de uso/);
+  assert.deepEqual(calls, ["codex"]);
+});
+
+test("Codex ausente cai no Claude Code e devolve a resposta dele", async () => {
+  const { calls, run } = fakeRun({
+    codex: missing("codex"),
+    claude: (child) => { child.stdout.emit("data", " 3 vendas hoje. "); child.emit("close", 0); },
+  });
+  const answer = await askCompanyAI([], "vendas?", { environment: { POLOZI_CASA_DIR: "/casa" }, run, detect: () => "codex" });
+  assert.equal(answer, "3 vendas hoje.");
+  assert.deepEqual(calls, ["codex", "claude"]);
 });

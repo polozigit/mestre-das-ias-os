@@ -117,10 +117,11 @@ mais simples pro leigo em sala.
   Aviso: o escopo concedido equivale à CONTA INTEIRA, deploy incluso, não
   só leitura [24a:conectores_mcp/f16].
 
-O aluno faz o login/OAuth no CHROME DELE, nunca no navegador embutido do
+O login/OAuth acontece no CHROME DO DONO, nunca no navegador embutido do
 app, que não usa aba, histórico, senha salva, cookie nem sessão do
-navegador pessoal [24a:app_desktop/F08]. A IA guia o clique, o aluno
-autoriza. "Conectado de verdade" é o que a TELA DO APP mostra — o estado
+navegador pessoal [24a:app_desktop/F08]. Ligar o plugin na aba Plugins do
+app é do dono (a IA diz o passo exato); a tela de autorização no Chrome a
+IA abre e clica (Computer Use), e senha e 2FA são só do dono. "Conectado de verdade" é o que a TELA DO APP mostra — o estado
 de autorização mora na CONTA, não no disco: desinstalar o plugin não
 desconecta o conector sozinho [24a:plugins/n19].
 
@@ -131,7 +132,15 @@ Depois de confirmar com o dono que ele já conectou os dois pelo app, prove:
 <PY> "<SKILL_DIR>/scripts/provar_conexao.py" --servico vercel --para "deploy da empresa"
 ```
 
-Quem conecta é o dono, no app dele — você nunca escreve nem edita o `~/.codex/config.toml`.
+O dono liga o conector no app dele; se o app não conseguir, você edita o `~/.codex/config.toml` (backup antes) e prova de novo.
+
+**Antes de provar, confira de quem é o plugin.** O plugin (conector) é da conta
+do ChatGPT, NÃO do usuário do computador: no teste de 08/10/2026 o da Vercel
+estava na conta de outra pessoa e o projeto não foi criado (403). Rode uma
+chamada de leitura que mostre a conta ou o time (Supabase `list_organizations`;
+Vercel `list_teams`) e diga ao dono qual apareceu. Não é a dele? **PARE** e
+ensine a desligar e religar o plugin com a conta dele. Plugin religado só vale
+em CONVERSA NOVA: peça para abrir uma e retomar com `$polozi-instalador`.
 
 ### Se travar (diagnóstico, não é passo do D1)
 
@@ -170,11 +179,18 @@ gh auth status
 Já logado, pule. Não logado:
 
 ```
-gh auth login
+gh auth login --hostname github.com --git-protocol https --web --scopes workflow
 ```
 
-Escolha **GitHub.com → HTTPS → Login with a web browser**: abre o navegador
-e mostra um código; o aluno digita o código e clica em Authorize. Você
+(Conferir a instalação do app do GitHub pela Vercel, não pelo `gh`: `gh api` não
+lista instalação de GitHub App com token de usuário, responde 403.)
+
+O escopo `workflow` vem já no primeiro login (sem ele o GitHub recusa o push
+da Casa, que tem `.github/workflows/`); logado sem ele, `gh auth refresh
+--hostname github.com --scopes workflow`. O comando mostra um código, abre o navegador
+padrão (o Chrome) e espera: deixe-o rodando. Não abriu, ou abriu outro? Abra
+`https://github.com/login/device` no Chrome do aluno; ele digita o código e
+clica em Authorize. Você
 nunca vê nem pede senha ou token. Sem credential store no sistema, o `gh`
 grava o token em arquivo de texto puro — pra saber onde o seu ficou, rode
 `gh auth status` de novo; jamais force o armazenamento inseguro da CLI.
@@ -189,9 +205,19 @@ aceita é `gh auth status`, nunca o rótulo da tela.
 
 ### 3. Chave de API (último recurso)
 
-Só quando não existe MCP oficial nem CLI. No site: gere a chave, clique em
-copiar. O valor nunca é digitado, colado num campo visível nem lido por
-você.
+Só quando não existe MCP oficial nem CLI. A IA abre o site no Chrome do dono
+(Computer Use), gera a chave e clica em copiar, sem perguntar "posso?". O valor
+nunca é digitado, colado num campo visível nem lido por você. **Depois de gerar
+a chave, NUNCA leia a página** (nem captura de tela, nem árvore de
+acessibilidade, nem `get_page_text`): o valor aparece nela e vai para o chat
+(vazou assim no teste de 08/10/2026). A única ação permitida é clicar em Copiar
+e rodar o comando de chave de uma linha abaixo.
+
+**Token pessoal do Supabase (Account, Access Tokens): ACESSO TOTAL, sempre**
+(decisão do Polozi, 08/10/2026; o token escopado fez a Action `deploy-db` falhar
+2 vezes com 403, o de acesso total passou). Na tela, o token clássico (rótulo
+"Legacy" na doc da Supabase), sem escolher organização nem permissão, validade
+"Never". Registre o escopo como `total`.
 
 **Chave MULTILINHA (ex.: PEM de service account) NUNCA vai inteira pro
 `.env`.** No Windows, `Get-Clipboard` junta linhas multilinha com espaço,
@@ -239,8 +265,8 @@ conector, avisa, não improvisa.
 ## Ordem do D1
 
 GitHub → Supabase → Vercel: as duas últimas nascem por "Continue with
-GitHub". As CONTAS nascem em sala, no hotspot — peça pro dono abrir a
-página no Chrome DELE [24a:app_desktop/F08] e guie campo a campo; quem
+GitHub". As CONTAS nascem em sala, no hotspot — abra a
+página no Chrome DELE (Computer Use) [24a:app_desktop/F08] e guie campo a campo; quem
 digita e confirma é sempre o dono.
 
 ## Provar (o que decide se está conectado)
@@ -265,7 +291,7 @@ finalidade, estado, data).
   possível pra um leigo em sala.
 - MCP é global, da máquina do dono (`~/.codex/config.toml`); ele liga pela
   aba de plugins do app [D24-29] — travou, o terminal é o diagnóstico
-  ("Se travar" acima). Você só PROVA, nunca edita esse arquivo à mão. Cada
+  ("Se travar" acima). Você PROVA e, se o app não resolver, edita esse arquivo (backup antes). Cada
   MCP ligado soma contexto em toda mensagem e consome cota
   [24a:modelos/n03]: o custo foi aceito pela simplicidade (D24-18), então
   não deixe ligado o que não usa.

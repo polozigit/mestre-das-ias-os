@@ -6,4 +6,8 @@
 config_file = "agents/marketing-revisor.toml"
 description = "Confere persona e marca contra o dossiê. Use antes de publicar persona, identidade visual, tom de voz ou logo, chamado pelas skills marketing-persona, marketing-identidade e marketing-logo com o documento e o dossiê"
 
+[agents.marketing-pesquisador]
+config_file = "agents/marketing-pesquisador.toml"
+description = "Pesquisa pública do cliente para a persona. Use só quando a skill marketing-persona pedir pesquisa pública; devolve fichas com link, data e trecho literal"
+
 # AGENTES:FIM (marketing)

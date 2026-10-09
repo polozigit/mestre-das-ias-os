@@ -12,7 +12,7 @@ Mantida por `$polozi-instalar-time`, nunca à mão.
 
 | Time | Agentes | Estado | Verificado em |
 |---|---|---|---|
-| marketing | marketing-revisor | ativo | 2026-10-09 |
+| marketing | marketing-revisor, marketing-pesquisador | ativo | 2026-10-09 |
 | pmo | pmo-conferente | ativo | 2026-10-09 |
 | tecnologia | tecnologia-revisor-seguranca | ativo | 2026-10-09 |
 | native-ai | native-ai-construtor, native-ai-avaliador | ativo | 2026-10-09 |

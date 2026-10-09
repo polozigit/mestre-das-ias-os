@@ -55,10 +55,11 @@ instalei" — o disco decide, não a memória da conversa.
    acionamento por nome de papel, via pedido direto ou via instrução de
    AGENTS.md/skill que peça delegação [24a:agentes/n02]. Nunca por caminho
    de arquivo.
-2. UM time por vez — coerente com `max_concurrent_threads_per_session = 1`
-   já commitado no `.codex/config.toml` da Casa v3 [24a:agentes/f5] e com
-   `[agents] enabled = true`, que mantém o multi-agente ligado
-   [24a:agentes/f8].
+2. UM time por vez: o diretor de um time decide o trabalho daquela área, e
+   dois diretores na mesma mensagem disputam a mesma conversa. Paralelo é
+   para partes independentes DENTRO de um trabalho (até
+   `max_concurrent_threads_per_session = 3` no `.codex/config.toml` da Casa
+   [24a:agentes/f5]), com `[agents] enabled = true` [24a:agentes/f8].
 3. A mensagem de delegação tem os 2 campos que o "Ciclo de trabalho" do
    AGENTS.md v3 exige: objetivo e formato de saída (o AGENTS.md não fala
    em "insumos" — não são 3 campos). Na prática, o que o agente precisa

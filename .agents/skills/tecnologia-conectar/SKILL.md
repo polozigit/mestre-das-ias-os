@@ -21,7 +21,8 @@ Liga o sistema da empresa (Vercel) ao banco (Supabase) e prova, por comando, que
 - `<PY>` é o `comando_python:` de `operacao/INSTALACAO.md` (no Windows costuma ser `py -3` ou `python`).
 - `<CASA>` é a pasta principal aberta, caminho absoluto, entre aspas. Rode os comandos da raiz da Casa.
 - No Windows, use o PowerShell: os comandos abaixo rodam nele sem mudar nada.
-- Precisa da CLI da Vercel instalada e logada. Sem ela: `npm i -g vercel` (ou `npx vercel`) e `vercel login`. Se travar, siga a seção "CLI da Vercel no Windows" de `referencias/roteiro-cliques.md`.
+- Precisa da CLI da Vercel instalada e logada. Sem ela, a IA instala sem perguntar (`npm i -g vercel`) e roda `vercel login`, que abre a página de login no navegador: a IA a conduz no Chrome do dono e só a senha, o código e o 2FA são do dono. `vercel whoami` tem que mostrar a conta do aluno. Se travar, siga a seção "CLI da Vercel no Windows" de `referencias/roteiro-cliques.md`.
+- Sem perguntar "posso?": cada passo abaixo a IA executa direto, pelo terminal ou pelo Chrome do dono. Para só em senha, código do celular, 2FA, janela de permissão do sistema, gasto de dinheiro e apagar dados.
 - `<DOMINIO>` é só o endereço de produção, sem `https://` e sem barra (ex.: `minha-empresa.vercel.app`). `<TIME>` é o apelido do time da Vercel (a parte final dos endereços de prévia).
 
 ## Passos
@@ -30,7 +31,13 @@ Na ordem do instalador. Cada passo diz o comando, a prova e o que fazer se falha
 
 ### (e1) Criar o projeto na Vercel
 
-A IA cria o projeto pelo conector da Vercel (detalhes em `## Plataforma e limites`): nome igual ao `slug_os:` de `operacao/INSTALACAO.md`, repositório da Casa, pasta raiz `sistemas/empresa-os`. Crie sem deploy automático (`deploy=false` no conector): o deploy de preview do padrão sai vermelho, porque as variáveis do banco ainda não existem. Anote o `id` do projeto e o endereço de produção `.vercel.app`.
+Antes de criar, nesta ordem (cada item confere antes se já está feito):
+
+1. **Conector na conta do aluno.** O conector (plugin) da Vercel é da conta do app, não do usuário do computador: no teste de 08/10/2026 ele estava ligado na Vercel de outra pessoa e o projeto não foi criado (403). Rode `list_teams` e mostre ao dono o nome do time. Não é a conta dele? PARE e ensine a religar o plugin com a conta dele; plugin religado só vale em CONVERSA NOVA (as ferramentas somem na conversa aberta), então peça para abrir uma conversa nova e chamar `$polozi-instalador` de novo.
+2. **Conta da Vercel verificada.** Conta nova pede o número do celular por SMS (um número só serve para uma conta): o código é do dono, com o celular na mão.
+3. **App "Vercel" no GitHub do aluno, com acesso a TODOS os repositórios** (decisão do Polozi, 08/10/2026). Sem ele a Vercel não enxerga o repositório privado (`repo_not_found`). A IA abre `https://github.com/apps/vercel` no Chrome do dono, clica em instalar (ou "Configure", se já existir) na conta do aluno, escolhe "All repositories" e salva; a senha ou o 2FA do GitHub, se pedirem, são do dono. A instalação se confere pela Vercel (o repositório aparece na importação), não pelo `gh api`, que não lista instalação de app com token de usuário (403).
+
+A IA cria o projeto pelo conector da Vercel (detalhes em `## Plataforma e limites`): nome igual ao `slug_os:` de `operacao/INSTALACAO.md`, repositório da Casa, pasta raiz `sistemas/empresa-os`. Crie sem deploy automático (`deploy=false` no conector): o deploy de preview do padrão sai vermelho, porque as variáveis do banco ainda não existem. Anote o `id` do projeto e o endereço de produção `.vercel.app`. A branch de produção é a `main` (no teste, sem isso a Vercel publicou uma branch do Dependabot como produção). Deploy de branch errada em produção se resolve publicando a `main` por cima (passo e4); nunca remova o domínio de produção na instalação.
 
 Prova: o conector mostra o projeto com o nome `slug_os`. Sem o conector, ou 2 falhas: seção "Projeto na Vercel a mão" do roteiro.
 
@@ -81,10 +88,10 @@ Grava o Site URL e as Redirect URLs (o que já existia fica). Prova: o script l�
 São 3 provas (o site responde 200 em `/login` sem redirecionar, os nomes estão na Vercel, o Supabase tem o endereço certo). Só siga se imprimir `TUDO LIGADO`. A linha `[FALHA]` diz qual prova caiu.
 
 ```
-<PY> .agents/skills/tecnologia-conectar/scripts/conectar.py vault --casa "<CASA>" --repo <DONO/REPO> --org-supabase <ORG> --time-vercel <TIME> --projeto-vercel <SLUG_OS> --escopo-token pat
+<PY> .agents/skills/tecnologia-conectar/scripts/conectar.py vault --casa "<CASA>" --repo <DONO/REPO> --org-supabase <ORG> --time-vercel <TIME> --projeto-vercel <SLUG_OS> --escopo-token total
 ```
 
-Guarda cada segredo do `credenciais/.env` no cofre do banco (Vault) e registra onde cada um vive no inventário do banco (`public.conexao`). Depois escreve um espelho em lista em `credenciais/CONEXOES.md`, entre `<!-- BANCO:INICIO -->` e `<!-- BANCO:FIM -->`; o resto do arquivo fica igual. O `credenciais/.env` NÃO é apagado: o script que regrava os Secrets e o `7-banco` ainda leem dele. `<DONO/REPO>` é o repositório da Casa no GitHub; `<ORG>` é o identificador da organização do projeto no Supabase; use `--escopo-token total` se o token da etapa `7-banco` foi criado com acesso total. Prova: a linha `N conexão(ões) lidas de public.conexao` (com N maior que zero) e o bloco `BANCO` atualizado. Se falhar, nada é escrito no `CONEXOES.md`: anote 1 linha em `operacao/PENDENCIAS.md` (o motivo, sem valor de chave) e siga, porque nada no fluxo depende do vault. Nunca cole o valor de uma chave num SQL: o texto do SQL vai para o log do banco.
+Guarda cada segredo do `credenciais/.env` no cofre do banco (Vault) e registra onde cada um vive no inventário do banco (`public.conexao`). Depois escreve um espelho em lista em `credenciais/CONEXOES.md`, entre `<!-- BANCO:INICIO -->` e `<!-- BANCO:FIM -->`; o resto do arquivo fica igual. O `credenciais/.env` NÃO é apagado: o script que regrava os Secrets e o `7-banco` ainda leem dele. `<DONO/REPO>` é o repositório da Casa no GitHub; `<ORG>` é o identificador da organização do projeto no Supabase; o token da etapa `7-banco` é sempre de acesso total (decisão de 08/10/2026), por isso `--escopo-token total`; `pat` só para uma Casa antiga que ainda use token escopado. Prova: a linha `N conexão(ões) lidas de public.conexao` (com N maior que zero) e o bloco `BANCO` atualizado. Se falhar, nada é escrito no `CONEXOES.md`: anote 1 linha em `operacao/PENDENCIAS.md` (o motivo, sem valor de chave) e siga, porque nada no fluxo depende do vault. Nunca cole o valor de uma chave num SQL: o texto do SQL vai para o log do banco.
 
 ### (e6) Convite do dono
 

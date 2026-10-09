@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, ArrowUpRight, ChevronDown } from "lucide-react";
+import { AlertTriangle, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Pill } from "@/components/ui/Pill";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -10,16 +10,15 @@ import type { Ocupante } from "@/lib/organograma/ocupacao";
 import { createClient } from "@/lib/supabase/client";
 import { getOrgPlaybooksPorCargo } from "@/lib/organograma/consultas";
 import { rotuloApqc } from "@/lib/organograma/arvore";
-import { apqcSemNotas, documentosDoCargo, fatosCargo, ondaDoCargo } from "@/lib/organograma/cargo";
-import { TIPO_ROTULO } from "@/lib/organograma/documentos";
-import type { OrgCargoPlaybook, OrgDocumentoResumo, OrgNo, OrgOnda, OrgSalario } from "@/lib/organograma/tipos";
+import { apqcSemNotas, fatosCargo } from "@/lib/organograma/cargo";
+import type { OrgCargoPlaybook, OrgNo, OrgSalario } from "@/lib/organograma/tipos";
 import { TituloSecao } from "./TituloSecao";
 
 const brl = (v: number | null) => (v == null ? "—" : Math.round(v).toLocaleString("pt-BR"));
 
 /** Regra da memória de trabalho (Miller/Cowan): até 4 itens abertos de cara,
  * resto atrás de 1 clique — evita parede de texto no telão de Workshop pra
- * cargo com muito documento ou muito playbook (ex. CHRO atua em 18). */
+ * cargo com muito playbook (ex. CHRO atua em 18). */
 const LIMITE_ABERTO = 4;
 
 function faixaSalario(s: OrgSalario): string {
@@ -99,65 +98,6 @@ function BlocoFatos({ no }: { no: OrgNo }) {
   );
 }
 
-function SecaoOnda({ ondas, no, onIrParaFluxo }: { ondas: OrgOnda[]; no: OrgNo; onIrParaFluxo?: () => void }) {
-  if (no.tipo === "area") return null;
-  const onda = ondaDoCargo(ondas, no.slug);
-  if (!onda) return null;
-  return (
-    <p className="text-sm text-fg-2">
-      Formado na onda <span className="font-mono text-acento-texto">{onda.codigo}</span>: {onda.time}
-      {onIrParaFluxo && (
-        <button
-          type="button"
-          onClick={onIrParaFluxo}
-          className="ml-1.5 inline-flex items-center gap-1 text-[12px] font-medium text-acento-texto underline-offset-2 hover:underline"
-        >
-          ver no fluxo e ondas <ArrowUpRight size={12} />
-        </button>
-      )}
-    </p>
-  );
-}
-
-function SecaoDocumentosCargo({
-  no,
-  documentos,
-  onAbrirDocumento,
-}: {
-  no: OrgNo;
-  documentos: OrgDocumentoResumo[];
-  onAbrirDocumento?: (caminho: string) => void;
-}) {
-  if (no.tipo === "area") return null;
-  const docs = documentosDoCargo(documentos, no.slug);
-  if (docs.length === 0) return null;
-  // Fechado por padrão quando passa do limite de memória de trabalho (regra
-  // da casa: ≤4 itens visíveis de cara, resto atrás de 1 clique) — telão de
-  // Workshop não pode virar parede de texto pra cargo com muito documento.
-  return (
-    <details open={docs.length <= LIMITE_ABERTO} className="group rounded-md border border-borda-suave">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-[12px] font-semibold uppercase tracking-wide text-fg-3">
-        <span>Documentos deste cargo · {docs.length}</span>
-        <ChevronDown size={16} className="shrink-0 text-fg-3 transition-transform group-open:rotate-180" />
-      </summary>
-      <ul className="flex flex-col gap-1.5 border-t border-borda-suave p-3">
-        {docs.map((d) => (
-          <li key={d.caminho}>
-            <button
-              type="button"
-              onClick={() => onAbrirDocumento?.(d.caminho)}
-              className="flex w-full items-baseline justify-between gap-2 rounded-md bg-bg-sutil px-3 py-1.5 text-left hover:bg-acento-suave"
-            >
-              <span className="text-sm text-fg-1">{d.titulo}</span>
-              <span className="shrink-0 text-[12px] text-fg-3">{TIPO_ROTULO[d.tipo]}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </details>
-  );
-}
-
 type EstadoPlaybooksCargo =
   | { status: "vazio" }
   | { status: "carregando" }
@@ -220,7 +160,7 @@ function SecaoPlaybooksDoCargo({
   if (!ativo) return null;
   if (estado.status === "vazio") return null;
   // Nada modelado ainda pra este cargo: omite a seção (mesmo padrão de
-  // "esconde se vazio" da SecaoDocumentosCargo) em vez de ocupar espaço com
+  // "esconde se vazio" das outras seções) em vez de ocupar espaço com
   // "0 playbooks" — o painel já tem seção de sobra pra cargo cheio.
   if (estado.status === "ok" && estado.playbooks.length === 0) return null;
   const aberto = estado.status !== "ok" || estado.playbooks.length <= LIMITE_ABERTO;
@@ -277,21 +217,13 @@ function tomOcupacao(o: Ocupante[] | undefined): "brand" | "success" | "neutral"
 export function PainelCargo({
   no,
   apqc,
-  documentos,
-  ondas,
   ocupacao,
-  onAbrirDocumento,
   onAbrirPlaybook,
-  onIrParaFluxo,
 }: {
   no: OrgNo;
   apqc: Map<string, string>;
-  documentos?: OrgDocumentoResumo[];
-  ondas?: OrgOnda[];
   ocupacao?: Ocupante[];
-  onAbrirDocumento?: (caminho: string) => void;
   onAbrirPlaybook?: (pacoteSlug: string, slug: string) => void;
-  onIrParaFluxo?: () => void;
 }) {
   const horasMes = no.processos.reduce((s, p) => s + (p.horas_mes ?? 0), 0);
 
@@ -321,8 +253,6 @@ export function PainelCargo({
             <p className="max-w-[70ch] text-sm text-fg-2">{no.reporta_a_texto}</p>
           </>
         )}
-
-        <SecaoOnda ondas={ondas ?? []} no={no} onIrParaFluxo={onIrParaFluxo} />
 
         {no.missao && (
           <>
@@ -418,7 +348,6 @@ export function PainelCargo({
         </div>
 
         <div className="mt-4 flex flex-col gap-4 empty:mt-0 empty:hidden">
-          <SecaoDocumentosCargo no={no} documentos={documentos ?? []} onAbrirDocumento={onAbrirDocumento} />
           <SecaoPlaybooksDoCargo no={no} onAbrirPlaybook={onAbrirPlaybook} />
         </div>
       </div>

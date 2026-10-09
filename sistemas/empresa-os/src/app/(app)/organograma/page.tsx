@@ -19,7 +19,7 @@ function dataCarga(iso: string | undefined): string {
 
 export default async function OrganogramaPage() {
   const c = await createClient();
-  const [{ nos, raias, passos, ondas, apqc, carga, documentos }, ocupacao] = await Promise.all([
+  const [{ nos, raias, passos, apqc, carga }, ocupacao] = await Promise.all([
     getOrganograma(c),
     getOcupacao(c),
   ]);
@@ -48,9 +48,7 @@ export default async function OrganogramaPage() {
             nos={nos}
             raias={raias}
             passos={passos}
-            ondas={ondas}
             apqc={apqc}
-            documentos={documentos}
             ocupacao={ocupacao}
           />
           <footer className="border-t border-borda-suave pt-4 text-xs text-fg-3">

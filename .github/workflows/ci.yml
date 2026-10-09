@@ -60,9 +60,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # Versão EXATA da CLI, nunca "latest": cada versão nova da CLI traz uma
+      # imagem nova do Postgres local e um formato novo do `gen types`, e isso
+      # quebrava o CI do aluno sem ele ter mudado nada (teste do aluno,
+      # 08/10/2026). Os 5 workflows usam a MESMA versão (tests/test_workflows.py
+      # confere); subir de versão = trocar nos 5 e regerar src/types/supabase.gen.ts.
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.120.0
 
       # Sem --workdir: o defaults.run.working-directory já põe o cwd em
       # sistemas/empresa-os, onde está o supabase/config.toml. Passar

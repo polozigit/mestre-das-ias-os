@@ -3,6 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
 import { moduloDaRota, pode, sessaoDoRpc } from "@/lib/auth/permissoes";
 import { configPublicaDoServidorOuNada } from "./env";
+import { adminDoPreview, entrarComoDonoNoPreview } from "./preview-dono";
+import { createServiceClient } from "./service";
 
 /**
  * Coração do middleware: refresh de sessão + gate de login + gate de módulo
@@ -46,41 +48,31 @@ export async function updateSession(request: NextRequest) {
     return resposta;
   };
 
-  // Bypass de QA SÓ em preview da Vercel (VERCEL_ENV === "preview"), nunca em
-  // produção — mesmo se PREVIEW_TEST_TOKEN vazar pro env de produção, o gate
-  // de VERCEL_ENV barra. Token por query (?preview_token=) ou pelo cookie
-  // desta sessão de QA. Loga com sessão REAL (usuário QA fixo) em vez de
-  // sessão sintética — senão RLS devolve tudo vazio e a página não tem dado
-  // real pra testar.
+  // QA do preview entra como o DONO (link mágico gerado no servidor, sem
+  // senha e sem usuário extra). SÓ em preview da Vercel: o gate de VERCEL_ENV
+  // fica em tokenDePreviewValido e barra produção mesmo com token vazado.
+  // Token por query (?preview_token=) ou pelo cookie desta sessão de QA.
   const previewToken = process.env.PREVIEW_TEST_TOKEN;
-  const qaEmail = process.env.PREVIEW_QA_EMAIL;
-  const qaPassword = process.env.PREVIEW_QA_PASSWORD;
-  let entregarCookiePreview = false;
-  if (
-    process.env.VERCEL_ENV === "preview" &&
-    previewToken &&
-    qaEmail &&
-    qaPassword
-  ) {
-    const supplied =
+  const resultadoPreview = await entrarComoDonoNoPreview({
+    env: process.env,
+    tokenFornecido:
       request.nextUrl.searchParams.get("preview_token") ??
-      request.cookies.get("preview_auth")?.value;
-    if (supplied === previewToken) {
-      entregarCookiePreview = true;
-      const { data: existing } = await supabase.auth.getUser();
-      if (!existing.user) {
-        const { error: erroQa } = await supabase.auth.signInWithPassword({
-          email: qaEmail,
-          password: qaPassword,
-        });
-        if (erroQa) {
-          // Credencial QA errada NÃO pode virar redirect mudo pra /login —
-          // sinaliza na URL qual das camadas falhou (token ok, login não).
-          return redirecionar("/login", "?erro=qa-preview");
-        }
-      }
-    }
+      request.cookies.get("preview_auth")?.value,
+    // Adaptador fino: comparar o cliente inteiro com a interface estoura o tsc (TS2589).
+    sessao: {
+      auth: {
+        getUser: () => supabase.auth.getUser(),
+        verifyOtp: (params) => supabase.auth.verifyOtp(params),
+      },
+    },
+    criarAdmin: () => adminDoPreview(createServiceClient()),
+  });
+  if (resultadoPreview === "falhou") {
+    // Token certo mas login do dono falhou: NÃO pode virar redirect mudo pra
+    // /login — sinaliza na URL qual das camadas falhou (token ok, login não).
+    return redirecionar("/login", "?erro=qa-preview");
   }
+  const entregarCookiePreview = resultadoPreview !== "fora";
 
   const {
     data: { user },

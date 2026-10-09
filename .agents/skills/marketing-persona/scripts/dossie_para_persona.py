@@ -10,7 +10,11 @@ Duas funções, sem rede e sem escrever nada:
   conferir  confere um documento (persona, identidade, tom) contra o dossiê, sem opinar: toda marca
             "(dossiê X.Y)" aponta para uma pergunta que existe e foi respondida; toda frase entre aspas
             com 4 palavras ou mais está no dossiê ou no anexo do próprio documento; toda marca
-            "(relato do dono, AAAA-MM-DD)" tem a data no anexo. Com --estrito (persona), toda linha das
+            "(relato do dono, AAAA-MM-DD)" tem a data no anexo; toda marca "(pesquisa [n])" aponta para
+            uma fonte [n] da seção "Fontes da pesquisa" com URL https e data AAAA-MM-DD; toda marca
+            "(dados de clientes, AAAA-MM-DD)" tem a data na subseção "Dados de clientes" do anexo. Sem
+            --estrito (tom de voz, identidade), linha de exemplo "Certo:", "Errado:" ou "Exemplo:" que
+            termina em "(proposta do time)" não é citação. Com --estrito (persona), toda linha das
             seções de fato tem marca de origem e o cabeçalho declara estado e origem da persona.
 
 Uso (da raiz do projeto):
@@ -54,8 +58,13 @@ RE_PERGUNTA = re.compile(r"^### (\d{1,2}\.\d{1,2}) - (.+)$", re.MULTILINE)
 RE_ESTADO = re.compile(r"^- Estado de extração: (.+?)\s*$", re.MULTILINE)
 SEM_RESPOSTA = "Nenhuma resposta identificada."
 
-SECOES_LIVRES = ("anexo", "o que ainda nao sabemos", "como validar")  # texto de método, não afirma fato
-RE_MARCA = re.compile(r"\((dossie|relato do dono|hipotese|nao consta|material do dono|proposta do time)\b([^)]*)\)")
+SECOES_LIVRES = ("anexo", "o que ainda nao sabemos", "como validar", "fontes da pesquisa")  # texto de método, não afirma fato
+RE_MARCA = re.compile(r"\((dossie|relato do dono|hipotese|nao consta|material do dono|proposta do time|pesquisa|dados de clientes)\b([^)]*)\)")
+RE_REF = re.compile(r"\[(\d{1,3})\]")
+RE_FONTE_LINHA = re.compile(r"^- \[(\d{1,3})\]")
+RE_FONTE = re.compile(r"^- \[(\d{1,3})\] .+?(https://\S+?)\.?\s+Acessado em (\d{4}-\d{2}-\d{2})\.?\s*$")
+# exemplo de tom de voz: não é fala de cliente, então não pede o literal (só fora do --estrito)
+RE_EXEMPLO = re.compile(r"^(?:- (?:Certo|Errado):|.*\bExemplo:).*\(proposta do time\)\.?\s*$")
 RE_CODIGO = re.compile(r"\b(\d{1,2}\.\d{1,2})\b")
 RE_DATA = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
 RE_ASPAS = re.compile(r'"([^"\n]{8,})"|“([^”\n]{8,})”')
@@ -181,8 +190,17 @@ def _linhas_de_fato(texto: str) -> list[tuple[int, str]]:
     return achadas
 
 
-def conferir_documento(texto: str, dossie: dict, estrito: bool = False) -> tuple[list[str], int]:
-    """(problemas, quantas marcas de dossiê foram conferidas)."""
+def conferir_documento(texto: str, dossie: dict, estrito: bool = False, *, pesquisa_e_dados: bool = True,
+                       isentar_exemplos: bool = False) -> tuple[list[str], int]:
+    """(problemas, quantas marcas de dossiê foram conferidas).
+
+    pesquisa_e_dados: confere as marcas (pesquisa [n]) contra "Fontes da pesquisa" e (dados de clientes, data)
+    contra o Anexo (persona). A identidade e o tom de voz usam as fontes tipadas de "## 9. Fontes" e quem as
+    confere é o marca_dados.py, que desliga esta parte.
+    isentar_exemplos: sem --estrito, linha de exemplo ("- Certo:", "- Errado:" ou com "Exemplo:") que termina em
+    "(proposta do time)" não é citação. Desligado por padrão: o conferidor de marca (marca_dados.py) tem a sua
+    própria exceção e o comando `conferir` continua reprovando essa linha.
+    """
     texto = texto.lstrip("\ufeff").replace("\r\n", "\n").replace("\r", "\n")
     problemas: list[str] = []
     perguntas = dossie["perguntas"]
@@ -196,6 +214,30 @@ def conferir_documento(texto: str, dossie: dict, estrito: bool = False) -> tuple
         " ".join(r for p in perguntas.values() for r in p["respostas"]))
     anexo = " ".join(l for t, _, ls in secoes(texto) if t.startswith("anexo") for _, l in ls)
     datas_do_anexo = {m for m in RE_DATA.findall(anexo)}
+    # só as datas da subseção "### Dados de clientes" do anexo valem para a marca (dados de clientes, data)
+    datas_dos_dados: set[str] = set()
+    for titulo, _, linhas in secoes(texto):
+        if not titulo.startswith("anexo"):
+            continue
+        nos_dados = False
+        for _, linha in linhas:
+            if linha.startswith("### "):
+                nos_dados = normalizar(linha[4:]).startswith("dados de clientes")
+            elif nos_dados:
+                datas_dos_dados.update(RE_DATA.findall(linha))
+    # fontes da pesquisa: cada "- [n] ..." precisa de URL https e data AAAA-MM-DD
+    fontes: set[int] = set()
+    for titulo, _, linhas in secoes(texto):
+        if not titulo.startswith("fontes da pesquisa"):
+            continue
+        for n, linha in linhas:
+            ref = RE_FONTE_LINHA.match(linha)
+            if not ref:
+                continue
+            if RE_FONTE.match(linha.rstrip()):
+                fontes.add(int(ref.group(1)))
+            else:
+                problemas.append(f"linha {n}: fonte [{ref.group(1)}] sem URL https ou sem data AAAA-MM-DD")
     literal = fonte_literal + " " + normalizar(anexo)
     conferidas = 0
     corpo = next((n for n, l in enumerate(texto.split("\n"), 1) if l.startswith("## ")), 1)  # o cabeçalho só explica as marcas
@@ -222,12 +264,27 @@ def conferir_documento(texto: str, dossie: dict, estrito: bool = False) -> tuple
                     problemas.append(f"linha {n}: marca (relato do dono) sem data AAAA-MM-DD")
                 elif data.group(1) not in datas_do_anexo:
                     problemas.append(f"linha {n}: relato do dono de {data.group(1)} sem registro no Anexo do documento")
+            elif tipo == "pesquisa" and pesquisa_e_dados:
+                refs = RE_REF.findall(resto)
+                if not refs:
+                    problemas.append(f"linha {n}: marca (pesquisa) sem número de fonte [n]")
+                for ref in refs:
+                    if int(ref) not in fontes:
+                        problemas.append(f"linha {n}: cita a fonte [{ref}], que não está em Fontes da pesquisa com https e data")
+            elif tipo == "dados de clientes" and pesquisa_e_dados:
+                data = RE_DATA.search(resto)
+                if not data:
+                    problemas.append(f"linha {n}: marca (dados de clientes) sem data AAAA-MM-DD")
+                elif data.group(1) not in datas_dos_dados:
+                    problemas.append(f"linha {n}: dados de clientes de {data.group(1)} sem registro em Dados de clientes no Anexo")
     # citações literais: fora do anexo e das seções livres, toda frase entre aspas (4 palavras ou mais)
     # tem de estar no dossiê ou no anexo; sem isso, a "fala do cliente" pode ter sido inventada
     for titulo, _, linhas in secoes(texto):
         if titulo.startswith(SECOES_LIVRES):
             continue
         for n, linha in linhas:
+            if isentar_exemplos and not estrito and RE_EXEMPLO.match(linha.strip()):
+                continue  # exemplo de tom de voz proposto pelo time, não fala de cliente
             for m in RE_ASPAS.finditer(linha):
                 frase = m.group(1) or m.group(2)
                 if len(frase.split()) >= 4 and normalizar(frase) not in literal:
@@ -246,7 +303,7 @@ def conferir_documento(texto: str, dossie: dict, estrito: bool = False) -> tuple
         for n, linha in _linhas_de_fato(texto):
             if not RE_MARCA.search(sem_acento(linha).lower()):
                 problemas.append(f"linha {n}: sem marca de origem (dossiê X.Y, relato do dono, hipótese, "
-                                 f"não consta ou proposta do time): {linha[:70]}")
+                                 f"não consta, proposta do time, pesquisa [n] ou dados de clientes, data): {linha[:70]}")
     return problemas, conferidas
 
 
@@ -285,7 +342,8 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--casa", default=".")
     c.add_argument("--dossie", help=f"caminho do dossiê (padrão: {DOSSIE})")
     c.add_argument("--arquivo", required=True, help="documento .md a conferir")
-    c.add_argument("--estrito", action="store_true", help="regras da persona: marca de origem em toda linha de fato")
+    c.add_argument("--estrito", action="store_true", help="regras da persona: marca de origem em toda linha de fato "
+                   "(dossiê, relato do dono, hipótese, não consta, proposta do time, pesquisa [n], dados de clientes)")
     try:
         a = ap.parse_args(argv)
     except SystemExit as e:

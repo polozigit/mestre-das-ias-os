@@ -19,7 +19,7 @@ Arquivos protegidos: qualquer mudança neles vai pelo caminho 3, com a prova e a
 | Nome | Quando chamar |
 |---|---|
 | `pmo-conferente` | Use antes de concluir tarefa do plano de 90 dias ou prioridade do trimestre, chamado pelo pmo-quadro com a tarefa e a evidência |
-| `pmo-quadro` | Ponto de entrada do time: ver o quadro, abrir, priorizar e mover tarefa |
+| `pmo-quadro` | Ponto de entrada do time: ver o quadro, abrir, priorizar e mover tarefa. A tarefa de cada pedido o hook de registro abre e fecha (origem_tipo pedido): não abra outra |
 | `pmo-semana` | Planejar a semana: escolher o que entra e marcar as tarefas |
 | `pmo-revisao-semanal` | Fazer a revisão da semana: o que andou, o que parou e o que entra na próxima |
 | `pmo-trilha` | Mostrar a trilha de 90 dias, o cronograma e as prioridades do trimestre |

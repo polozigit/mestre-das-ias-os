@@ -499,7 +499,6 @@ SEGREDOS = (
     "SUPABASE_DB_PASSWORD",
     "SUPABASE_SERVICE_ROLE_KEY",
     "PREVIEW_TEST_TOKEN",
-    "PREVIEW_QA_PASSWORD",
 )
 SEGREDOS_OBRIGATORIOS = SEGREDOS[:3]
 PADRAO_NOME_LIVRE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/-]*\Z")
@@ -531,9 +530,6 @@ def conexoes_padrao(repo, org_supabase, time_vercel, projeto_vercel, ref, escopo
     ]
     if "PREVIEW_TEST_TOKEN" in presentes:
         itens.append(c("vercel", time_vercel, "preview_qa", "PREVIEW_TEST_TOKEN",
-                       ["vercel_env:preview", "arquivo_env"], projeto_vercel))
-    if "PREVIEW_QA_PASSWORD" in presentes:
-        itens.append(c("vercel", time_vercel, "preview_qa_login", "PREVIEW_QA_PASSWORD",
                        ["vercel_env:preview", "arquivo_env"], projeto_vercel))
     itens.append(c("github", repo, "vercel_app", None, [], projeto_vercel))
     return itens

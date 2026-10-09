@@ -10,10 +10,10 @@
 | `SUPABASE_SERVICE_ROLE_KEY` ou `SUPABASE_SECRET_KEY` | chave de MÁQUINA (ignora RLS). A integração grava o segundo nome; com os dois preenchidos, vale o primeiro. Server-only: convite de usuário, scripts/setup-inicial.mjs, `/marca` (URL assinada da imagem) e `/usuarios` (`listUsers`), sempre no servidor, depois de checar a permissão da rota. NUNCA em `NEXT_PUBLIC_*` | credenciais/.env + integração Supabase → Vercel | todos (server) |
 | `SITE_URL` | URL pública do sistema (redirectTo dos e-mails) | credenciais/.env (uso no setup) | setup |
 | `CURSO_INICIO` | data do Dia 1 do curso (AAAA-MM-DD, opcional; padrão = hoje). Ancora o cronograma instanciado por `scripts/setup-inicial.mjs` | credenciais/.env (uso no setup) | setup |
-| `PREVIEW_TEST_TOKEN` | token de QA: `?preview_token=` abre sessão de teste no PREVIEW | CLI (`vercel env add`, só preview) | SÓ preview |
-| `PREVIEW_QA_EMAIL` / `PREVIEW_QA_PASSWORD` | credencial do usuário de QA (crie um membro visualizador dedicado) | CLI (`vercel env add`, só preview) | SÓ preview |
+| `PREVIEW_TEST_TOKEN` | token da conferência opcional: `?preview_token=` abre sessão do DONO no PREVIEW (a IA olha só a tela alterada) | CLI (`vercel env add`, só preview) | SÓ preview |
+| `PREVIEW_OWNER_EMAIL` | e-mail do dono: com o token certo, o preview gera um link mágico dele no servidor (chave de serviço, sem e-mail enviado e sem senha) | CLI (`vercel env add`, só preview; publicado pelo instalador a partir do `operacao/INSTALACAO.md`) | SÓ preview |
 
-Regras: produção IGNORA o trio de preview por construção (`VERCEL_ENV`);
+Regras: produção IGNORA o par de preview por construção (`VERCEL_ENV`);
 rotacione `PREVIEW_TEST_TOKEN` quando quiser (é só trocar no painel);
 variável nova de módulo futuro = linha nova AQUI no mesmo commit; segredo de
 integração (chave de serviço de terceiro) vai pro Vault do banco por

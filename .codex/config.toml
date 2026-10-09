@@ -3,22 +3,28 @@
 # Não crie outro config.toml dentro de sistemas/ - o mais próximo do cwd ganha [24a:config/f4].
 #
 # Modelos do kit [24a:modelos/f3, f4, f5]: a Casa pina o Terra (gpt-5.6-terra) pro dia a dia. Os agentes
-# de veredito (revisor de segurança, conferente, avaliador) declaram o Sol (gpt-6.1-sol) no .toml de cada
-# um, de propósito diferente do modelo de quem fez; a rotina barata usa o Luna (gpt-6-luna). Sol e Luna
-# só rodam no Codex 0.160 ou mais novo: o preflight do instalador confere a versão.
+# de rotina e de veredito por checklist declaram o Luna (gpt-6-luna) no .toml de cada um, diferente do
+# modelo de quem fez e 20x mais barato por token; só o revisor de segurança usa o Sol (gpt-6.1-sol), em
+# medium. Nenhum agente do kit roda em high. Fonte: learn.chatgpt.com/docs/pricing e /docs/models, lidas
+# em 09/10/2026 (achado A41: aluno Plus estourava o limite). Sol e Luna só rodam no Codex 0.160 ou mais
+# novo: o preflight do instalador confere a versão.
 
 model = "gpt-5.6-terra"  # dia a dia da Casa [24a:modelos/f4]
 model_reasoning_effort = "medium"  # default oficial, minimal|low|medium|high|xhigh [24a:config/f9, modelos/f12, modelos/f14]
-approval_policy = "on-request"  # o Codex pausa e pergunta quando precisa [24a:config/f10]
-sandbox_mode = "workspace-write"  # escreve na pasta da Casa, nunca danger-full-access [24a:agentes/f14]
+# Acesso total (decisão do dono do kit, 08/10/2026): a IA instala, configura e executa sozinha, sem
+# parar pra pedir aprovação. No app, o seletor de permissão da tela vale mais que este arquivo
+# [24a:config/n65]: o instalador confere que o "Acesso total" está ligado lá. As guardas continuam:
+# o hook PreToolUse da Casa bloqueia mesmo em acesso total [24a:hooks/n66].
+approval_policy = "never"  # nunca pausa pra pedir aprovação [24a:config/f10]
+sandbox_mode = "danger-full-access"  # sem sandbox: o modo "Acesso total" do app [24a:config/n65]
 
 [sandbox_workspace_write]
-network_access = true  # política do kit (push/gh/MCP); é opt-in, o exemplo oficial mostra false, o default não é publicado [24a:config/n06]
+network_access = true  # só vale se a tela voltar pro modo com sandbox; o default não é publicado [24a:config/n06]
 
 [agents]
 enabled = true  # liga multi-agente; false desligaria os agentes de veredito [24a:agentes/f8, agentes/f9]
-max_concurrent_threads_per_session = 1  # política do kit: 1 conversa = 1 trabalho; a chave existe, o default não é publicado [24a:agentes/f5]
-default_subagent_model = "gpt-5.6-terra"  # rede de segurança, o toml de cada agente vence [24a:agentes/f8, agentes/f7]
+max_concurrent_threads_per_session = 3  # até 3 subagentes em paralelo (partes independentes); o default não é publicado [24a:agentes/f5]
+default_subagent_model = "gpt-6-luna"  # subagente sem toml próprio (leitura, busca) vai no Luna; construir pede o Terra no pedido; o toml de cada agente vence [24a:agentes/f8, agentes/f7]
 default_subagent_reasoning_effort = "medium"  # rede de segurança, o toml de cada agente vence [24a:agentes/f8, agentes/f7]
 
 # O MCP de Supabase e Vercel NÃO entra aqui — o dono conecta pelo app

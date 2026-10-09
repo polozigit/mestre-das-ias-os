@@ -1,0 +1,7 @@
+interface:
+  display_name: "Tecnologia Aplicar Marca"
+  short_description: "Aplica a identidade aprovada no sistema, com mockup claro e escuro antes."
+  default_prompt: "Use $tecnologia-aplicar-marca para aplicar a identidade visual aprovada da minha marca no sistema."
+
+policy:
+  allow_implicit_invocation: false

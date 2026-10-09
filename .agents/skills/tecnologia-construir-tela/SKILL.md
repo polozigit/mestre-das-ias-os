@@ -27,7 +27,7 @@ Fatos do sistema, com `arquivo:linha`, estão em `.agents/skills/tecnologia-sist
 
 4. **Escrever no molde do sistema.** Abra uma tela parecida e copie a estrutura, em vez de inventar: o módulo `sistemas/empresa-os/src/app/(app)/tarefas/` mostra o padrão (`layout.tsx` com a guarda de acesso, `page.tsx` que lê o banco, `actions.ts` que grava). Reuse os componentes de `src/components/ui/` (Button, Card, Empty, Sheet, ResponsiveTable...).
    - **Módulo novo** (rota nova): 3 lugares, juntos no mesmo commit. A permissão e a rota em `src/lib/auth/permissoes.ts` (`Modulo`, `PERMISSAO_MODULO`, `MODULO_ROTA`); o item de menu em `src/lib/nav.ts` (`NAV_GRUPOS`); e a guarda no `layout.tsx` do módulo (`requireAcesso("<modulo>")`). O `nav.ts` diz isso no comentário do topo.
-   - **Visual (`DESIGN.md`):** só classes semânticas (`bg-acento`, `text-fg-2`, `border-borda`, `bg-bg-elevada`). NUNCA cor literal (`bg-[#ff0000]`, `text-red-500`, `style={{ color: ... }}`). NÃO edite `src/app/globals.css` nem os componentes base de `src/components/ui/`; se faltar um comportamento, crie um componente novo ao lado, na pasta do módulo. Tema e marca só em `src/app/theme.css` (e isso é outra tarefa). Teste visual: claro e escuro, computador e celular.
+   - **Visual (`DESIGN.md`):** só classes semânticas (`bg-acento`, `text-fg-2`, `border-borda`, `bg-bg-elevada`). NUNCA cor literal (`bg-[#ff0000]`, `text-red-500`, `style={{ color: ... }}`). NÃO edite `src/app/globals.css` nem os componentes base de `src/components/ui/`; se faltar um comportamento, crie um componente novo ao lado, na pasta do módulo. Tema e marca: skill `tecnologia-aplicar-marca`, nunca à mão. Teste visual: claro e escuro, computador e celular.
 
 5. **Dados e segurança (3 camadas: RLS no banco, guarda no servidor, tela escondendo botão; a tela é cosmética, nunca a defesa).**
    - Leia e grave pelo cliente do servidor que usa a sessão da pessoa: `createClient()` de `@/lib/supabase/server`. Quem decide o que a pessoa vê é a regra de acesso do banco (RLS).
@@ -46,36 +46,29 @@ Fatos do sistema, com `arquivo:linha`, estão em `.agents/skills/tecnologia-sist
 
 8. **Publicar até o link de teste.** Chame `tecnologia-publicar` e diga a ele o `TASK-N` (a chamada vem da construção de tela). Ele roda a revisão de segurança, abre a PR, espera as checagens e para no link de teste, ANTES do merge, devolvendo o controle a você. BLOCKED do revisor volta para você: corrija, rode o passo 7 de novo e publique de novo.
 
-9. **Provar cada critério antes do merge (você, sem o dono).** Regra do sistema: nada mergeia sem teste, e a senha do dono nunca é digitada pela IA (`AGENTS.md:29-31`). Para cada critério do `requisito.md`, escolha UMA das três provas e marque na linha dele:
-   - **Visto no link de teste:** `- [x] ... (sim, visto no teste em AAAA-MM-DD)` (data de `date +%F`).
+9. **Provar cada critério antes do merge.** Regra do sistema: nada mergeia sem teste, e a senha do dono nunca é digitada pela IA (`AGENTS.md:29-31`). Para cada critério do `requisito.md`, escolha UMA das três provas e marque na linha dele:
+   - **Aprovado pelo dono no link de teste:** `- [x] ... (aprovado pelo dono no link em AAAA-MM-DD)` (data de `date +%F`).
    - **Provado por teste automático:** `- [x] ... (provado por teste <arquivo>)`.
    - **Não provado:** `- [ ] ... (não: <o que apareceu ou por que não deu para provar>)`.
 
-   Só marque `[x]` do que foi visto ou do que um teste verde prova. Não marque por dedução do código.
+   Só marque `[x]` do que o dono aprovou ou do que um teste verde prova. Não marque por dedução do código.
 
-   **9a. Como o link de teste é aberto (e por que o valor do token nunca passa por você).** O preview da Vercel aceita `?preview_token=` só em ambiente de preview e entra com um usuário de teste SOMENTE LEITURA (`src/lib/supabase/proxy.ts:49-66`; `conexao.md:13-14`, "crie um membro visualizador dedicado"). O mecanismo documentado: a seção "Primeira vez neste sistema" da `tecnologia-publicar` (o script `.agents/skills/tecnologia-publicar/scripts/instalar_guardas.py`) gera o `PREVIEW_TEST_TOKEN`, guarda em `credenciais/.env` e publica na Vercel com `vercel env add PREVIEW_TEST_TOKEN preview`, valor por arquivo (`empresa-os-template/LEIA-ME.md`, passos 7 e 9); quem monta a URL é o agente `polozi-sistema-qa` da Casa, por script que lê `credenciais/.env` (`polozi-sistema-qa.toml:8-10`). Você chama o agente com o link e o que conferir (todas as telas do módulo, console sem erro, página não vazia por regra de acesso: `AGENTS.md:29-31`) e recebe o veredito; nunca lê, mostra nem monta o token.
-   O mesmo script publica o usuário de teste (`PREVIEW_QA_EMAIL` e `PREVIEW_QA_PASSWORD`) quando o dono já o guardou em `credenciais/.env`. O usuário em si é um membro só de leitura que só o dono cria na tela Usuários: o convite não aceita senha (quem abre o e-mail a define), então nenhum script o cria. Por isso existe uma configuração ÚNICA, do dono, e uma marca dela em `operacao/sistema.md` (arquivo sem segredo, o mesmo do `SITE_URL`):
-   - **Linha `PREVIEW_QA: configurado em AAAA-MM-DD`:** use o `polozi-sistema-qa` normalmente. Se ele não conseguir entrar, troque a linha por `PREVIEW_QA: pendente, avisado em AAAA-MM-DD` e siga o caso abaixo.
-   - **Sem a linha, ou `pendente`:** avise o dono UMA vez (se a linha ainda não diz `avisado`), em palavras simples, sem esperar resposta, com este passo a passo:
-     1. "Para eu testar as telas sozinho falta uma configuração que só você faz, uma vez só. Enquanto isso eu provo por teste automático e sigo."
-     2. "No sistema, abra a tela Usuários e convide um membro só de leitura para testes, com um e-mail que você consiga abrir. Abra o e-mail e defina a senha dele pelo link."
-     3. "Copie o e-mail desse membro e me diga \"copiei\". Depois copie a senha e me diga \"copiei\" de novo. Eu guardo os dois no arquivo de chaves sem ver o valor." (O guardar é o caminho de chave de uma linha da `tecnologia-acessos`, passo 3 de "Conectar": o comando da área de transferência grava no `credenciais/.env`; você nunca digita, cola nem lê a senha.)
-     4. "Não me mande a senha pelo chat. Eu publico os dois no ambiente de teste da Vercel e te aviso."
-     Grave `PREVIEW_QA: pendente, avisado em AAAA-MM-DD`. NÃO é portão: siga com prova só por teste (veja abaixo). Quando o dono disser que fez e o par estiver guardado, rode `python3 .agents/skills/tecnologia-publicar/scripts/instalar_guardas.py --casa "<pasta principal da Casa>" --so usuario_qa` e confira só os nomes: `vercel env ls preview | grep -E "PREVIEW_TEST_TOKEN|PREVIEW_QA_EMAIL|PREVIEW_QA_PASSWORD"` deve mostrar os três; então grave `PREVIEW_QA: configurado em AAAA-MM-DD`. Se o comando pedir login ou falhar, diga "não verificado" e peça ao dono que confirme os três nomes no painel da Vercel.
+   **9a. O dono olha a tela no link e diz "aprovado".** O critério visual (aparência, texto, posição, celular, tema escuro) se prova assim: o `tecnologia-publicar` (passo 7) entrega o link do preview, o dono abre, olha a tela que mudou e responde "aprovado". A primeira resposta dá a ele só esse passo: abrir o link, olhar a tela que mudou e responder "aprovado". Nunca peça para criar usuário, convidar membro de teste ou guardar senha.
+   **Conferência pela IA é opcional.** Se ajudar, a IA abre o link e olha só a tela que esta mudança alterou. O preview da Vercel aceita `?preview_token=` só em ambiente de preview e entra como o dono do sistema (`src/lib/supabase/proxy.ts`; `conexao.md`); o token é montado pelo agente `polozi-sistema-qa` da Casa por script que lê `credenciais/.env`, então você nunca lê, mostra nem monta o token. Como o preview usa o banco de PRODUÇÃO, a conferência só navega e olha: não salva, não exclui, não convida, não muda configuração. Teste que precisa gravar usa um registro "[TESTE]" e apaga no fim. Se o login do preview falhar (a página volta para `/login?erro=qa-preview`) ou o agente estiver fora, não insista e não peça nada ao dono: nada trava, ele só abre o link.
 
-   **9b. Critério que o link de teste não prova por desenho.** O usuário de teste só lê. Critério de GRAVAR (salvar, apagar, "quem não tem permissão não grava") ou de negação de acesso não se prova clicando. Cubra no MESMO commit/PR com teste: regra pura em `node --test` (passo 6) ou, se há migration/policy, teste pgTAP de permissão e negação COMO usuário em `sistemas/empresa-os/supabase/tests/` (molde: `tecnologia-mudar-banco`). Marque `- [x] ... (provado por teste <arquivo>)` depois de ver o teste verde (passo 7, ou o job `banco` do CI para pgTAP). Esses critérios NÃO entram no ciclo de 3 tentativas: se o teste está vermelho, corrija como qualquer erro do passo 7. Sem como cobrir por teste nem pelo link, deixe `[ ] (não: <por quê>)`, siga sem esperar e conte ao dono UMA vez, no aviso do passo 10, que esse critério ficou sem prova.
+   **9b. Critério de gravar ou de negar acesso: por teste automático.** Critério de GRAVAR (salvar, apagar, "quem não tem permissão não grava") ou de negação de acesso não se prova olhando a tela, porque o preview usa o banco de produção. Cubra no MESMO commit/PR com teste: regra pura em `node --test` (passo 6) ou, se há migration/policy, teste pgTAP de permissão e negação COMO usuário em `sistemas/empresa-os/supabase/tests/` (molde: `tecnologia-mudar-banco`). Marque `- [x] ... (provado por teste <arquivo>)` depois de ver o teste verde (passo 7, ou o job `banco` do CI para pgTAP). Se o teste está vermelho, corrija como qualquer erro do passo 7. Sem como cobrir por teste, deixe `[ ] (não: <por quê>)`, siga sem esperar e conte ao dono UMA vez, no aviso do passo 10, que esse critério ficou sem prova.
 
    **9c. O que fazer com o resultado.**
-   - **Todos os critérios provados** (visto ou por teste): devolva o controle ao `tecnologia-publicar` para seguir do passo 8 em diante (merge, deploy, conferência da produção). O dono NÃO precisa responder nada.
-   - **Critério de tela visto no link falhou:** corrija, volte ao passo 7 e depois ao 8 (a mesma PR recebe o novo commit e o link se atualiza) e exercite de novo. Na terceira tentativa sem fechar o mesmo critério, pare antes do merge e conte ao dono, em palavras simples, o que não deu certo (único caso em que ele entra antes).
-   - **Sem como abrir o link** (`PREVIEW_QA` pendente, ou o agente de QA indisponível): prove por teste tudo o que um teste cobre. O critério só visual (aparência, celular, tema escuro) fica `[ ] (não visto no navegador: teste de preview não configurado)` e NÃO bloqueia o merge; ele vai listado no aviso do passo 10. Não faça o merge se algum critério que um teste cobriria estiver sem teste verde.
+   - **Mudança de tela:** devolva o controle ao `tecnologia-publicar` (passo 7) e espere o "aprovado" do dono. Com ele, siga do passo 8 em diante (merge, deploy, conferência da produção).
+   - **Dono pediu ajuste na tela:** corrija, volte ao passo 7 e depois ao 8 (a mesma PR recebe o novo commit e o link se atualiza) e peça o "aprovado" de novo.
+   - **Mudança sem tela, critérios todos provados por teste:** devolva ao `tecnologia-publicar` para seguir do passo 8, sem esperar resposta do dono. Não faça o merge se algum critério que um teste cobriria estiver sem teste verde.
 
 10. **Avisar o dono depois.** Quando o `tecnologia-publicar` provar que está no ar (passo 11 dele), diga: "Está no ar: <o que mudou, em 1 frase>. Link: <endereço do site ou da tela>". O dono pode responder, mas não precisa. Se algum critério ficou sem prova (`[ ]`), acrescente uma frase: "Não consegui conferir: <critério>." Mensagem única, sem esperar resposta. Quem fecha a TASK é a skill `polozi-concluir-trabalho`; esta skill só marca os critérios.
 
 ## Como falar com o dono
 
 - Depois de no ar, uma frase: "Está no ar: <o que mudou>. Link: <link>." Sem pedir permissão para publicar: o requisito que ele aprovou já cobre isso.
-- Falha que não se resolve em 3 tentativas: "O critério <tal> não passou: <o que apareceu>. Parei antes de colocar no ar. O que você prefere?"
+- Teste automático que não passa depois de 3 tentativas: "O critério <tal> não passou: <o que apareceu>. Parei antes de colocar no ar. O que você prefere?"
 - Sem jargão: nada de RLS, slug, Server Action. Diga "só quem tem permissão enxerga e grava".
 - Não prometa "está seguro": diga o que foi testado (a revisão e os testes) e o que ficou por conferir.
 
@@ -95,11 +88,12 @@ Fatos do sistema, com `arquivo:linha`, estão em `.agents/skills/tecnologia-sist
 - Proteger só escondendo o botão: a checagem de permissão vai no servidor, dentro de cada ação.
 - Escrever migration ou SQL por aqui: banco é com `tecnologia-mudar-banco`.
 - Editar `sistemas/` na `main` com produção publicada (o hook recusa) ou fazer push direto dessa mudança: publicar é com `tecnologia-publicar`.
-- Marcar critério como sim sem ter visto o resultado no link de teste ou o teste verde.
+- Marcar critério como sim sem o "aprovado" do dono no link de teste ou o teste verde.
 - Pedir "ok" ao dono a cada publicação, ou mandar a conversa de volta para `tecnologia-definir-o-que` quando a mudança é simples.
-- Fazer o merge sem ter provado, por link ou por teste, cada critério que dá para provar.
+- Fazer o merge de mudança de tela sem o "aprovado" do dono, ou sem teste verde nos critérios que um teste cobre.
 - Digitar a senha do dono ou pedir que ele a cole no chat.
 - Seguir com lint, tipos, testes ou as duas conferências do passo 7 em vermelho.
 - Dizer "pronto" com algum critério em `[ ]` sem avisar o dono qual ficou sem prova.
-- Ler, mostrar ou montar o `PREVIEW_TEST_TOKEN`, ou digitar a senha do usuário de teste.
-- Tratar a configuração do preview como portão: sem ela, siga com prova por teste e avise uma vez.
+- Ler, mostrar ou montar o `PREVIEW_TEST_TOKEN`.
+- Salvar, excluir ou convidar no preview (ele usa o banco de produção): só navegar e olhar; teste que grava usa registro "[TESTE]" e apaga depois.
+- Tratar a conferência pela IA ou o login do preview como portão: se falhar, entregue o link ao dono e avise uma vez.
