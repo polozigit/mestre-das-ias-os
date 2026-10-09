@@ -65,7 +65,7 @@ jobs:
       # quebrava o CI do aluno sem ele ter mudado nada (teste do aluno,
       # 08/10/2026). Os 5 workflows usam a MESMA versão (tests/test_workflows.py
       # confere); subir de versão = trocar nos 5 e regerar src/types/supabase.gen.ts.
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         with:
           version: 2.120.0
 
