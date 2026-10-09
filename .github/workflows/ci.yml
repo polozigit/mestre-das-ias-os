@@ -39,7 +39,7 @@ jobs:
       # GOTCHA: defaults.run.working-directory só vale pra passos "run:".
       # Passo "uses:" resolve path a partir da RAIZ do repo — por isso o
       # cache-dependency-path abaixo repete o caminho completo.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: "npm"
