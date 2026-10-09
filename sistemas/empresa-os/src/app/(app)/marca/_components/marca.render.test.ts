@@ -17,6 +17,8 @@ import { abertosDasAbas, hrefsDasAbas, porAba, type Aba } from "../../../../lib/
 register("../../../../lib/carregador-tsx-para-teste.mjs", import.meta.url);
 const { AbasMarca } = await import("./AbasMarca.tsx");
 const { montarPaineis } = await import("./PainelDocumento.tsx");
+const { IdentidadeMarca } = await import("./IdentidadeMarca.tsx");
+const { juntarMarca } = await import("../../../../lib/marca-dados.ts");
 const { SearchParamsContext } = await import("next/dist/shared/lib/hooks-client-context.shared-runtime.js");
 
 const MARCA = { id: "m1", tipo: "marca", titulo: "Exemplo: manual da marca", caminho_origem: "exemplo/marca.md", publicado_em: "2026-10-07T12:00:00Z" };
@@ -160,4 +162,151 @@ test("os painéis ficam ligados às abas (acessibilidade): aria-controls aponta 
     assert.match(h, new RegExp(`aria-controls="painel-${aba}"`));
     assert.match(h, new RegExp(`id="painel-${aba}"[^>]*aria-labelledby="aba-${aba}"|aria-labelledby="aba-${aba}"[^>]*id="painel-${aba}"`));
   }
+});
+
+// ---------------------------------------------------------------------------
+// Identidade em divisões (blocos marca-dados)
+// ---------------------------------------------------------------------------
+
+const BLOCO_IDENTIDADE = {
+  documento: "identidade",
+  versao: 1,
+  personalidade: { palavras: ["acolhedora", "direta"], arquetipo: { principal: "Prestativo", secundario: "Inocente" } },
+  cores: [
+    { nome: "Azul Mar", hex: "#1F4E79", funcao: "principal", origem: "logo" },
+    { nome: "Areia", hex: "#F4EBD9", funcao: "fundo", origem: "proposta" },
+  ],
+  pares: [
+    { texto: "Azul Mar", fundo: "Areia", razao: 8.1, uso: "texto" },
+    { texto: "Areia", fundo: "Azul Mar", razao: 8.1, uso: "destaque" },
+    { texto: "Fantasma", fundo: "Areia", razao: 3, uso: "texto" },
+  ],
+  tipografia: [{ uso: "titulos", familia: "Montserrat", pesos: [600, 700], fonte: "google", licenca: "OFL", origem: "site" }],
+  materiais: [{ n: 1, tipo: "site", alvo: "https://exemplo.com.br", visto_em: "2026-10-08" }],
+};
+const BLOCO_VOZ = {
+  documento: "voz",
+  versao: 1,
+  escalas: [
+    { eixo: "formal-casual", posicao: 4, origem: "dossie" },
+    { eixo: "serio-engracado", posicao: 2, origem: "persona" },
+    { eixo: "respeitoso-irreverente", posicao: 1, origem: "proposta" },
+    { eixo: "factual-entusiasmado", posicao: 3, origem: "dossie" },
+  ],
+  palavras: ["próxima", "clara"],
+  anti: ["fria"],
+};
+const cerca = (o: unknown) => "## Dados para o sistema\n\n```marca-dados\n" + JSON.stringify(o) + "\n```\n";
+const DOC_ID = {
+  id: "m1",
+  titulo: "Identidade da marca - Padaria",
+  publicado_em: "2026-10-08T12:00:00Z",
+  caminho_origem: "empresa/marca/identidade-visual.md",
+  texto: "# Identidade\n\n## 1. Plataforma da marca\nPropósito: pão de verdade.\n\n## 4. Cores\nProporção 60-30-10.\n\n## 9. Fontes\n- [1] site\n\n" + cerca(BLOCO_IDENTIDADE),
+};
+const DOC_VOZ = {
+  id: "m2",
+  titulo: "Tom de voz - Padaria",
+  publicado_em: "2026-10-08T11:00:00Z",
+  caminho_origem: "empresa/marca/tom-de-voz.md",
+  texto: "# Voz\n\n## 1. Como a marca soa\nFalamos como no balcão.\n\n" + cerca(BLOCO_VOZ),
+};
+
+function telaIdentidade(logos: { papel: "principal"; url: string }[] = []): string {
+  const marca = juntarMarca([DOC_ID, DOC_VOZ])!;
+  const docs = [DOC_ID, DOC_VOZ].map((d) => ({ id: d.id, tipo: "marca", titulo: d.titulo, caminho_origem: d.caminho_origem, publicado_em: d.publicado_em }));
+  const grupos = porAba(docs);
+  const abertos = abertosDasAbas(grupos, undefined);
+  const painel = createElement(IdentidadeMarca, { marca, logos });
+  return renderToStaticMarkup(
+    createElement(
+      SearchParamsContext.Provider,
+      { value: new URLSearchParams("aba=marca") as never },
+      createElement(AbasMarca, {
+        contagem: { marca: 2, persona: 0, dossie: 0 },
+        hrefs: hrefsDasAbas(grupos, abertos),
+        paineis: montarPaineis(grupos, abertos, new Map(), new Map(), painel),
+      }),
+    ),
+  );
+}
+
+test("aba com bloco válido mostra cores, tipografia e voz em divisões (não o texto do documento)", () => {
+  const h = telaIdentidade();
+  const marca = paineis(h)[0];
+  assert.equal(marca.oculto, false);
+  // navegação por divisão, só das que têm conteúdo, com âncora e alvo de toque >= 44px
+  const nav = h.slice(h.indexOf('aria-label="Divisões da identidade"'));
+  const ancoras = [...nav.slice(0, nav.indexOf("</nav>")).matchAll(/<a href="#(marca-[a-z]+)"[^>]*class="([^"]*)"[^>]*>([^<]*)<\/a>/g)];
+  assert.deepEqual(ancoras.map((m) => [m[1], m[3]]), [
+    ["marca-essencia", "Essência"],
+    ["marca-personalidade", "Personalidade"],
+    ["marca-cores", "Cores"],
+    ["marca-tipografia", "Tipografia"],
+    ["marca-voz", "Voz"],
+    ["marca-fontes", "Fontes"],
+  ]);
+  for (const m of ancoras) assert.match(m[2], /min-h-11/);
+  for (const [id] of ancoras.map((m) => [m[1]])) assert.match(h, new RegExp(`id="${id}"`));
+  // cores: nome, HEX, função, origem; amostra pelo HEX validado
+  assert.match(marca.texto, /Azul Mar/);
+  assert.match(marca.texto, /#1F4E79/);
+  assert.match(marca.texto, /Principal/);
+  assert.match(marca.texto, /Origem: Logo/);
+  assert.match(h, /style="background-color:#1F4E79"/);
+  // pares de contraste: "Aa" no fundo real, razão e uso; par com cor inexistente é ignorado
+  assert.match(h, /style="background-color:#F4EBD9;color:#1F4E79"/);
+  assert.match(marca.texto, /8,10:1/);
+  assert.match(marca.texto, /só destaque/);
+  assert.doesNotMatch(marca.texto, /Fantasma/);
+  // tipografia na própria família + link do Google Fonts montado só com a família validada
+  assert.match(h, /font-family:&quot;Montserrat&quot;, ui-sans-serif/);
+  assert.match(h, /<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com\/css2\?family=Montserrat:wght@600;700&amp;display=swap"/);
+  // voz: 4 trilhos, palavras de tom e anti-tom, seção de texto no cartão
+  assert.equal([...h.matchAll(/aria-label="[^"]*posição \d de 5/g)].length, 4);
+  assert.match(marca.texto, /Soamos/);
+  assert.match(marca.texto, /próxima/);
+  assert.match(marca.texto, /Nunca soamos/);
+  assert.match(marca.texto, /Falamos como no balcão\./);
+  // seção de texto da plataforma via Markdown
+  assert.match(marca.texto, /Propósito: pão de verdade\./);
+  // o JSON do bloco não vaza pra tela
+  assert.doesNotMatch(marca.texto, /marca-dados|"documento"/);
+  // segurança: nada de HTML cru
+  assert.doesNotMatch(h, /dangerouslySetInnerHTML|<script/);
+});
+
+test("rodapé lista os documentos publicados com o link ?doc= pro texto integral", () => {
+  const h = telaIdentidade();
+  const rodape = h.slice(h.indexOf("<footer"));
+  const links = [...rodape.matchAll(/<a ([^>]*)>([^<]*)<\/a>/g)].map((m) => [desescapar(/href="([^"]*)"/.exec(m[1])?.[1] ?? ""), m[2]]);
+  assert.deepEqual(links, [
+    ["/marca?aba=marca&doc=m1", "Identidade da marca - Padaria"],
+    ["/marca?aba=marca&doc=m2", "Tom de voz - Padaria"],
+  ]);
+});
+
+test("logos assinados aparecem em quadro claro e escuro", () => {
+  const h = telaIdentidade([{ papel: "principal", url: "https://exemplo.test/logo.png?token=abc" }]);
+  assert.match(h, /id="marca-logo"/);
+  assert.equal([...h.matchAll(/<img /g)].length, 2, "uma imagem em cada quadro");
+  assert.match(h, /sobre claro/);
+  assert.match(h, /sobre escuro/);
+});
+
+test("sem bloco válido a aba mostra o documento em texto, como antes (sem navegação de divisões)", () => {
+  const h = tela("aba=marca");
+  assert.doesNotMatch(h, /Divisões da identidade/);
+  assert.match(paineis(h)[0].texto, /Exemplo: manual da marca/);
+  assert.match(paineis(h)[0].texto, /Tom de voz: simples, direto e gentil\./);
+  assert.equal(juntarMarca([{ id: "m1", titulo: "x", texto: TEXTOS.get("m1")!, publicado_em: "2026-10-07T12:00:00Z" }]), null);
+});
+
+test("texto integral pedido: documento em texto com o caminho de volta pra identidade", () => {
+  const grupos = porAba([MARCA]);
+  const abertos = abertosDasAbas(grupos, "m1");
+  const painel = renderToStaticMarkup(montarPaineis(grupos, abertos, TEXTOS, new Map(), null, "/marca?aba=marca").marca as never);
+  assert.match(texto(painel), /Voltar à identidade em divisões/);
+  assert.match(desescapar(painel), /href="\/marca\?aba=marca"/);
+  assert.match(texto(painel), /Tom de voz: simples, direto e gentil\./);
 });

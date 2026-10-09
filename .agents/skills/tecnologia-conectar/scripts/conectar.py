@@ -348,6 +348,14 @@ def conferir_nomes_na_vercel(casa: Path) -> dict[str, int]:
     return contagem
 
 
+def tipo_vercel(nome: str) -> str:
+    """Tipo explícito pro `vercel env add`. A CLI 63.1.0 recusa `NEXT_PUBLIC_*`
+    com cara de credencial sem tipo (`public_prefix_requires_type`): `config`
+    expõe de propósito (URL e anon key são públicas, toda tabela tem RLS);
+    o resto vai como `secret` (não legível depois de salvo)."""
+    return "config" if nome.startswith("NEXT_PUBLIC_") else "secret"
+
+
 def cmd_vercel_env(casa: Path) -> int:
     if not caminho_project_json(casa).is_file():
         raise ErroConectar(
@@ -362,8 +370,12 @@ def cmd_vercel_env(casa: Path) -> int:
             "Esses valores entram na etapa 7-banco do instalador (ou pela skill tecnologia-acessos)."
         )
     for nome, alvo in MAPA_VERCEL:
+        # --type: exigido pela CLI 63.1.0 em NEXT_PUBLIC_* (ver tipo_vercel).
         # --yes: sem ele a CLI pode perguntar a branch de preview mesmo com STDIN
-        resultado = _rodar(["vercel", "env", "add", nome, alvo, "--yes"], cwd=projeto_dir(casa), entrada=env[nome])
+        resultado = _rodar(
+            ["vercel", "env", "add", nome, alvo, "--type", tipo_vercel(nome), "--yes"],
+            cwd=projeto_dir(casa), entrada=env[nome],
+        )
         saida = _saida(resultado)
         if resultado is not None and resultado.returncode == 0:
             linha("ok", "vercel-env", f"{nome} ({alvo})")

@@ -15,7 +15,7 @@
 | empresa/marca/logo/logo-escuro.png | para fundo claro | <inversão das cores ou todo preto>, só porque o dono pediu (material do dono: <arquivo original>) |
 | empresa/marca/logo/logo-principal-embutido.svg | site e peças que pedem SVG | contêiner com o PNG dentro; NÃO é vetor (material do dono: <arquivo original>) |
 
-Apague da tabela as linhas dos arquivos que não foram feitos.
+Apague da tabela, e também do bloco `marca-dados` do fim do documento, as linhas dos arquivos que não foram feitos. Papéis do bloco: principal, icone, claro, escuro e svg (o `principal` é obrigatório).
 
 ## 2. Regras de uso (padrão do time, o dono pode mudar)
 
@@ -32,3 +32,10 @@ Apague da tabela as linhas dos arquivos que não foram feitos.
 ## 4. O que foi feito, passo a passo
 
 - <comando do logo.py e o relatório dele: tolerância, fundo, avisos> (material do dono: <arquivo original>)
+
+## Dados para o sistema
+
+```marca-dados
+{"documento":"logo","versao":1,
+ "arquivos":[{"papel":"principal","arquivo":"empresa/marca/logo/logo-principal.png"},{"papel":"icone","arquivo":"empresa/marca/logo/logo-icone.png"}]}
+```

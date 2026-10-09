@@ -20,5 +20,5 @@ Arquivos protegidos: qualquer mudança neles vai pelo caminho 3, com a prova e a
 |---|---|
 | `marketing-revisor` | Use antes de publicar persona, identidade visual, tom de voz ou logo, chamado pelas skills marketing-persona, marketing-identidade e marketing-logo com o documento e o dossiê |
 | `marketing-persona` | Ponto de entrada do time: montar o cliente ideal e a persona a partir do dossiê da empresa |
-| `marketing-identidade` | Montar a identidade visual e o tom de voz: paleta, tipografia e manual curto |
+| `marketing-identidade` | Montar a identidade da marca completa e o tom de voz, a partir do dossiê, da persona e do site, Instagram ou apresentação do dono |
 | `marketing-logo` | Tratar o logo que o dono entregou: fundo transparente, ícone e variantes |

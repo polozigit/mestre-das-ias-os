@@ -25,6 +25,7 @@ export function PainelDocumento({
   aberto,
   texto,
   imagemUrl,
+  voltarHref = null,
 }: {
   aba: Aba;
   /** Todos os documentos da aba, o mais recente primeiro. */
@@ -32,12 +33,19 @@ export function PainelDocumento({
   aberto: DocumentoDaLista | null;
   texto: string | null;
   imagemUrl: string | null;
+  /** Quando a aba tem a identidade em divisões, o caminho de volta pra ela (texto integral aberto por ?doc=). */
+  voltarHref?: string | null;
 }) {
   if (!aberto || texto === null) {
     return <Empty icon={Palette} title={`${ROTULO_ABA[aba]} ainda não foi publicado`} description={ETAPA_QUE_PUBLICA[aba]} />;
   }
   return (
     <article className="flex flex-col gap-4 rounded-lg border border-borda-suave bg-bg-elevada p-5">
+      {voltarHref && (
+        <Link href={voltarHref} prefetch={false} className="inline-flex min-h-11 items-center self-start text-sm font-semibold text-acento-texto underline underline-offset-2">
+          Voltar à identidade em divisões
+        </Link>
+      )}
       <div className="flex flex-col gap-1">
         <h2 className="text-base font-semibold text-fg-1">{aberto.titulo}</h2>
         <p className="text-xs text-fg-3">
@@ -82,9 +90,17 @@ export function montarPaineis<T extends DocumentoDaLista>(
   abertos: Record<Aba, T | null>,
   textos: Map<string, string>,
   imagens: Map<Aba, string>,
+  /** Painel pronto da aba Identidade e voz (IdentidadeMarca); sem ele, o documento aberto em texto. */
+  painelMarca: ReactNode = null,
+  /** Com `painelMarca` disponível mas o texto integral pedido por ?doc=, o caminho de volta. */
+  voltarMarcaHref: string | null = null,
 ): Record<Aba, ReactNode> {
   const paineis = {} as Record<Aba, ReactNode>;
   for (const aba of ABAS) {
+    if (aba === "marca" && painelMarca) {
+      paineis[aba] = painelMarca;
+      continue;
+    }
     const aberto = abertos[aba];
     paineis[aba] = (
       <PainelDocumento
@@ -93,6 +109,7 @@ export function montarPaineis<T extends DocumentoDaLista>(
         aberto={aberto}
         texto={aberto ? (textos.get(aberto.id) ?? null) : null}
         imagemUrl={imagens.get(aba) ?? null}
+        voltarHref={aba === "marca" ? voltarMarcaHref : null}
       />
     );
   }

@@ -14,7 +14,7 @@
   ],
   "skills": [
     {"name": "marketing-persona", "dir": ".agents/skills/marketing-persona", "quando": "Ponto de entrada do time: montar o cliente ideal e a persona a partir do dossiê da empresa", "entrada": true},
-    {"name": "marketing-identidade", "dir": ".agents/skills/marketing-identidade", "quando": "Montar a identidade visual e o tom de voz: paleta, tipografia e manual curto"},
+    {"name": "marketing-identidade", "dir": ".agents/skills/marketing-identidade", "quando": "Montar a identidade da marca completa e o tom de voz, a partir do dossiê, da persona e do site, Instagram ou apresentação do dono"},
     {"name": "marketing-logo", "dir": ".agents/skills/marketing-logo", "quando": "Tratar o logo que o dono entregou: fundo transparente, ícone e variantes"}
   ]
 }

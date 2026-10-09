@@ -112,21 +112,208 @@ FROM (VALUES
 WHERE NOT EXISTS (SELECT 1 FROM public.execucoes_agente e WHERE e.resumo = v.resumo);
 
 -- ---------------------------------------------------------------------------
--- 3 documentos publicados (persona, marca e dossie), com o hash do proprio texto
+-- 4 documentos publicados (persona, 2 de marca e dossie). O hash e o sha256 do proprio texto.
+-- Os de marca (identidade e voz da Padaria Exemplo, fictícia) trazem o bloco marca-dados que a tela
+-- Marca desenha em divisoes; o texto antigo de uma linha so mostrava o documento em texto.
 -- ---------------------------------------------------------------------------
-INSERT INTO public.documentos_publicados (id, tipo, titulo, texto, resumo, caminho_origem, hash) VALUES
-  ('00000000-0000-4000-8000-0000000000d1', 'persona', 'Exemplo: persona do cliente',
+INSERT INTO public.documentos_publicados (id, tipo, titulo, texto, resumo, caminho_origem, hash)
+SELECT v.id, v.tipo, v.titulo, v.texto, v.resumo, v.caminho_origem,
+       encode(sha256(convert_to(v.texto, 'UTF8')), 'hex')
+FROM (VALUES
+  ('00000000-0000-4000-8000-0000000000d1'::uuid, 'persona', 'Exemplo: persona do cliente',
    'Dona Maria, 45 anos, tem uma padaria e quer vender mais sem trabalhar mais.', 'Cliente ideal de exemplo',
-   'exemplo/persona.md',
-   encode(sha256(convert_to('Dona Maria, 45 anos, tem uma padaria e quer vender mais sem trabalhar mais.', 'UTF8')), 'hex')),
-  ('00000000-0000-4000-8000-0000000000d2', 'marca', 'Exemplo: manual da marca',
-   'Tom de voz: simples, direto e gentil. Cores: as do tema.', 'Manual de marca de exemplo',
-   'exemplo/marca.md',
-   encode(sha256(convert_to('Tom de voz: simples, direto e gentil. Cores: as do tema.', 'UTF8')), 'hex')),
-  ('00000000-0000-4000-8000-0000000000d3', 'dossie', 'Exemplo: dossiê da empresa',
+   'exemplo/persona.md'),
+  ('00000000-0000-4000-8000-0000000000d2'::uuid, 'marca', 'Identidade da marca - Padaria Exemplo',
+   $md$# Identidade da marca - Padaria Exemplo
+
+Exemplo de uma padaria de bairro fictícia. Troque pelo conteúdo da sua empresa.
+
+## 1. Plataforma da marca
+
+- **Propósito:** pão de verdade, feito de madrugada, para começar bem o dia de quem mora aqui (dossiê 1.1).
+- **Posicionamento:** a padaria de bairro que assa todo dia e conhece o cliente pelo nome. Alternativa ao pão de mercado, que fica dias na prateleira (dossiê 2.3).
+- **Promessa:** pão quente na mesa antes das 7h, todos os dias (dossiê 5.1).
+- **Nunca prometemos:** entrega em menos de 40 minutos nem pão sem glúten (dossiê 5.2).
+- **Valores:** frescor, vizinhança, honestidade no preço (persona).
+- **Não somos:** padaria gourmet de vitrine nem rede de franquia (proposta do time).
+
+## 2. Personalidade e arquétipo
+
+Acolhedora, direta, caseira e pontual (persona). Arquétipo principal: Prestativo, porque a marca existe para cuidar de quem passa pelo balcão (proposta do time). Arquétipo secundário: Inocente, pelo gosto do simples (proposta do time).
+
+## 3. Logo
+
+Ainda sem arquivo de logo neste exemplo. Quando o logo for publicado, ele aparece aqui sobre fundo claro e escuro, com as regras de uso: área de proteção igual à altura da espiga, tamanho mínimo de 24 px e nunca esticado (proposta do time).
+
+## 4. Cores
+
+| Cor | HEX | Função | Origem |
+|---|---|---|---|
+| Marrom Forno | #5B3A29 | principal | logo [3] |
+| Creme | #FFF6E5 | fundo | site [1] |
+| Trigo | #E0A83A | destaque | site [1] |
+| Tomate | #B8402A | apoio | instagram [2] |
+| Grafite | #2B2B2B | texto | proposta do time |
+
+Proporção de uso: cerca de 60% Creme, 30% Marrom Forno e 10% Trigo ou Tomate (proposta do time). Trigo sobre Creme não tem contraste para texto: use só em destaque, nunca em frase.
+
+## 5. Tipografia
+
+- **Títulos:** Montserrat, pesos 600 e 700, Google Fonts, licença OFL (site [1]).
+- **Texto:** Source Sans 3, pesos 400 e 600, Google Fonts, licença OFL (proposta do time).
+- **Reserva:** Arial, fonte do sistema, quando as outras não carregarem.
+
+## 6. Imagem e elementos
+
+Fotos de pão saindo do forno, luz natural da manhã, mãos de quem trabalha. Nada de banco de imagem com sorriso posado. Ícones de traço simples, na cor Marrom Forno (proposta do time). Imagem feita por IA só como rascunho, nunca no lugar do logo.
+
+## 7. Aplicações
+
+- **Post e story:** fundo Creme, título em Montserrat 700 na cor Marrom Forno, um destaque em Trigo.
+- **WhatsApp:** foto do balcão no perfil, nome da padaria e horário na descrição.
+- **Cartão e etiqueta:** logo em Marrom Forno sobre Creme, sem sombra.
+
+## 8. Regras de ouro
+
+1. O Creme é o fundo da marca; nunca fundo branco puro.
+2. Trigo só em destaque, nunca em texto corrido.
+3. Uma foto real por peça, sempre que der.
+4. Frase curta, de balcão: quem lê entende na primeira passada.
+
+## 9. Fontes
+
+- [1] site: https://padariaexemplo.example. Visto em 2026-10-08.
+- [2] instagram: @padariaexemplo. Visto em 2026-10-08.
+- [3] logo: contexto/fontes-originais/logo-padaria.png. Visto em 2026-10-08.
+
+## Anexo
+
+### O que o dono disse
+
+Exemplo fictício, sem fala real do dono.
+
+### Trechos dos materiais
+
+Exemplo fictício, sem trecho real de material.
+
+## Dados para o sistema
+
+```marca-dados
+{
+  "documento": "identidade",
+  "versao": 1,
+  "personalidade": {
+    "palavras": ["acolhedora", "direta", "caseira", "pontual"],
+    "arquetipo": {"principal": "Prestativo", "secundario": "Inocente"}
+  },
+  "cores": [
+    {"nome": "Marrom Forno", "hex": "#5B3A29", "funcao": "principal", "origem": "logo"},
+    {"nome": "Creme", "hex": "#FFF6E5", "funcao": "fundo", "origem": "site"},
+    {"nome": "Trigo", "hex": "#E0A83A", "funcao": "destaque", "origem": "site"},
+    {"nome": "Tomate", "hex": "#B8402A", "funcao": "apoio", "origem": "instagram"},
+    {"nome": "Grafite", "hex": "#2B2B2B", "funcao": "texto", "origem": "proposta"}
+  ],
+  "pares": [
+    {"texto": "Grafite", "fundo": "Creme", "razao": 13.19, "uso": "texto"},
+    {"texto": "Marrom Forno", "fundo": "Creme", "razao": 9.39, "uso": "texto"},
+    {"texto": "Creme", "fundo": "Tomate", "razao": 5.14, "uso": "texto"},
+    {"texto": "Trigo", "fundo": "Marrom Forno", "razao": 4.72, "uso": "texto"},
+    {"texto": "Trigo", "fundo": "Creme", "razao": 1.99, "uso": "destaque"}
+  ],
+  "tipografia": [
+    {"uso": "titulos", "familia": "Montserrat", "pesos": [600, 700], "fonte": "google", "licenca": "OFL", "origem": "site"},
+    {"uso": "texto", "familia": "Source Sans 3", "pesos": [400, 600], "fonte": "google", "licenca": "OFL", "origem": "proposta"},
+    {"uso": "reserva", "familia": "Arial", "pesos": [400, 700], "fonte": "sistema", "licenca": "sistema", "origem": "proposta"}
+  ],
+  "materiais": [
+    {"n": 1, "tipo": "site", "alvo": "https://padariaexemplo.example", "visto_em": "2026-10-08"},
+    {"n": 2, "tipo": "instagram", "alvo": "@padariaexemplo", "visto_em": "2026-10-08"},
+    {"n": 3, "tipo": "logo", "alvo": "contexto/fontes-originais/logo-padaria.png", "visto_em": "2026-10-08"}
+  ]
+}
+```
+$md$,
+   'Identidade da marca de exemplo', 'exemplo/marca/identidade-visual.md'),
+  ('00000000-0000-4000-8000-0000000000d4'::uuid, 'marca', 'Tom de voz - Padaria Exemplo',
+   $md$# Tom de voz - Padaria Exemplo
+
+Exemplo de uma padaria de bairro fictícia. Troque pelo conteúdo da sua empresa.
+
+## 1. Como a marca soa
+
+A Padaria Exemplo fala como quem atende no balcão: próxima, clara e sem pressa de vender. A voz é sempre a mesma; o tom muda conforme a situação (persona).
+
+## 2. Traços de voz
+
+- Somos próximos, mas não íntimos demais (proposta do time).
+- Somos diretos, mas não secos (dossiê 3.2).
+- Somos bem-humorados, mas não piadistas (persona).
+
+## 3. Tom por situação
+
+- **Boas-vindas:** caloroso e curto. Chamamos pelo nome.
+- **Venda:** claro sobre o que é, quanto custa e até quando. Sem urgência falsa.
+- **Reclamação:** primeiro reconhecer, depois resolver. Nada de justificativa longa.
+- **Cobrança:** gentil e objetiva, com a data e o valor à vista.
+
+## 4. Faça e não faça
+
+- Faça: use o nome do cliente e o nome do pão.
+- Faça: diga o horário que o pão sai do forno.
+- Não faça: use jargão de padaria (fermentação natural, autólise) sem explicar.
+- Não faça: prometa o que a padaria não entrega.
+
+## 5. Vocabulário
+
+Palavras que usamos: fresquinho, saiu agora, de manhãzinha, vizinho, balcão. Palavras que evitamos: premium, exclusivo, experiência, solução (proposta do time).
+
+## 6. Exemplos certo e errado por canal
+
+- WhatsApp, certo: Oi, Dona Maria! O pão de queijo saiu agora e ainda está quente. (proposta do time)
+- WhatsApp, errado: Prezada cliente, informamos a disponibilidade do produto. (proposta do time)
+- Instagram, certo: Sábado tem pão de fermentação própria, a partir das 6h. (proposta do time)
+- Instagram, errado: Uma experiência gastronômica premium para você. (proposta do time)
+
+## 7. O que nunca prometemos
+
+Entrega em menos de 40 minutos, pão sem glúten e preço fixo o ano todo (dossiê 5.2).
+
+## 8. Teste com leitores reais
+
+Mostrar três mensagens para cinco clientes do balcão e perguntar qual soa como a padaria. Ainda não feito neste exemplo (hipótese).
+
+## 9. Fontes
+
+- [1] site: https://padariaexemplo.example. Visto em 2026-10-08.
+
+## Anexo
+
+### O que o dono disse
+
+Exemplo fictício, sem fala real do dono.
+
+## Dados para o sistema
+
+```marca-dados
+{
+  "documento": "voz",
+  "versao": 1,
+  "escalas": [
+    {"eixo": "formal-casual", "posicao": 4, "origem": "dossie"},
+    {"eixo": "serio-engracado", "posicao": 3, "origem": "persona"},
+    {"eixo": "respeitoso-irreverente", "posicao": 2, "origem": "proposta"},
+    {"eixo": "factual-entusiasmado", "posicao": 3, "origem": "dossie"}
+  ],
+  "palavras": ["próxima", "clara", "calorosa"],
+  "anti": ["fria", "exagerada", "técnica"]
+}
+```
+$md$,
+   'Tom de voz de exemplo', 'exemplo/marca/tom-de-voz.md'),
+  ('00000000-0000-4000-8000-0000000000d3'::uuid, 'dossie', 'Exemplo: dossiê da empresa',
    'Resumo da empresa: o que ela faz, para quem e por que importa. Texto de exemplo, troque pelo da sua empresa.', 'Dossiê de exemplo',
-   'exemplo/dossie.md',
-   encode(sha256(convert_to('Resumo da empresa: o que ela faz, para quem e por que importa. Texto de exemplo, troque pelo da sua empresa.', 'UTF8')), 'hex'))
+   'exemplo/dossie.md')
+) AS v(id, tipo, titulo, texto, resumo, caminho_origem)
 ON CONFLICT DO NOTHING;
 
 -- ---------------------------------------------------------------------------

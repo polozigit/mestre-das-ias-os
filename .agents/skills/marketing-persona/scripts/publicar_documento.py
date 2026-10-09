@@ -11,6 +11,7 @@ livre, nunca apaga nada, nunca lê o Vault.
 Uso (da raiz do projeto):
   publicar_documento.py --tipo persona --arquivo empresa/publico/persona.md --titulo "Persona" [--resumo "..."] [--dry-run]
   publicar_documento.py --tipo marca --arquivo empresa/marca/logo/logo.md --titulo "Logo" --imagem empresa/marca/logo/logo-principal.png
+  publicar_documento.py --tipo marca --arquivo empresa/marca/logo/logo.md --titulo "Logo"   (com o bloco `documento: logo`)
   publicar_documento.py --tipo marca --arquivo empresa/marca/tom-de-voz.md --conferir
   publicar_documento.py --tipo dossie --arquivo contexto/dossie/dossie-completo.md --titulo "Dossiê da empresa"
 
@@ -21,7 +22,11 @@ O que ele garante antes de mandar qualquer coisa:
   - o texto não tem `<...>` de modelo que ficou sem preencher (saída 2, com o número da linha);
   - o dono deu o sim e o texto não mudou depois dele (aprovacao.py conferir);
   - imagem só para marca, dentro de empresa/marca/, png, jpg, webp ou svg (svg sem script) e com o
-    cabeçalho do formato certo (arquivo qualquer com nome de imagem não passa).
+    cabeçalho do formato certo (arquivo qualquer com nome de imagem não passa);
+  - documento da marca com o bloco `marca-dados` de "documento": "logo" (seção "Dados para o sistema"): TODAS as
+    variantes de `arquivos` (principal, icone, claro, escuro, svg; cada papel uma vez) sobem, cada uma com as mesmas
+    validações de imagem, e `imagem_caminho` guarda o `principal`. Sem o bloco, vale o --imagem de sempre.
+    Bloco inválido (JSON quebrado, papel ou caminho fora do contrato, sem `principal`) sai 2 sem enviar nada.
 Com --dry-run roda tudo isso, imprime o que seria enviado (sem segredo) e não usa rede nem credencial.
 
 Credencial: <raiz do projeto>/credenciais/.env, NEXT_PUBLIC_SUPABASE_URL (ou SUPABASE_URL) e
@@ -70,6 +75,10 @@ TETO_TEXTO = 1_000_000
 TETO_IMAGEM = 5_000_000
 TETO_TITULO = 120
 TETO_RESUMO = 300
+PAPEIS_LOGO = ("principal", "icone", "claro", "escuro", "svg")
+# bloco de dados da marca (contrato do marca_dados.py, marketing-identidade): só o do logo muda o que se envia
+RE_BLOCO_MARCA = re.compile(r"^```marca-dados[ \t]*\n(.*?)^```[ \t]*$", re.M | re.S)
+RE_ARQUIVO_LOGO = re.compile(r"^empresa/marca/[a-z0-9][a-z0-9/_.-]*\.(png|jpg|jpeg|webp|svg)$")
 TIMEOUT = 60
 USER_AGENT = "mestre-das-ias-publicador/1.0"  # o urllib sozinho se apresenta como Python-urllib, que filtro de borda costuma recusar
 
@@ -232,6 +241,60 @@ def ler_imagem(casa: Path, tipo: str, imagem: str, regra: re.Pattern) -> dict:
         if re.search(r"<script|javascript:|\son[a-z]+\s*=", texto, re.IGNORECASE):
             raise Erro(f"{rel} tem script dentro do SVG; não envio", 2)
     return {"rel": rel, "dados": dados, "mime": IMAGENS[ext], "caminho_bucket": caminho_no_bucket(rel)}
+
+
+def arquivos_do_logo(texto: str) -> list[dict] | None:
+    """Os `arquivos` do bloco marca-dados de "documento": "logo", com o `principal` primeiro; None se o documento
+    não tem esse bloco (comportamento de sempre). Bloco quebrado ou fora do contrato: Erro 2, nada é enviado."""
+    blocos = RE_BLOCO_MARCA.findall(texto.replace("\r\n", "\n"))
+    if not blocos:
+        return None
+    if len(blocos) > 1:
+        raise Erro("o documento tem mais de um bloco marca-dados; deixe só um. Nada foi enviado.", 2)
+    try:
+        dados = json.loads(blocos[0])
+    except ValueError:
+        raise Erro("o bloco marca-dados do documento não é um JSON válido (rode marca_dados.py conferir). "
+                   "Nada foi enviado.", 2) from None
+    if not isinstance(dados, dict) or dados.get("documento") != "logo":
+        return None
+    arquivos = dados.get("arquivos")
+    if not isinstance(arquivos, list) or not arquivos:
+        raise Erro("o bloco do logo precisa ter pelo menos o logo principal. Nada foi enviado.", 2)
+    papeis: list[str] = []
+    caminhos: list[str] = []
+    for item in arquivos:
+        papel = item.get("papel") if isinstance(item, dict) else None
+        caminho = item.get("arquivo") if isinstance(item, dict) else None
+        if papel not in PAPEIS_LOGO:
+            raise Erro(f"papel de logo {str(papel)[:20]!r} não existe no bloco (use {', '.join(PAPEIS_LOGO)}). "
+                       "Nada foi enviado.", 2)
+        if not (isinstance(caminho, str) and RE_ARQUIVO_LOGO.match(caminho)) or ".." in caminho:
+            raise Erro("arquivo de logo do bloco fora do contrato: precisa estar em empresa/marca/ e ser png, jpg, "
+                       "webp ou svg, sem ... Nada foi enviado.", 2)
+        papeis.append(papel)
+        caminhos.append(caminho)
+    if len(set(papeis)) != len(papeis) or len(set(caminhos)) != len(caminhos):
+        raise Erro("o bloco do logo repete um papel ou um arquivo. Nada foi enviado.", 2)
+    if "principal" not in papeis:
+        raise Erro("o bloco do logo não tem o papel principal. Nada foi enviado.", 2)
+    ordem = sorted(zip(papeis, caminhos), key=lambda par: par[0] != "principal")
+    return [{"papel": p, "arquivo": c} for p, c in ordem]
+
+
+def imagens_do_documento(casa: Path, tipo: str, texto: str, imagem_arg: str | None, regra: re.Pattern) -> list[dict]:
+    """As imagens a enviar, a principal primeiro. Documento com bloco de logo: todas as variantes do bloco;
+    senão, só o --imagem (se veio)."""
+    do_bloco = arquivos_do_logo(texto) if tipo == "marca" else None
+    if do_bloco is None:
+        return [ler_imagem(casa, tipo, imagem_arg, regra)] if imagem_arg else []
+    imagens = [ler_imagem(casa, tipo, item["arquivo"], regra) for item in do_bloco]
+    if imagem_arg:
+        extra = ler_imagem(casa, tipo, imagem_arg, regra)
+        if extra["rel"] != imagens[0]["rel"]:
+            raise Erro(f"--imagem ({extra['rel']}) não é o principal do bloco do logo ({imagens[0]['rel']}); "
+                       "tire o --imagem: o bloco manda. Nada foi enviado.", 2)
+    return imagens
 
 
 def agora_iso() -> str:
@@ -408,15 +471,16 @@ def publicar(casa: Path, tipo: str, arquivo: str, titulo: str | None, resumo: st
         raise Erro(f"{doc['rel']}: {motivo}. Nada foi enviado.", 5)
     if regra.search(f"{titulo or ''} {resumo or ''}"):
         raise Erro("possível segredo no título ou no resumo. Nada foi enviado; tire o segredo e rode de novo.", 3)
-    imagem = ler_imagem(casa, tipo, imagem_arg, regra) if imagem_arg else None
+    imagens = imagens_do_documento(casa, tipo, doc["texto"], imagem_arg, regra)
+    imagem = imagens[0] if imagens else None  # a principal é a capa (imagem_caminho)
     payload = montar_payload(doc, tipo, titulo or "", resumo, imagem)
     if dry_run:
         resumo_texto = dict(payload, texto=f"<{len(doc['texto'])} caracteres, {motivo}>")
         print("DRY-RUN: nada foi enviado e nenhuma credencial foi lida.")
         print(json.dumps(resumo_texto, ensure_ascii=False, indent=2))
-        if imagem:
-            print(f"imagem: {imagem['rel']} -> bucket {BUCKET}/{imagem['caminho_bucket']} ({imagem['mime']}, {len(imagem['dados'])} bytes)")
-        print(f"operações previstas: {'criar o bucket se faltar, enviar a imagem, ' if imagem else ''}"
+        for img in imagens:
+            print(f"imagem: {img['rel']} -> bucket {BUCKET}/{img['caminho_bucket']} ({img['mime']}, {len(img['dados'])} bytes)")
+        print(f"operações previstas: {'criar o bucket se faltar, enviar ' + ('as ' + str(len(imagens)) + ' imagens' if len(imagens) > 1 else 'a imagem') + ', ' if imagens else ''}"
               f"upsert em {TABELA} por caminho_origem")
         return 0
     cred = credencial(casa)
@@ -427,12 +491,13 @@ def publicar(casa: Path, tipo: str, arquivo: str, titulo: str | None, resumo: st
         return 2
     url, chave = cred
     exigir_https(url)
-    if imagem:
+    if imagens:
         garantir_bucket(url, chave)
-        enviar_imagem(url, chave, imagem)
+        for img in imagens:
+            enviar_imagem(url, chave, img)
     gravar_linha(url, chave, payload)
     print(f'FEITO: {tipo} "{payload["titulo"]}" publicado ({doc["rel"]}, hash {doc["hash"][:12]}'
-          f'{", com imagem" if imagem else ""}). Confira em Marca, aba {ABA[tipo]}, no sistema.')
+          f'{", com " + str(len(imagens)) + " imagens" if len(imagens) > 1 else ", com imagem" if imagens else ""}). Confira em Marca, aba {ABA[tipo]}, no sistema.')
     return 0
 
 

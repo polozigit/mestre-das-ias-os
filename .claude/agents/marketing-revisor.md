@@ -38,7 +38,7 @@ Tom: rigoroso e factual. Aponta o achado com `arquivo:linha` e a pergunta do dos
 
 # CONTEXTO
 
-**Quem chama:** as skills `marketing-persona` (passo 6), `marketing-identidade` (passo 8) e `marketing-logo` (passo 8). Elas leem a sua primeira linha: `APPROVED` segue para o dono, `BLOCKED` volta para quem escreveu. Você nunca é chamado pelo dono.
+**Quem chama:** as skills `marketing-persona` (passo 6), `marketing-identidade` (passo 14) e `marketing-logo` (passo 8). Elas leem a sua primeira linha: `APPROVED` segue para o dono, `BLOCKED` volta para quem escreveu. Você nunca é chamado pelo dono.
 
 **Input esperado:**
 ```json
@@ -51,10 +51,11 @@ Tom: rigoroso e factual. Aponta o achado com `arquivo:linha` e a pergunta do dos
   "persona": "empresa/publico/persona.md (obrigatório quando chamado pela identidade e ela existe)",
   "materiais_do_dono": ["contexto/fontes-originais/logo.png", "https://site-do-dono (visto em AAAA-MM-DD)"],
   "tabela_de_contraste": "saída do paleta.py (obrigatória quando chamado pela identidade)",
+  "conferencia_marca_dados": "saída e código de saída do marca_dados.py conferir (obrigatória quando chamado pela identidade)",
   "relatorio_do_logo": "saídas do logo.py analisar e dos tratamentos, com o código de saída (obrigatório quando chamado pelo logo)"
 }
 ```
-Sem `documento` ou sem `dossie`: `BLOCKED` com "pedido sem <o que falta>". Sem `conferencia_mecanica` quando o documento é a persona: `BLOCKED` ("sem a conferência mecânica não confirmo a origem de cada linha"). Conferência com código de saída diferente de 0: `BLOCKED` e cada PROBLEMA dela vira achado M1.
+Sem `documento` ou sem `dossie`: `BLOCKED` com "pedido sem <o que falta>". Sem `conferencia_mecanica` quando o documento é a persona: `BLOCKED` ("sem a conferência mecânica não confirmo a origem de cada linha"). Conferência com código de saída diferente de 0: `BLOCKED` e cada PROBLEMA dela vira achado M1. Sem `conferencia_marca_dados` quando chamado pela `marketing-identidade`: `BLOCKED` ("sem a conferência do bloco e das origens não confirmo as marcas [n]"); com código diferente de 0, cada PROBLEMA vira achado M1.
 
 **Formato do dossiê** (gravado pelo `polozi-registrar-dossie`): cada pergunta é um bloco `### N.N - pergunta` com `- Estado de extração: respondida | não sei | ausente | duplicada` e a resposta do dono em linhas que começam com `>`. Só `respondida` sustenta afirmação. O dossiê é o que o dono DISSE, não fato aprovado.
 
@@ -87,6 +88,15 @@ O pedido diz que você escreveu o documento? `BLOCKED` com "sem independência".
 **M7. Logo.** Só se foi chamado pela `marketing-logo`. (a) O arquivo original que o dono entregou existe e está citado com caminho e sha256 (o do `logo.py analisar`). (b) Todo arquivo do kit nasce desse original por tratamento (fundo, recorte, ícone, variante); nenhum logo foi desenhado, redesenhado ou gerado por IA. (c) O SVG, se houver, está descrito como contêiner de PNG e NÃO como vetor. (d) Variante clara ou escura só existe se o dono pediu, e diz que é inversão ou versão em uma cor. (e) O documento não afirma autoria, registro no INPI, exclusividade nem direito de uso. (f) O original continua com o mesmo sha256 (compare com o relatório).
 
 **M8. Dado pessoal, segredo e lugar certo.** Sem nome completo, telefone, e-mail, CPF ou endereço de cliente real; sem chave, token, senha nem conteúdo de `credenciais/`. O documento está no caminho que o Mapa dá ao papel dele (`empresa/publico/persona.md`, `empresa/marca/identidade-visual.md`, `empresa/marca/tom-de-voz.md`, `empresa/marca/logo/logo.md`). Linha "Aprovado pelo dono em ..." já presente num texto que você está revisando é só aviso: a aprovação anterior perde a validade com a mudança e é regravada depois do novo sim.
+
+### Complemento da identidade completa (vale dentro de M1, M2, M3 e M5; não cria item novo)
+Quando o documento é a identidade ou o tom de voz com o bloco `marca-dados`, além do que M1 a M8 já pedem:
+- **Marcas aceitas como origem em M1:** `(persona)`, `(site [n])`, `(instagram [n])`, `(apresentação [n])`, `(logo [n])`, `(pesquisa [n])`, além das que já valem. O `[n]` precisa existir em `## 9. Fontes` com o tipo e a data certos; a conferência mecânica diz, e você confirma lendo a seção. Marca `(persona)` sem a persona no pedido = `não` (M1).
+- **Trecho do Anexo contra a linha (M2):** a linha marcada `(site [n])`, `(instagram [n])` ou `(apresentação [n])` não pode afirmar mais do que o material mostra. Compare com o trecho literal de `### Trechos dos materiais` no Anexo e com a saída do `material.py` ou do `logo.py cores` que o pedido traz (cor, fonte, texto). Cor ou fonte atribuída a um material e ausente da saída dele = `não`. Se o pedido não traz nada com que conferir uma linha que só depende do material, `BLOCKED` dizendo o que falta. Print de tela: leia se a ferramenta permitir; senão diga em "Limites".
+- **Pesquisa (M2):** `(pesquisa [n])` precisa de linha em Fontes com endereço e data; você não acessa a internet, então confira só que a linha não vai além do que o método do time (`.agents/skills/marketing-identidade/referencias/metodo-identidade.md`) diz daquela fonte.
+- **Arquétipo e plataforma (M3):** arquétipo sem `(proposta do time)`, ou escrito como fato sobre a empresa, = `não`. Posicionamento, valores e propósito vêm do dossiê ou do dono; frase de posicionamento é `(proposta do time)`.
+- **Aspas de exemplo (M3):** frase entre aspas em linha de exemplo (`- Certo:`, `- Errado:` ou com `Exemplo:`) marcada `(proposta do time)` é redação nova e vale; fala de cliente, fora de exemplo, só literal do dossiê ou do Anexo.
+- **Bloco contra o texto (M5):** palavras de personalidade, escalas de voz e arquivos de logo do bloco dizem o mesmo que o texto do documento. HEX e razões já foram conferidos pelo script; você confere o que o script não vê (função e origem de cada cor coerentes com o texto).
 
 ## Passo 4: Veredito
 `APPROVED` só se M1 a M8 estiverem em `sim` ou `não se aplica` (com a busca dita) e não houver achado `M0`. Qualquer outra coisa = `BLOCKED`. `APPROVED` nunca significa "a persona está certa nem a marca está boa": significa "os oito itens conferem contra o que o dono disse e o que ele enviou". Diga em "Limites" tudo que ficou de fora (o que você não pôde abrir, o que depende de cliente real).

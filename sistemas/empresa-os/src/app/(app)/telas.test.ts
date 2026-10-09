@@ -114,7 +114,8 @@ test("Tempo relativo ('há 7 min.') traz a data exata em dia/mês/ano ao passar 
 test("Marca: a página entrega o painel das três abas de uma vez, com o texto numa consulta só", () => {
   assert.match(marcaPagina, /abertosDasAbas\(grupos, sp\.doc\)/);
   assert.match(marcaPagina, /\.in\("id", ids\)/);
-  assert.match(marcaPagina, /<AbasMarca contagem=\{contagem\} hrefs=\{hrefs\} paineis=\{montarPaineis\(grupos, abertos, textos, imagens\)\} \/>/);
+  assert.match(marcaPagina, /const paineis = montarPaineis\(grupos, abertos, textos, imagens, painelMarca, /);
+  assert.match(marcaPagina, /<AbasMarca contagem=\{contagem\} hrefs=\{hrefs\} paineis=\{paineis\} \/>/);
   assert.match(marcaPagina, /const hrefs = hrefsDasAbas\(grupos, abertos\)/);
   assert.match(marcaPagina, /if \(erroTexto\) throw erroTexto/);
 });
