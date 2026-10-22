@@ -1387,6 +1387,15 @@ isOneToOne: false
 "marcar_senha_trocada":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
+"mensageria_api":
+{ Args: { "p_dados"?: Json,"p_operacao": string }; Returns: Json
+                           },
+"mensageria_dispositivo":
+{ Args: { "p_dados"?: Json,"p_operacao": string,"p_token": string }; Returns: Json
+                           },
+"mensageria_servico":
+{ Args: { "p_dados"?: Json,"p_operacao": string }; Returns: Json
+                           },
 "papel_parte_encerrar":
 { Args: { "p_papel_id": number,"p_vigente_ate"?: string }; Returns: undefined
                            },

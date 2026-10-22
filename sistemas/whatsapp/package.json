@@ -7,6 +7,10 @@
     "node": ">=20"
   },
   "scripts": {
+    "mensageria:configurar": "node src/multicanal/cli.mjs configurar",
+    "mensageria:iniciar": "node src/multicanal/cli.mjs iniciar",
+    "mensageria:status": "node src/multicanal/cli.mjs status",
+    "mensageria:mcp": "node src/multicanal/mcp-server.mjs",
     "conectar": "node src/conectar.mjs",
     "setup": "node src/setup.mjs",
     "preflight": "node src/preflight.mjs",

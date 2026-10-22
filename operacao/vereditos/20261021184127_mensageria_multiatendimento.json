@@ -1,0 +1,11 @@
+{
+  "migration": "20261021184127_mensageria_multiatendimento.sql",
+  "sha256": "acbd2756931410c44238fc7c74dc9b35ae09d22011e7f54dc6fada3611686673",
+  "classe": "acrescenta",
+  "achados": [],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": null,
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada no ambiente de homologação do kit (lista de migrations aplicadas lida em 2026-10-22T15:03:34Z, sha256 igual ao arquivo) e verificação pgTAP do kit",
+  "data": "2026-10-22"
+}

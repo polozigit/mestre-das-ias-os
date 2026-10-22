@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-08T04:04:19Z",
+  "gerado_em": "2026-10-22T15:03:34Z",
   "fonte": "ambiente de homologação do kit: lista de migrations aplicadas + sha256 do arquivo; pgTAP roda no CI do template (empresa-os-tests)",
   "migrations": [
     {
@@ -133,6 +133,30 @@
       "arquivo": "0022_catalogo_ia.sql",
       "sha256": "cd39b9db2aa8976056252dfdfd00cb06d078d7bc2bc0034f7f29672d5103dd12",
       "aplicada_na_fabrica": true
+    },
+    {
+      "versao": "20261021184127",
+      "arquivo": "20261021184127_mensageria_multiatendimento.sql",
+      "sha256": "acbd2756931410c44238fc7c74dc9b35ae09d22011e7f54dc6fada3611686673",
+      "aplicada_na_fabrica": false,
+      "aplicada_em_homologacao": true,
+      "pgtap_aprovado": true
+    },
+    {
+      "versao": "20261021194632",
+      "arquivo": "20261021194632_mensageria_ordem_e_leitura.sql",
+      "sha256": "9c20814d3d1806f35c882298ef736f0ec8f4465850d9c83a3405c90e49f0793b",
+      "aplicada_na_fabrica": false,
+      "aplicada_em_homologacao": true,
+      "pgtap_aprovado": true
+    },
+    {
+      "versao": "20261022145513",
+      "arquivo": "20261022145513_mensageria_nomes_grupos.sql",
+      "sha256": "abd09b2cacef79232ed1987006a1fff3045654361df57ca284fba1d1e258f555",
+      "aplicada_na_fabrica": false,
+      "aplicada_em_homologacao": true,
+      "pgtap_aprovado": true
     }
   ]
 }

@@ -56,13 +56,13 @@ function grupos(html: string): string[] {
   return [...html.matchAll(/<p class="sidebar-group-title[^"]*">([^<]*)<\/p>/g)].map((m) => m[1]);
 }
 
-test("o dono vê os 10 itens, na ordem e nos grupos combinados", () => {
+test("o dono vê os 11 itens, incluindo o atendimento, na ordem combinada", () => {
   const h = menu("/inicio");
   assert.deepEqual(itens(h), [
     "Início", "Cronograma", "Tarefas do curso", "Tarefas", "Organograma", "Marca",
-    "Agentes e skills", "Atividade", "Usuários", "Configurações",
+    "Mensagens", "Agentes e skills", "Atividade", "Usuários", "Configurações",
   ]);
-  assert.deepEqual(grupos(h), ["Mestre das IAs", "Gestão", "Marketing", "Tecnologia"]);
+  assert.deepEqual(grupos(h), ["Mestre das IAs", "Gestão", "Marketing", "Atendimento", "Tecnologia"]);
 });
 
 test("os links levam aos endereços certos, e os dois de tarefas se distinguem pela query", () => {
@@ -73,6 +73,7 @@ test("os links levam aos endereços certos, e os dois de tarefas se distinguem p
     { rotulo: "Tarefas", href: "/tarefas" },
     { rotulo: "Organograma", href: "/organograma" },
     { rotulo: "Marca", href: "/marca" },
+    { rotulo: "Mensagens", href: "/mensagens" },
     { rotulo: "Agentes e skills", href: "/agentes" },
     { rotulo: "Atividade", href: "/atividade" },
     { rotulo: "Usuários", href: "/usuarios" },

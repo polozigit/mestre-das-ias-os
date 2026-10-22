@@ -1,5 +1,5 @@
 import {
-  Activity, Bot, CalendarRange, GraduationCap, Home, KanbanSquare, Network, Palette, Settings, Users,
+  Activity, Bot, CalendarRange, GraduationCap, Home, KanbanSquare, MessageSquare, Network, Palette, Settings, Users,
   type LucideIcon,
 } from "lucide-react";
 import type { Modulo } from "@/lib/auth/permissoes";
@@ -59,6 +59,11 @@ export const NAV_GRUPOS: NavGrupo[] = [
     id: "marketing",
     titulo: "Marketing",
     itens: [{ href: "/marca", label: "Marca", modulo: "marca", icone: Palette }],
+  },
+  {
+    id: "atendimento",
+    titulo: "Atendimento",
+    itens: [{ href: "/mensagens", label: "Mensagens", modulo: "mensagens", icone: MessageSquare }],
   },
   {
     id: "tecnologia",

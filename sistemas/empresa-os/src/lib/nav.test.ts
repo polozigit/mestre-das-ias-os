@@ -20,6 +20,7 @@ test("o menu é agrupado por diretoria, com os grupos, itens e textos combinados
       ["Mestre das IAs", [["Cronograma", "/cronograma"], ["Tarefas do curso", "/tarefas?trilha=curso"]]],
       ["Gestão", [["Tarefas", "/tarefas"], ["Organograma", "/organograma"]]],
       ["Marketing", [["Marca", "/marca"]]],
+      ["Atendimento", [["Mensagens", "/mensagens"]]],
       ["Tecnologia", [["Agentes e skills", "/agentes"], ["Atividade", "/atividade"], ["Usuários", "/usuarios"], ["Configurações", "/configuracoes"]]],
     ],
   );
@@ -32,7 +33,7 @@ test("o menu antigo (Empresa, Estrutura, Sistema) não existe mais", () => {
 
 test("cada grupo tem id único e só o primeiro (o Início) fica sem título", () => {
   assert.equal(new Set(NAV_GRUPOS.map((g) => g.id)).size, NAV_GRUPOS.length);
-  assert.deepEqual(NAV_GRUPOS.map((g) => g.titulo === null), [true, false, false, false, false]);
+  assert.deepEqual(NAV_GRUPOS.map((g) => g.titulo === null), [true, false, false, false, false, false]);
 });
 
 test("nenhum grupo vazio sobra depois do filtro", () => {
@@ -49,9 +50,15 @@ test("href de item é único (serve de chave no menu)", () => {
   assert.equal(new Set(todosItens.map((i) => i.href)).size, todosItens.length);
 });
 
-test("dono vê os 10 itens", () => {
+test("dono vê os 11 itens", () => {
   const r = filtrarNav(NAV_GRUPOS, () => true);
-  assert.equal(r.flatMap((g) => g.itens).length, 10);
+  assert.equal(r.flatMap((g) => g.itens).length, 11);
+});
+
+test("mensageria.read libera somente o atendimento e não libera administração", () => {
+  const leitor = { eDono: false, permissoes: ["mensageria.read"] };
+  assert.deepEqual(rotulosVisiveis(filtrarNav(NAV_GRUPOS, m => pode(leitor, m))), ["Início", "Mensagens"]);
+  assert.equal(pode(leitor, "whatsapp"), false);
 });
 
 test("sem nenhuma permissão o menu fica vazio", () => {

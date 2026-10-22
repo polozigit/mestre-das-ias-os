@@ -33,7 +33,16 @@ insert into _exc (guarda, objeto) values
   ('GA-04', 'organograma.v_posicao_ocupante -> public.agentes'),
   ('GA-07', 'organograma.org_workflow.nome'),
   ('GA-07', 'organograma.org_workflow_raia.nome'),
-  ('GA-07', 'public.artefatos_ia.nome');
+  ('GA-07', 'public.artefatos_ia.nome'),
+  ('GA-05', 'fk_mens_membro_usuario'),
+  ('GA-05', 'fk_mens_conversa_parte'),
+  ('GA-05', 'fk_mens_conversa_responsavel'),
+  ('GA-05', 'fk_mens_mensagem_autor'),
+  ('GA-05', 'fk_mens_leitura_usuario'),
+  ('GA-05', 'fk_mens_comando_autor'),
+  ('GA-05', 'fk_mens_rascunho_decisor'),
+  ('GA-05', 'fk_mens_feedback_usuario'),
+  ('GA-05', 'fk_mens_politica_autor');
 
 create temp view _tabs as
   select c.oid, n.nspname as s, c.relname as t
