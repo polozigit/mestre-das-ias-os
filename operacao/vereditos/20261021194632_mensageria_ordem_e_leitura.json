@@ -1,0 +1,27 @@
+{
+  "migration": "20261021194632_mensageria_ordem_e_leitura.sql",
+  "sha256": "9c20814d3d1806f35c882298ef736f0ec8f4465850d9c83a3405c90e49f0793b",
+  "classe": "destrutiva",
+  "achados": [
+    {
+      "linha": 10,
+      "comando": "UPDATE",
+      "trecho": "UPDATE mensageria.mensagem m SET ordem=f.n+coalesce(x.n,0) FROM faltantes f LEFT JOIN maximos x ON x.conversa_id=f.conve"
+    },
+    {
+      "linha": 11,
+      "comando": "UPDATE",
+      "trecho": "UPDATE mensageria.conversa c SET proxima_ordem=greatest(proxima_ordem,coalesce((SELECT max(m.ordem) FROM mensageria.mens"
+    },
+    {
+      "linha": 12,
+      "comando": "UPDATE",
+      "trecho": "UPDATE mensageria.leitura l SET ultima_ordem=coalesce((SELECT max(m.ordem) FROM mensageria.mensagem m WHERE m.conversa_i"
+    }
+  ],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": "Mestre das IAs (kit) em 2026-10-22: sim, migration do modelo revisada na construção do template",
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada no ambiente de homologação do kit (lista de migrations aplicadas lida em 2026-10-22T15:03:34Z, sha256 igual ao arquivo) e verificação pgTAP do kit",
+  "data": "2026-10-22"
+}

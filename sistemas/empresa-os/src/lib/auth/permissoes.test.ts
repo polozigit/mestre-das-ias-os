@@ -4,6 +4,12 @@ import { pode, podeEscrever, moduloDaRota, sessaoDoRpc, PERMISSAO_MODULO, MODULO
 
 const base = { eDono: false, permissoes: [] as string[] };
 
+test('gestor de numeros nao recebe acesso aos dados gerais da empresa',()=>{
+ const sessao={...base,permissoes:['mensageria.read','mensageria.manage']};
+ assert.equal(pode(sessao,'whatsapp'),true);assert.equal(pode(sessao,'configuracoes'),false);
+ assert.equal(moduloDaRota('/configuracoes/whatsapp'),'whatsapp');
+});
+
 test("sem sessão ninguém pode nada, nem início", () => {
   assert.equal(pode(null, "inicio"), false);
 });

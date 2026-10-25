@@ -1,18 +1,20 @@
 export type Sessao = { usuarioId: string; nome: string; email: string; eDono: boolean; senhaTrocadaEm: string | null; permissoes: string[] };
-export type Modulo = "inicio" | "cronograma" | "tarefas" | "organograma" | "agentes" | "marca" | "atividade" | "usuarios" | "configuracoes";
+export type Modulo = "inicio" | "cronograma" | "tarefas" | "organograma" | "agentes" | "marca" | "atividade" | "usuarios" | "configuracoes" | "mensagens" | "whatsapp";
 
 export const PERMISSAO_MODULO: Record<Modulo, string | null> = {
   inicio: null, cronograma: "tarefas.read", tarefas: "tarefas.read", organograma: "organograma.read",
   agentes: "agentes.read", marca: "documentos.read", atividade: "atividade.read",
   usuarios: "usuarios.manage", configuracoes: "configuracoes.read",
+  mensagens: "mensageria.read", whatsapp: "mensageria.manage",
 };
 export const MODULO_ROTA: Record<Modulo, string> = {
   inicio: "/inicio", cronograma: "/cronograma", tarefas: "/tarefas", organograma: "/organograma",
   agentes: "/agentes", marca: "/marca", atividade: "/atividade", usuarios: "/usuarios", configuracoes: "/configuracoes",
+  mensagens: "/mensagens", whatsapp: "/configuracoes/whatsapp",
 };
 
 export function moduloDaRota(pathname: string): Modulo | null {
-  for (const [m, rota] of Object.entries(MODULO_ROTA) as [Modulo, string][]) {
+  for (const [m, rota] of (Object.entries(MODULO_ROTA) as [Modulo, string][]).sort((a,b) => b[1].length-a[1].length)) {
     if (pathname === rota || pathname.startsWith(rota + "/")) return m;
   }
   return null;

@@ -1,9 +1,12 @@
 import { requireAcesso } from "@/lib/auth/guards";
+import {getSessao} from '@/lib/auth/sessao';
+import {pode} from '@/lib/auth/permissoes';
 
-/** Gate do módulo Configurações: o dono ou quem tem a permissão `configuracoes.read` (PERMISSAO_MODULO em permissoes.ts). */
+/** Cada página mantém seu próprio guard. Gerir números não concede leitura dos dados gerais da empresa. */
 export default async function ConfiguracoesLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  await requireAcesso("configuracoes");
+  const sessao=await getSessao();
+  if(!pode(sessao,'configuracoes')&&!pode(sessao,'whatsapp'))await requireAcesso('configuracoes');
   return <>{children}</>;
 }

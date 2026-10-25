@@ -79,3 +79,57 @@ excecoes:
     dono: Lider de Dados
     adr: ADR-012
     motivo: nome do artefato de IA (agente, skill ou workflow, identificador de ferramenta), nao de pessoa natural
+
+  - guarda: GA-05
+    objeto: fk_mens_membro_usuario
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.usuarios; preserva identidade sem cadastro duplicado
+
+  - guarda: GA-05
+    objeto: fk_mens_conversa_parte
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.parte; preserva identidade sem cadastro duplicado
+
+  - guarda: GA-05
+    objeto: fk_mens_conversa_responsavel
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.usuarios; preserva identidade sem cadastro duplicado
+
+  - guarda: GA-05
+    objeto: fk_mens_mensagem_autor
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.usuarios; preserva identidade sem cadastro duplicado
+
+  - guarda: GA-05
+    objeto: fk_mens_leitura_usuario
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.usuarios; preserva identidade sem cadastro duplicado
+
+  - guarda: GA-05
+    objeto: fk_mens_comando_autor
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.usuarios; preserva identidade sem cadastro duplicado
+
+  - guarda: GA-05
+    objeto: fk_mens_rascunho_decisor
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.usuarios; preserva identidade sem cadastro duplicado
+
+  - guarda: GA-05
+    objeto: fk_mens_feedback_usuario
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.usuarios; preserva identidade sem cadastro duplicado
+
+  - guarda: GA-05
+    objeto: fk_mens_politica_autor
+    dono: CRO
+    adr: ADR-013
+    motivo: referencia de mensageria ao nucleo public.usuarios; preserva identidade sem cadastro duplicado

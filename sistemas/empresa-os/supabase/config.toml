@@ -4,6 +4,10 @@
 # working directory name when running `supabase init`.
 project_id = "empresa-os-template"
 
+# Webhook Meta autentica a assinatura; mídia e dispatcher autenticam por rota.
+[functions.mensageria]
+verify_jwt = false
+
 [api]
 enabled = true
 # Port to use for the API URL.
