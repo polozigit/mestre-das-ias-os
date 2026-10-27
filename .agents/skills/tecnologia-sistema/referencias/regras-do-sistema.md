@@ -6,7 +6,7 @@ Só fato lido no arquivo. Cada item traz `arquivo:linha`. Não confie em número
 
 - Sem prefixo especial = relativo a `sistemas/empresa-os/` (a pasta do sistema no repositório do aluno; no Polozi-Stack ela é `10-mestre-das-ias/chatgpt-work-codex/empresa-os-template/`). Exemplo: `AGENTS.md:14` é `sistemas/empresa-os/AGENTS.md`, linha 14.
 - `Casa:` = relativo à raiz da Casa do aluno (modelo em `plugins/polozi-fundacao/skills/polozi-criar-empresa-ia/assets/modelo-empresa-ia-v3/`). Exemplo: `Casa:.codex/hooks/guarda.py:185`.
-- `.github/workflows/...` e `.github/dependabot.yml`: nascem em `sistemas/empresa-os/.github/` e a instalação os copia para `.github/` na raiz da Casa (`.github/workflows/ci.yml:2-4`). Os números de linha citados são os do template.
+- `.github/workflows/...` e `.github/dependabot.yml`: nascem em `sistemas/empresa-os/.github/` e a instalação os copia para `.github/` na raiz da Casa (passo `copiar_guardas` de `tecnologia-publicar/scripts/instalar_guardas.py`). Os números de linha citados são os do template.
 - `Fontes:` = o arquivo de fontes oficiais do Polozi-Stack, citado na seção 11.
 - O LEIA-ME do template diz "0001 → 0020" (`LEIA-ME.md:36`), mas existe a `0021_whatsapp_grupo.sql` e `supabase/README.md:33,35` já a lista. Para contar migrations, use o mapa gerado, não o LEIA-ME.
 
@@ -43,7 +43,7 @@ Só fato lido no arquivo. Cada item traz `arquivo:linha`. Não confie em número
 
 - Todo arquivo é idempotente (rodar 2 vezes não quebra nem duplica) e o rollback fica comentado no rodapé do próprio arquivo. `supabase/README.md:127-130`.
 - Cada migration termina num smoke `DO $$`; exceção ali = migration FALHOU. `supabase/README.md:3-7`.
-- Schema mudou: regerar `src/types/supabase.gen.ts` no MESMO commit; `src/types/database.ts` só re-exporta. `AGENTS.md:36-38`. O CI confere que o arquivo está em dia. `.github/workflows/ci.yml:104-106`.
+- Schema mudou: regerar `src/types/supabase.gen.ts` no MESMO commit; `src/types/database.ts` só re-exporta. `AGENTS.md:36-38`. Ninguém confere isso automaticamente (o CI saiu do GitHub em 26/10/2026): com Docker, gere de novo e compare antes do commit.
 - Migration só entra com veredito `APPROVED` (mesmo sha256 do arquivo) em `operacao/vereditos/<nome>.json`. `supabase/README.md:118-125`; o pre-commit bloqueia sem ele ou com sha diferente. `Casa:.githooks/pre-commit:14-43`.
 - Crescer o banco = um módulo por PR, só acrescentando; nada de renomear ou apagar coluna de contrato. `supabase/README.md:45-52`.
 
@@ -52,20 +52,22 @@ Só fato lido no arquivo. Cada item traz `arquivo:linha`. Não confie em número
 - `schemas = ["public", "graphql_public", "tarefas", "organograma"]` no `supabase/config.toml:13` (config do Supabase local).
 - Schema de módulo novo precisa ser exposto no painel do projeto (Project Settings > Data API > Exposed schemas), senão a consulta falha com `PGRST106`. `AGENTS.md:39-41`; passo a passo em `LEIA-ME.md:41-45`.
 
-## 7. CI e automação (GitHub Actions)
+## 7. Checagem e automação
 
-- `ci.yml`: lint (`:48`), tsc (`:49`), testes (`:50`), Postgres local com as migrations em duas rodadas (`:70`, `:81`), pgTAP (`:95`), guardas estáticas (`:98`), tipos em dia (`:104-106`).
-- `deploy-db.yml`: aplica migration em produção ao entrar na `main` (`:6-10`, `supabase db push` em `:46`). "Quem aplica migration em produção é este arquivo, nunca a IA e nunca você na mão." `deploy-db.yml:1-3`.
-- `deploy-db-homologacao.yml`: ensaio por PR que toca migration ou seed, `db push --include-seed` na homologação (`:12-16`, `:61`). O seed nunca vai para produção. `supabase/README.md:39`.
-- `gitleaks.yml`: varredura por PR e diária (`:10-13`), sem gatilho de push (`:4-7`).
-- `keep-alive.yml`: toca o banco 1 vez por dia para o projeto Free não pausar (`:1-4`, `:21`); há um job também para a homologação (`:53`). Se isso evita mesmo a pausa não está provado (`keep-alive.yml:12-16`).
-- `dependabot.yml`: npm semanal e actions mensal (`:6-11`, `:19-21`).
+Decisão de 26/10/2026: no GitHub Actions ficam só os dois workflows que aplicam migration, para a cota grátis (2.000 min/mês em repositório privado) nunca travar a publicação. O resto roda no computador ou na Vercel.
+
+- Checagem antes do merge: `Casa:.agents/skills/tecnologia-publicar/scripts/checar_local.py` (passo 4 da `tecnologia-publicar`): segredo nas linhas novas e arquivo proibido (as regras de `Casa:.githooks/regras-segredo.sh`), veredito de cada migration, `npm run lint`, `npx tsc --noEmit`, `npm test`, guardas estáticas (`tests/test_arquitetura.py`) e, com Docker, migrations em duas rodadas com dado + pgTAP (`scripts/testar-migrations-local.sh`).
+- `deploy-db.yml`: aplica migration em produção ao entrar na `main` (`:11-16`, `supabase db push` em `:100`), só depois do job `vereditos` (`:35`, `needs` em `:83`). "Quem aplica migration em produção é este arquivo, nunca a IA e nunca você na mão." `deploy-db.yml:1-3`.
+- `deploy-db-homologacao.yml`: ensaio por PR que toca migration ou seed, com o mesmo job `vereditos` (`:44`) antes do `db push --include-seed` na homologação (`:118`). O seed nunca vai para produção. `supabase/README.md:39`.
+- Keep-alive: o Cron da Vercel (`vercel.json`, 1 vez por dia, grátis no Hobby) chama `src/app/api/keep-alive/route.ts`, que lê uma linha do banco de produção. A rota só responde com o `CRON_SECRET` (`src/lib/keep-alive.ts`). A homologação não tem toque diário (a Vercel não roda Cron em preview): se pausar, restaure no painel da Supabase. Se uma leitura por dia evita mesmo a pausa não está provado (a Supabase não publica o critério).
+- Cópia do banco: skill `tecnologia-vigiar`, no computador.
+- `dependabot.yml`: npm semanal e actions mensal (`:10`, `:23`). Roda de graça (não conta na cota do Actions).
 
 ## 8. Variáveis e segredos (só nomes)
 
 - Variáveis do sistema (catálogo sem valores): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SITE_URL`, `CURSO_INICIO`, `PREVIEW_TEST_TOKEN`, `PREVIEW_OWNER_EMAIL` (e-mail do dono, só preview). `conexao.md:8-14`. Variável nova de módulo = linha nova no `conexao.md` no mesmo commit. `conexao.md:18`.
 - Segredos de Action no GitHub: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID`. `conexao.md:26-28`.
-- Homologação usa o par `SUPABASE_DB_PASSWORD_HOMOLOG` e `SUPABASE_PROJECT_ID_HOMOLOG` (não estão no `conexao.md`, só nos workflows). `.github/workflows/deploy-db-homologacao.yml:8,41-42` e `.github/workflows/keep-alive.yml:60-61`.
+- Homologação usa o par `SUPABASE_DB_PASSWORD_HOMOLOG` e `SUPABASE_PROJECT_ID_HOMOLOG` (não estão no `conexao.md`, só no workflow). `.github/workflows/deploy-db-homologacao.yml:98-99`.
 - Valores moram em `credenciais/.env` da Casa; produção mora no painel da Vercel; nunca no repo nem no chat. `AGENTS.md:34-35`.
 
 ## 9. Next.js 16, testes e preview

@@ -1,6 +1,11 @@
 # Quem aplica migration em produção é este arquivo, nunca a IA e nunca você
 # na mão. Rodar `supabase db push` fora daqui é o jeito de o schema do banco
 # divergir do que está versionado no repo.
+#
+# Este e o deploy-db-homologacao.yml são os ÚNICOS workflows do kit (decisão
+# 26/10/2026): o resto da checagem roda no computador do dono antes do merge
+# (skill tecnologia-publicar, checar_local.py). Cada execução gasta cerca de
+# 1 minuto da cota grátis do GitHub Actions.
 name: deploy-db
 
 on:
@@ -13,9 +18,8 @@ on:
 permissions:
   contents: read
 
-# DESVIO DELIBERADO do padrão dos outros 3 workflows: cancel-in-progress
-# FALSE. Cancelar um `db push` no meio deixa o schema pela metade — pior do
-# que esperar a fila.
+# DESVIO DELIBERADO do padrão: cancel-in-progress FALSE. Cancelar um
+# `db push` no meio deixa o schema pela metade — pior do que esperar a fila.
 concurrency:
   group: deploy-db
   cancel-in-progress: false
@@ -25,8 +29,58 @@ defaults:
     working-directory: sistemas/empresa-os
 
 jobs:
+  # Última rede antes da produção: toda migration nova ou alterada neste push
+  # precisa de veredito APPROVED com o mesmo sha (veredito.py conferir). Pega o
+  # merge feito sem PR ou sem a skill tecnologia-publicar.
+  vereditos:
+    name: toda migration do push tem veredito
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # O veredito mora na raiz da Casa (operacao/vereditos), não em
+    # sistemas/empresa-os: este job roda da raiz.
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: confere o veredito de cada migration nova ou alterada
+        env:
+          # Vem por env, nunca por ${{ }} dentro do script.
+          ANTES: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          VER=.agents/skills/tecnologia-mudar-banco/scripts/veredito.py
+          if [ ! -f "$VER" ]; then
+            echo "Falta $VER: o time tecnologia nao esta instalado nesta Casa."
+            exit 1
+          fi
+          # Execucao manual (instalador) ou primeiro envio da main: nao ha
+          # intervalo de commits para comparar.
+          if [ -z "$ANTES" ] || [ "$ANTES" = "0000000000000000000000000000000000000000" ]; then
+            echo "Sem commit anterior: nada a conferir."
+            exit 0
+          fi
+          # --no-renames: migration renomeada sai como A (nome novo) e e conferida.
+          lista=$(git diff --name-only --no-renames --diff-filter=ACM "$ANTES" HEAD -- 'sistemas/*/supabase/migrations/*.sql')
+          if [ -z "$lista" ]; then
+            echo "Nenhuma migration neste envio."
+            exit 0
+          fi
+          falhou=0
+          for f in $lista; do
+            echo "conferindo: $f"
+            python3 "$VER" conferir "$f" || falhou=1
+          done
+          if [ "$falhou" != "0" ]; then
+            echo "Ha migration sem veredito valido (motivos acima)."
+            exit 1
+          fi
+
   migrar:
     name: aplica migrations em produção
+    needs: vereditos
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Só o nome — approval de environment é recurso pago. Serve pra agrupar

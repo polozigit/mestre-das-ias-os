@@ -1,4 +1,4 @@
-# Regras da varredura de segredo do GitHub (workflow gitleaks).
+# Regras para quem roda o gitleaks na própria máquina (`gitleaks git --config .gitleaks.toml`).
 # Soma as regras prontas do gitleaks com as chaves do padrão da Casa: cada regra
 # abaixo espelha uma alternativa de PADRAO_SEGREDO em .githooks/regras-segredo.sh.
 # Mexeu num lado? Mexa no outro (um teste confere que os dois andam juntos).

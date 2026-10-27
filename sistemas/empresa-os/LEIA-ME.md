@@ -122,12 +122,15 @@ pra ver o que ele faz), Marca, Usuários (convidar sócio/esposa), Atividade e C
 (claro, escuro ou o do aparelho); no desktop o menu lateral recolhe, e no
 celular ele abre como gaveta pelo botão do canto.
 
-**9. Guardas.** O sistema ganha arquivos de vigilância automática: PR
-checado antes de mergear, com o veredito de cada migration conferido
-(`ci.yml`), migration só chega em produção pela Action (`deploy-db.yml`, com
-ensaio antes em `deploy-db-homologacao.yml`), segredo vazado vira alarme
-(`gitleaks.yml`), o banco é tocado todo dia para o projeto Free não pausar
-(`keep-alive.yml`) e a cópia semanal do banco (`backup-db.yml`). Eles nascem
+**9. Guardas.** A checagem antes do merge (segredo, veredito de cada
+migration, lint, tsc, testes e banco local) roda no computador, pela skill
+`tecnologia-publicar` (`checar_local.py`), e não gasta a cota grátis do GitHub
+Actions. No GitHub ficam só dois arquivos: migration chega em produção pela
+Action (`deploy-db.yml`, com ensaio antes em `deploy-db-homologacao.yml`), e
+as duas conferem o veredito de cada migration antes de aplicar. O banco é
+tocado todo dia para o projeto Free não pausar pelo Cron da Vercel
+(`vercel.json` chama `/api/keep-alive`, protegido pelo `CRON_SECRET` que o
+instalador cria). Os dois workflows nascem
 dentro de `sistemas/empresa-os/.github/`: nesse lugar são arquivo morto,
 porque o GitHub só lê `.github/` da RAIZ do repositório da Casa. A única forma
 suportada de ligá-los é a seção "Primeira vez neste sistema" da skill
@@ -141,8 +144,8 @@ python3 .agents/skills/tecnologia-publicar/scripts/instalar_guardas.py --casa "<
 Na instalação pelo instalador, ele já roda no passo 7; aqui só confira o bloco `DEPLOY` de `operacao/INSTALACAO.md`.
 
 **Token da Supabase (`SUPABASE_ACCESS_TOKEN`).** O `instalar_guardas.py` grava
-esse token nos Secrets do GitHub (`deploy-db.yml`, `backup-db.yml` e
-`keep-alive.yml` dependem dele). Se ele
+esse token nos Secrets do GitHub (`deploy-db.yml` e
+`deploy-db-homologacao.yml` dependem dele). Se ele
 ainda não estiver em `credenciais/.env`, o dono cria no painel da Supabase
 (Account > Access Tokens) e a IA captura por `$polozi-registrar-conexao`. Na
 criação: validade **"Never"** (nunca expira), senão a automação para sozinha no

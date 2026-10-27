@@ -7,6 +7,12 @@
 # secrets de producao. Usa o MESMO SUPABASE_ACCESS_TOKEN (e da conta) e o par
 # *_HOMOLOG. SUPABASE_PROJECT_ID (producao) entra SO pra comparar: o passo
 # abaixo derruba o job se a homologacao estiver vazia ou for igual a producao.
+#
+# Este e o deploy-db.yml sao os UNICOS workflows do kit (decisao 26/10/2026):
+# lint, tsc, testes, banco local e varredura de segredo rodam no computador do
+# dono, pela skill tecnologia-publicar (checar_local.py), antes do merge. Assim
+# a cota gratis do GitHub Actions (2.000 min/mes em repositorio privado) so
+# gasta quando uma migration chega no banco, cerca de 1 minuto por vez.
 name: deploy-db-homologacao
 
 on:
@@ -31,8 +37,59 @@ defaults:
     working-directory: sistemas/empresa-os
 
 jobs:
+  # Fecha a lacuna do hook de commit da Casa, que dá pra contornar: a migration
+  # só chega na homologação se cada migration nova ou alterada da PR tem
+  # veredito APPROVED, com o mesmo sha do arquivo e, se destrutiva, com o "sim"
+  # do dono (veredito.py conferir).
+  vereditos:
+    name: toda migration da PR tem veredito
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # O veredito mora na raiz da Casa (operacao/vereditos), não em
+    # sistemas/empresa-os: este job roda da raiz.
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: confere o veredito de cada migration nova ou alterada
+        env:
+          # Vem por env, nunca por ${{ }} dentro do script: o nome da branch
+          # não pode virar comando.
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          VER=.agents/skills/tecnologia-mudar-banco/scripts/veredito.py
+          if [ ! -f "$VER" ]; then
+            echo "Falta $VER: o time tecnologia nao esta instalado nesta Casa."
+            exit 1
+          fi
+          if [ -z "$BASE_REF" ]; then
+            echo "Execucao manual: nao ha PR, nada a conferir."
+            exit 0
+          fi
+          git fetch --no-tags origin "$BASE_REF"
+          # --no-renames: migration renomeada sai como A (nome novo) e e conferida.
+          lista=$(git diff --name-only --no-renames --diff-filter=ACM "origin/$BASE_REF...HEAD" -- 'sistemas/*/supabase/migrations/*.sql')
+          if [ -z "$lista" ]; then
+            echo "Nenhuma migration na PR."
+            exit 0
+          fi
+          falhou=0
+          for f in $lista; do
+            echo "conferindo: $f"
+            python3 "$VER" conferir "$f" || falhou=1
+          done
+          if [ "$falhou" != "0" ]; then
+            echo "Ha migration sem veredito valido (motivos acima)."
+            exit 1
+          fi
+
   homologar:
     name: aplica migrations e dado de exemplo na homologação
+    needs: vereditos
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: homologacao
