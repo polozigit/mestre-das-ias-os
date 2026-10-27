@@ -1,7 +1,7 @@
 # Regras de segredo da Empresa IA, num lugar só.
 # Não roda sozinho: o pre-commit e o pre-push fazem `. regras-segredo.sh`.
 # Só usa o que há em todo git (sh, grep, sed): funciona no Mac e no Git Bash do
-# Windows. O .gitleaks.toml (varredura do GitHub) espelha o padrão de chave daqui.
+# Windows. O .gitleaks.toml (para quem roda o gitleaks na máquina) espelha o padrão de chave daqui.
 
 # --- 1. Padrão de chave/segredo (grep -E) -----------------------------------
 # Uma alternativa por tipo de chave. O sk- exige que nada alfanumérico venha

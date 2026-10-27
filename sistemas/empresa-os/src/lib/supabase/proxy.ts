@@ -96,7 +96,9 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/auth") ||
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico" ||
-    pathname === "/sem-acesso";
+    pathname === "/sem-acesso" ||
+    // Cron da Vercel: não segue redirect e não tem login. A própria rota exige o CRON_SECRET.
+    pathname === "/api/keep-alive";
 
   if (!user && !isPublic) {
     return redirecionar("/login");

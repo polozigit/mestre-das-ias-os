@@ -1,5 +1,6 @@
-# PR do Dependabot passa pelo ci.yml igual às outras — pode simplesmente
-# fechar sem medo se não quiser atualizar agora.
+# O Dependabot roda de graça (não gasta a cota do GitHub Actions). A PR dele
+# passa pela checagem local da skill tecnologia-publicar antes do merge, igual
+# às outras; pode simplesmente fechar sem medo se não quiser atualizar agora.
 version: 2
 
 updates:

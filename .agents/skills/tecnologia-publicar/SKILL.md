@@ -17,7 +17,7 @@ Detalhes e `arquivo:linha` em `.agents/skills/tecnologia-sistema/referencias/reg
 - O hook da Casa recusa push na `main` (regra r02) só quando o sistema já está publicado em produção, sinal: existe `sistemas/empresa-os/.vercel/project.json`. Sem esse arquivo a `main` é a branch de trabalho e pode ser salva direto. O hook também recusa `vercel --prod/promote/rollback` (r04), `supabase db push` (r03) e, com produção publicada, editar `sistemas/` na branch principal (r11).
 - Quem aplica migration em produção é a Action `deploy-db.yml`, ao entrar na `main`. Nunca a IA e nunca na mão.
 - Branch gera preview na Vercel; merge na `main` gera produção.
-- A `main` do repositório privado no plano grátis não obriga check verde. Por isso o passo 6 espera os checks por conta própria antes do merge.
+- A checagem roda no computador, não no GitHub (decisão de 26/10/2026): o passo 4 roda `checar_local.py` (segredo, vereditos, lint, tsc, testes, guardas e banco local). No GitHub Actions ficam só os dois workflows que aplicam migration (`deploy-db.yml` e `deploy-db-homologacao.yml`, cerca de 1 minuto cada), para a cota grátis nunca travar a publicação.
 
 ## Salvar (Casa sem sistema no ar)
 
@@ -63,14 +63,19 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
 
    **3b. Migrations.** Se a lista toca `sistemas/*/supabase/migrations/*.sql`, para cada arquivo rode os dois, e guarde a saída e o código de saída de cada um para o passo 5: `python3 .agents/skills/tecnologia-mudar-banco/scripts/classificar_migration.py <sql>` (0 = acrescenta, 1 = destrutiva; o 1 só informa a classe, não é erro) e `python3 .agents/skills/tecnologia-mudar-banco/scripts/veredito.py conferir <sql>`. Qualquer problema (sem veredito, sha diferente, BLOCKED, destrutiva sem o "sim" do dono) = pare e chame a skill `tecnologia-mudar-banco`. Não siga.
 
-4. **Testes locais.** Se a lista toca `sistemas/empresa-os/`, rode num subshell para não mudar a pasta de trabalho: `(cd sistemas/empresa-os && npm run lint && npx tsc --noEmit && npm test)`. Sem `sistemas/empresa-os/node_modules` (a instalação só baixa o pacote do setup), rode `npm install` ali uma vez antes. Vermelho = pare, corrija, commite de novo (passo 2) e repita desde o passo 3.
+4. **Checagem local** (o que o GitHub Actions fazia antes, agora no computador). Na raiz da Casa: `git fetch --no-tags origin main` e depois `python3 .agents/skills/tecnologia-publicar/scripts/checar_local.py`. Ele confere só o que a branch mudou: segredo nas linhas novas e arquivo proibido, veredito de cada migration, `npm run lint` + `npx tsc --noEmit` + `npm test` (se mexe em `sistemas/empresa-os/`; instala as dependências sozinho na primeira vez), guardas de arquitetura e, com Docker ligado, as migrations num Postgres local com dado. Cada item sai `OK`, `FALHOU` ou `PULADO`.
+   - Saída 0 = siga. Guarde as linhas da saída: vão no texto da PR (passo 6).
+   - Saída 1 = pare, corrija o item `FALHOU`, commite de novo (passo 2) e repita desde o passo 3. Nunca siga com `FALHOU`.
+   - Saída 2 = a mensagem `PARE:` diz o que falta (em geral o `git fetch`).
+   - `PULADO banco` por falta de Docker é normal: quem prova a migration com dado é a homologação, no passo 6.
 
 5. **Revisão independente.** Só se a lista do passo 2 toca `sistemas/` ou o 3a deu saída 1 (arquivo protegido); senão pule este passo (o subagente começa sem contexto e custa tokens; documento e operação não passam por ele). Chame o subagente `tecnologia-revisor-seguranca` passando `chamado_por: tecnologia-publicar`, a lista do passo 2, o texto do diff (`git diff --no-renames origin/main...HEAD`), a saída do `arquivos_protegidos.py` (passo 3a, campo `arquivos_protegidos`), o `ok_do_dono` do 3a quando houver, e, para cada migration da lista, o caminho, a classificação (`classificar_migration.py`) e a saída, com o código de saída, do `veredito.py conferir` do passo 3b. O revisor só lê e não roda comando: sem esses dados ele devolve BLOCKED. BLOCKED = UMA correção: corrija, commite de novo, repita os passos 3 e 4 (a correção pode mudar o sha da migration e quebrar o veredito) e chame o mesmo revisor UMA vez só para conferir os achados corrigidos. BLOCKED de novo = PARE, não faça merge, registre o motivo em `operacao/PENDENCIAS.md` e conte ao dono em 1 linha. Nunca faça uma 3ª chamada ao revisor (teto do kit: 1 revisão + 1 correção por etapa, nunca em loop). Nunca siga com BLOCKED.
 
 6. **Push, PR e checks.**
    - `git push -u origin HEAD`.
    - PR: `gh pr create --fill --base main`. Se houve OK do passo 3a, crie com texto próprio para o OK ficar registrado: escreva num arquivo temporário (`T=$(mktemp)`, no mesmo comando) o resumo da mudança, a lista dos arquivos protegidos e a linha `OK do dono para arquivo protegido: <nome> em <AAAA-MM-DD>: <frase literal>`, e rode `gh pr create --base main --title "<o que mudou>" --body-file "$T"`.
-   - Espere os checks. Logo depois de criar a PR, o GitHub pode responder "no checks reported" porque os checks ainda não começaram; o bloco tenta de novo:
+   - Ponha no texto da PR as linhas `OK`/`PULADO` do `checar_local.py` (passo 4): é a prova de que a checagem rodou. Sem migration na lista, não há teste no GitHub para esperar: siga ao passo 7.
+   - **Só se a lista toca `sistemas/*/supabase/migrations/**` ou `seed_exemplo.sql`:** a Action `deploy-db-homologacao` confere os vereditos e aplica a migration com dado na homologação. Espere ela. Logo depois de criar a PR, o GitHub pode responder "no checks reported" porque ainda não começou; o bloco tenta de novo:
      ```bash
      B=<branch>; N=$(gh pr list --head "$B" --state open --json number --jq '.[0].number // empty')
      if [ -z "$N" ]; then echo "PARE: nenhuma PR aberta para $B"; else
@@ -78,8 +83,8 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
        gh pr checks "$N" --watch; echo "PR $N: checks saída $?"
      fi
      ```
-     Saída 0 = todos verdes. Ainda "no checks reported" depois das 6 tentativas = os testes automáticos do GitHub não começaram: não faça merge; diga ao dono "os testes automáticos do GitHub não começaram; estou olhando".
-   - Check vermelho: pegue o id da execução que falhou com `gh run list --branch <branch> --status failure --limit 1 --json databaseId --jq '.[0].databaseId'` e leia com `gh run view <id> --log-failed`. Corrija, commite (passo 2) e volte ao passo 3. Só avance com todos verdes.
+     Saída 0 = verde. Ainda "no checks reported" depois das 6 tentativas = a Action não começou (cota do GitHub Actions acabou ou Actions desligado no repositório): não faça merge de migration; diga ao dono "a atualização do banco de teste não começou no GitHub; estou olhando".
+   - Vermelho: pegue o id da execução que falhou com `gh run list --branch <branch> --status failure --limit 1 --json databaseId --jq '.[0].databaseId'` e leia com `gh run view <id> --log-failed`. Corrija, commite (passo 2) e volte ao passo 3. Só avance com verde.
 
 7. **Link do preview e "aprovado" do dono.** Pegue o link do preview da Vercel (comentário do bot na PR: `gh pr view <branch> --json comments`).
    - **Mudança que mexe em tela:** o dono vê o resultado antes de ir ao ar. Primeira resposta, em linguagem simples: "Abra este link, olhe a tela que mudou e responda aprovado se estiver certo: <link>". Espere o "aprovado" escrito no chat e só então siga ao passo 8. Se o dono pedir ajuste, volte ao passo 2 na mesma PR (o link se atualiza). Nunca peça para criar usuário, convidar membro de teste ou guardar senha: o preview entra como o dono, sem senha.
@@ -108,7 +113,7 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
    B=<branch>; N=$(gh pr list --head "$B" --state open --json number --jq '.[0].number // empty')
    if [ -z "$N" ]; then echo "PARE: nenhuma PR aberta para $B"; else gh pr merge "$N" --squash --delete-branch; gh pr view "$N" --json state --jq .state; fi
    ```
-   Vale o `state`, não o código de saída do `gh pr merge`: num worktree ele pode dar erro DEPOIS do merge feito (ao tentar trocar a pasta para a `main`, aberta em outra pasta). `MERGED` = mesclado; outra coisa = não mesclou, leia a mensagem. Não use `--auto` (o plano grátis não tem check obrigatório; por isso o passo 6 já esperou). Exceção: PR com migration `destrutiva` só entra depois do "sim" do dono gravado no veredito (o passo 3b garante isso), e PR com arquivo protegido só com o OK do passo 3a no texto da PR. Sem isso, não faça merge.
+   Vale o `state`, não o código de saída do `gh pr merge`: num worktree ele pode dar erro DEPOIS do merge feito (ao tentar trocar a pasta para a `main`, aberta em outra pasta). `MERGED` = mesclado; outra coisa = não mesclou, leia a mensagem. Não use `--auto` (não há check obrigatório; a checagem já rodou no passo 4 e, com migration, a homologação no passo 6). Exceção: PR com migration `destrutiva` só entra depois do "sim" do dono gravado no veredito (o passo 3b garante isso), e PR com arquivo protegido só com o OK do passo 3a no texto da PR. Sem isso, não faça merge.
 
 9. **Esperar o deploy certo e conferir a produção.** Checar logo depois do merge pode pegar a versão antiga ou um deploy ainda em construção. Se a lista do passo 2 NÃO toca `sistemas/` (só documento, operação ou instrução), não há site novo: faça só o 9.1 e vá ao passo 11 ("salvo"). Cada bloco recalcula o commit a partir de `<branch>` (na volta do passo 10, `<branch>` é a `volta/...`).
    1. Commit do merge:
@@ -196,7 +201,8 @@ Use o Python de `operacao/INSTALACAO.md` (campo `comando_python`; no Windows cos
 | `owner_email` | Publica `PREVIEW_OWNER_EMAIL` (o e-mail do dono, lido do `email_dono:` de `operacao/INSTALACAO.md`) no preview, com o valor num arquivo temporário. Sem e-mail válido o passo fica `NAO-MEDIDO` e a instalação segue; rode o instalador de novo quando o e-mail do dono estiver no `INSTALACAO.md`. |
 | `bypass_automacao` | Cria o "Protection Bypass for Automation" do projeto pela API da Vercel (`vercel api ... --input -`, segredo por STDIN) e guarda `VERCEL_AUTOMATION_BYPASS_SECRET` em `credenciais/.env`. A prévia continua protegida: a proteção nunca é desligada. A Vercel recusou: `NAO-MEDIDO` e a prévia abre no Chrome do dono, logado na Vercel. |
 | `conferir_integracao_supabase` | Confere pelos NOMES (`vercel env ls`) que as três variáveis do banco estão na Vercel; quem as grava é a `tecnologia-conectar` (`vercel-env`). Nunca imprime valor. |
-| `copiar_guardas` | Copia os workflows e o `dependabot.yml` de `sistemas/empresa-os/.github/` para o `.github/` da raiz, o único lugar onde o GitHub os lê (`ci`, `deploy-db`, `deploy-db-homologacao`, `gitleaks`, `keep-alive`, `backup-db`). |
+| `cron_secret` | Cria o `CRON_SECRET` na produção da Vercel, por arquivo temporário. A Vercel chama `/api/keep-alive` 1 vez por dia (`vercel.json`, grátis no Hobby) e a rota só responde com esse segredo: é o que impede o banco grátis da Supabase de pausar. Já existe: mantém. O valor fica só na Vercel. |
+| `copiar_guardas` | Copia os workflows e o `dependabot.yml` de `sistemas/empresa-os/.github/` para o `.github/` da raiz, o único lugar onde o GitHub os lê (`deploy-db` e `deploy-db-homologacao`). Apaga da raiz os que saíram do kit em 26/10/2026 (`ci`, `gitleaks`, `keep-alive`, `backup-db`), que gastariam a cota grátis do GitHub Actions. |
 | `gravar_secrets` | `gh secret set` dos três segredos da automação, sempre por arquivo temporário. |
 | `ligar_dependabot` | Liga alerta de vulnerabilidade e correção automática no repositório. |
 
@@ -210,9 +216,9 @@ As variáveis do banco na Vercel são da `tecnologia-conectar` (`vercel-env`), n
 
 **4. Salvar o que o script mudou.** O script grava `.github/` e `operacao/INSTALACAO.md`, e como a Casa já tem produção publicada o caminho é o dos `## Passos`: branch curta, commit só desses caminhos, PR e merge. `.github/` é arquivo protegido: faça o passo 3a (diga que são "os testes automáticos e a publicação do GitHub" e pergunte "Posso mudar isso? Responda sim ou não."). Sem o "sim" gravado, não publique esses arquivos.
 
-**5. Provar o backup uma vez**, depois do merge: `gh workflow run backup-db.yml`, depois `gh run list --workflow backup-db.yml --limit 1` e `gh run watch <id>`. O workflow recusa repositório público (a cópia tem dado de cliente) e só guarda o arquivo como artefato por 14 dias. Run vermelho: o motivo está no log (`gh run view <id> --log-failed`), conte ao dono sem prometer cópia que não existe. O `deploy-db.yml` ainda NÃO chama o backup antes de migrar; isso entra só depois de um run verde.
+A cópia do banco é da skill `tecnologia-vigiar` (no computador, na pasta principal), não do GitHub.
 
-Não faz: mexer em ruleset ou proteção de branch (o plano grátis do repositório privado não impõe check; por isso o passo 6 dos `## Passos` espera os checks sozinho), girar chave e publicar em produção.
+Não faz: mexer em ruleset ou proteção de branch (a checagem é a do passo 4 dos `## Passos`, no computador), girar chave e publicar em produção.
 
 ## Nunca
 

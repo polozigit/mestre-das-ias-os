@@ -12,6 +12,7 @@
 | `CURSO_INICIO` | data do Dia 1 do curso (AAAA-MM-DD, opcional; padrão = hoje). Ancora o cronograma instanciado por `scripts/setup-inicial.mjs` | credenciais/.env (uso no setup) | setup |
 | `PREVIEW_TEST_TOKEN` | token da conferência opcional: `?preview_token=` abre sessão do DONO no PREVIEW (a IA olha só a tela alterada) | CLI (`vercel env add`, só preview) | SÓ preview |
 | `PREVIEW_OWNER_EMAIL` | e-mail do dono: com o token certo, o preview gera um link mágico dele no servidor (chave de serviço, sem e-mail enviado e sem senha) | CLI (`vercel env add`, só preview; publicado pelo instalador a partir do `operacao/INSTALACAO.md`) | SÓ preview |
+| `CRON_SECRET` | segredo que a Vercel manda no `Authorization: Bearer` ao chamar o keep-alive diário (`/api/keep-alive`, `vercel.json`); sem ele a rota recusa e o banco Free pode pausar | CLI (`vercel env add`, só production; criado pelo instalador, passo `cron_secret`, valor só na Vercel) | SÓ produção |
 
 Regras: produção IGNORA o par de preview por construção (`VERCEL_ENV`);
 rotacione `PREVIEW_TEST_TOKEN` quando quiser (é só trocar no painel);
@@ -28,6 +29,6 @@ aceitos. O teste `config/supabase-env.test.ts` reprova leitura direta e `NEXT_PU
 
 | Secret | O que é | Onde vive | Quem usa |
 |---|---|---|---|
-| `SUPABASE_ACCESS_TOKEN` | token pessoal de acesso à CLI/API da Supabase. Ao criar: validade "Never" (nunca expira; senão a automação para sozinha), escopo mínimo; quem pegar usa até ser revogado, vazou = revoga e cria outro | Secrets do repositório no GitHub, gravados por `gh secret set` a partir de arquivo | `deploy-db.yml` e `keep-alive.yml` |
-| `SUPABASE_DB_PASSWORD` | senha do Postgres do projeto (usada pelo `supabase link`/`db push`) | Secrets do repositório no GitHub, gravados por `gh secret set` a partir de arquivo | `deploy-db.yml` e `keep-alive.yml` |
-| `SUPABASE_PROJECT_ID` | ref do projeto Supabase (`--project-ref`) | Secrets do repositório no GitHub, gravados por `gh secret set` a partir de arquivo | `deploy-db.yml` e `keep-alive.yml` |
+| `SUPABASE_ACCESS_TOKEN` | token pessoal de acesso à CLI/API da Supabase. Ao criar: validade "Never" (nunca expira; senão a automação para sozinha), escopo mínimo; quem pegar usa até ser revogado, vazou = revoga e cria outro | Secrets do repositório no GitHub, gravados por `gh secret set` a partir de arquivo | `deploy-db.yml` (e `deploy-db-homologacao.yml`) |
+| `SUPABASE_DB_PASSWORD` | senha do Postgres do projeto (usada pelo `supabase link`/`db push`) | Secrets do repositório no GitHub, gravados por `gh secret set` a partir de arquivo | `deploy-db.yml` |
+| `SUPABASE_PROJECT_ID` | ref do projeto Supabase (`--project-ref`) | Secrets do repositório no GitHub, gravados por `gh secret set` a partir de arquivo | `deploy-db.yml` (e `deploy-db-homologacao.yml`) |

@@ -5,7 +5,7 @@ e1-workflows-github.spec.json, + G11 (TEMPLATE_DEV nunca no kit).
 DESVIO registrado (ver relatório do construtor): a spec pedia
 `yaml.safe_load`. PyYAML não está instalado neste ambiente e instalar via
 pip exigiria `--break-system-packages` (efeito colateral na máquina,
-fora do escopo desta spec). Os 4 workflows + dependabot.yml são simples o
+fora do escopo desta spec). Os 2 workflows + dependabot.yml são simples o
 bastante para checar por texto/regex de forma determinística — cada guarda
 abaixo replica exatamente o que a spec descreve, sem depender de parser YAML.
 """
@@ -23,14 +23,13 @@ RAIZ = Path(__file__).resolve().parent.parent
 WORKFLOWS_DIR = RAIZ / ".github" / "workflows"
 DEPENDABOT = RAIZ / ".github" / "dependabot.yml"
 
-CI = WORKFLOWS_DIR / "ci.yml"
 DEPLOY_DB = WORKFLOWS_DIR / "deploy-db.yml"
-GITLEAKS = WORKFLOWS_DIR / "gitleaks.yml"
-KEEP_ALIVE = WORKFLOWS_DIR / "keep-alive.yml"
 DEPLOY_DB_HOMOLOG = WORKFLOWS_DIR / "deploy-db-homologacao.yml"
-BACKUP_DB = WORKFLOWS_DIR / "backup-db.yml"
 
-TODOS_WORKFLOWS = [CI, DEPLOY_DB, GITLEAKS, KEEP_ALIVE, DEPLOY_DB_HOMOLOG, BACKUP_DB]
+# Decisão 26/10/2026: só os dois workflows que aplicam migration ficam no
+# GitHub Actions; lint, tsc, testes, banco local e segredo rodam no computador
+# do dono (tecnologia-publicar, checar_local.py).
+TODOS_WORKFLOWS = [DEPLOY_DB, DEPLOY_DB_HOMOLOG]
 
 SECRETS_DEPLOY = {"SUPABASE_ACCESS_TOKEN", "SUPABASE_DB_PASSWORD", "SUPABASE_PROJECT_ID"}
 SECRETS_HOMOLOG = {"SUPABASE_PROJECT_ID_HOMOLOG", "SUPABASE_DB_PASSWORD_HOMOLOG"}
@@ -132,15 +131,6 @@ def test_nenhum_push_sem_filtro_de_branch_e_paths():
 # ---------------------------------------------------------------------------
 
 
-def test_ci_tem_os_quatro_comandos_e_o_diff_de_tipos():
-    texto = _texto(CI)
-    for comando in ("npm ci", "npm run lint", "npx tsc --noEmit", "npm test"):
-        assert comando in texto, f"ci.yml não roda '{comando}'"
-    assert "git diff --exit-code src/types/supabase.gen.ts" in texto, (
-        "ci.yml não fecha o contrato de tipos (git diff --exit-code do supabase.gen.ts)"
-    )
-
-
 # ---------------------------------------------------------------------------
 # G3
 # ---------------------------------------------------------------------------
@@ -156,12 +146,6 @@ def test_deploy_db_usa_exatamente_os_tres_secrets():
 # ---------------------------------------------------------------------------
 # G4
 # ---------------------------------------------------------------------------
-
-
-def test_gitleaks_sem_push_e_com_historico_completo():
-    texto = _texto(GITLEAKS)
-    assert re.search(r"(?m)^\s*push:\s*$", texto) is None, "gitleaks.yml nunca pode ter gatilho push"
-    assert "fetch-depth: 0" in texto, "gitleaks.yml precisa de fetch-depth: 0 (varredura é de commits)"
 
 
 # ---------------------------------------------------------------------------
@@ -185,17 +169,8 @@ def test_nenhum_run_interpola_secrets():
 
 def test_working_directory_e_sempre_sistemas_empresa_os():
     for wf in TODOS_WORKFLOWS:
-        texto = _texto(wf)
-        if wf == GITLEAKS:
-            # Varre o repositório inteiro com o .gitleaks.toml da raiz da Casa (#1445): não tem
-            # working-directory. Este teste não rodava no CI e ficou vermelho desde então.
-            assert not re.findall(r"working-directory:", _texto_sem_comentarios(wf)), (
-                "gitleaks.yml varre a raiz da Casa: não declare working-directory nele"
-            )
-            continue
-        if wf == CI:
-            # O job `vereditos` é a única exceção: o veredito mora na raiz da Casa (G19).
-            texto = _sem_job(texto, "vereditos")
+        # O job `vereditos` é a única exceção: o veredito mora na raiz da Casa (G19).
+        texto = _sem_job(_texto(wf), "vereditos")
         valores = re.findall(r"working-directory:\s*(\S+)", texto)
         assert valores, f"{wf.name} não declara defaults.run.working-directory"
         for v in valores:
@@ -228,20 +203,6 @@ def test_actionlint_sem_erro():
 # ---------------------------------------------------------------------------
 # G8
 # ---------------------------------------------------------------------------
-
-
-def test_keep_alive_tem_schedule_e_nao_faz_parsing_de_api_keys():
-    texto = _texto(KEEP_ALIVE)
-    assert re.search(r"(?m)^\s*schedule:\s*$", texto), "keep-alive.yml precisa do gatilho schedule"
-    assert _secrets_usados(texto) == SECRETS_DEPLOY | SECRETS_HOMOLOG, (
-        f"keep-alive.yml deveria usar exatamente {SECRETS_DEPLOY | SECRETS_HOMOLOG}, achei {_secrets_usados(texto)}"
-    )
-    assert re.search(r"(?m)^  homologacao:\s*$", texto), "keep-alive.yml precisa do 2o job `homologacao` (cada projeto Free pausa sozinho)"
-    texto_codigo = _texto_sem_comentarios(KEEP_ALIVE)
-    for proibido in ("projects api-keys", "jq ", "curl "):
-        assert proibido not in texto_codigo, (
-            f"keep-alive.yml voltou a usar '{proibido}' fora de comentário (desenho morto por n52)"
-        )
 
 
 # ---------------------------------------------------------------------------
@@ -323,31 +284,6 @@ def test_dependabot_existe_e_aponta_pro_sistema():
 
 
 # ---------------------------------------------------------------------------
-# G17 — CI do banco na ordem certa e nunca contra projeto ligado (E3-14).
-# ---------------------------------------------------------------------------
-
-
-def _job_banco(texto: str) -> str:
-    # Para no próximo job (G19 acrescentou `vereditos` depois dele), não só no fim do arquivo.
-    m = re.search(r"(?ms)^  banco:\s*\n(.*?)(?=^  \S|^\S|\Z)", texto)
-    assert m, "ci.yml sem o job `banco` (Deployment Checks amarra pelo nome)"
-    return m.group(1)
-
-
-def test_ci_banco_seed_antes_da_rodada_2_e_pgtap_local():
-    banco = _job_banco(_texto_sem_comentarios(CI))
-    i_start = banco.index("supabase db start")
-    i_seed = banco.index("supabase/seed_exemplo.sql")
-    i_loop = banco.index("for f in supabase/migrations/*.sql")
-    i_test = banco.index("supabase test db")
-    assert i_start < i_seed < i_loop < i_test, (
-        "ordem do job banco: supabase db start -> seed_exemplo.sql -> rodada 2 das migrations -> supabase test db"
-    )
-    assert "supabase test db --local supabase/tests" in banco, "pgTAP: caminho EXPLICITO e --local"
-    assert "--linked" not in banco, "o job banco nunca pode rodar contra projeto ligado (--linked)"
-
-
-# ---------------------------------------------------------------------------
 # G18 — homologacao nunca escreve em producao; producao nunca recebe seed (E3-12).
 # ---------------------------------------------------------------------------
 
@@ -380,97 +316,60 @@ def test_producao_nunca_recebe_seed():
 
 
 # ---------------------------------------------------------------------------
-# G19 — toda migration da PR tem veredito (job `vereditos` do ci.yml).
-# O hook de commit da Casa dá pra contornar; este job fecha a lacuna na PR.
+# G19 — toda migration nova ou alterada tem veredito antes de chegar no banco.
+# O hook de commit da Casa dá pra contornar; o job `vereditos` fecha a lacuna
+# na homologação (PR) e na produção (push na main), e o job que aplica espera
+# por ele (needs).
 # ---------------------------------------------------------------------------
 
 
-def test_ci_vereditos_confere_toda_migration_nova_ou_alterada_da_pr():
-    job = _job(_texto_sem_comentarios(CI), "vereditos")
-    assert "fetch-depth: 0" in job, "sem histórico completo o diff contra a base não existe"
+@pytest.mark.parametrize("wf", TODOS_WORKFLOWS, ids=lambda p: p.name)
+def test_vereditos_confere_toda_migration_nova_ou_alterada(wf):
+    job = _job(_texto_sem_comentarios(wf), "vereditos")
+    assert "fetch-depth: 0" in job, "sem histórico completo o diff não existe"
     assert ".agents/skills/tecnologia-mudar-banco/scripts/veredito.py" in job
     assert 'python3 "$VER" conferir "$f"' in job, "o job tem de rodar veredito.py conferir em cada migration"
     assert "--no-renames" in job, "sem isso migration renomeada sairia como R e escaparia do filtro"
     assert "--diff-filter=ACM" in job
     assert "'sistemas/*/supabase/migrations/*.sql'" in job
     assert "|| falhou=1" in job and 'if [ "$falhou" != "0" ]' in job, "veredito inválido tem de derrubar o job"
-
-
-def test_ci_vereditos_sem_o_script_do_time_falha_antes_de_decidir_que_nao_ha_pr():
-    job = _job(_texto_sem_comentarios(CI), "vereditos")
     i_falta = job.index('if [ ! -f "$VER" ]')
-    i_sem_pr = job.index('if [ -z "$BASE_REF" ]')
-    i_fetch = job.index("fetch --no-tags origin")
-    assert i_falta < i_sem_pr < i_fetch
-    assert "exit 1" in job[i_falta:i_sem_pr], "sem o veredito.py o job precisa falhar, não passar calado"
-    assert "exit 0" in job[i_sem_pr:i_fetch], "execução manual (sem PR) não tem o que conferir"
+    assert "exit 1" in job[i_falta:job.index("fi", i_falta)], "sem o veredito.py o job precisa falhar, não passar calado"
 
 
-def test_ci_vereditos_nome_da_branch_vai_por_env_e_nunca_dentro_do_script():
-    job = _job(_texto_sem_comentarios(CI), "vereditos")
-    assert "BASE_REF: ${{ github.base_ref }}" in job
+@pytest.mark.parametrize("wf", TODOS_WORKFLOWS, ids=lambda p: p.name)
+def test_vereditos_sem_expressao_do_github_dentro_do_script(wf):
+    job = _job(_texto_sem_comentarios(wf), "vereditos")
     corpos = _run_bodies(job)
     assert corpos, "o job vereditos não tem passo run"
     for corpo in corpos:
         assert "${{" not in corpo, f"expressão do GitHub dentro do script (injeção pelo nome da branch):\n{corpo}"
+    assert re.findall(r"working-directory:\s*(\S+)", job) == ["."], "vereditos roda da raiz da Casa"
 
 
-def test_ci_vereditos_e_o_unico_job_que_roda_fora_de_sistemas_empresa_os():
-    texto = _texto_sem_comentarios(CI)
-    assert re.findall(r"working-directory:\s*(\S+)", _job(texto, "vereditos")) == ["."]
-    assert set(re.findall(r"working-directory:\s*(\S+)", _sem_job(texto, "vereditos"))) == {"sistemas/empresa-os"}
+@pytest.mark.parametrize("wf,aplica", [(DEPLOY_DB, "migrar"), (DEPLOY_DB_HOMOLOG, "homologar")], ids=["producao", "homologacao"])
+def test_job_que_aplica_espera_os_vereditos(wf, aplica):
+    job = _job(_texto_sem_comentarios(wf), aplica)
+    assert re.search(r"(?m)^    needs:\s*vereditos\s*$", job), f"{wf.name}: `{aplica}` precisa de needs: vereditos"
+
+
+def test_homologacao_compara_com_a_base_da_pr_e_producao_com_o_envio_anterior():
+    homolog = _job(_texto_sem_comentarios(DEPLOY_DB_HOMOLOG), "vereditos")
+    assert "BASE_REF: ${{ github.base_ref }}" in homolog
+    assert '"origin/$BASE_REF...HEAD"' in homolog
+    producao = _job(_texto_sem_comentarios(DEPLOY_DB), "vereditos")
+    assert "ANTES: ${{ github.event.before }}" in producao
+    assert '"$ANTES" HEAD' in producao
 
 
 # ---------------------------------------------------------------------------
-# G20 — backup do banco de produção por Action (backup-db.yml).
+# G22 — cota grátis: nenhum workflow novo entra no kit sem decisão (26/10/2026).
 # ---------------------------------------------------------------------------
 
 
-def test_backup_so_segue_com_repositorio_privado_antes_de_qualquer_outro_passo():
-    codigo = _texto_sem_comentarios(BACKUP_DB)
-    i_privado = codigo.index("--jq .private")
-    assert i_privado < codigo.index("actions/checkout") < codigo.index("supabase link") < codigo.index("supabase db dump"), (
-        "a checagem de repositório privado tem de vir antes do checkout, do link e do dump"
+def test_so_os_dois_workflows_de_migration_existem():
+    achados = sorted(p.name for p in WORKFLOWS_DIR.glob("*.y*ml"))
+    assert achados == ["deploy-db-homologacao.yml", "deploy-db.yml"], (
+        f"workflow fora do combinado no kit: {achados}. A checagem roda local (checar_local.py); "
+        "workflow novo gasta a cota grátis do GitHub Actions do aluno."
     )
-    trecho = codigo[i_privado: codigo.index("actions/checkout")]
-    assert '[ "$privado" != "true" ]' in trecho and "exit 1" in trecho, "repositório público tem de falhar o job"
-
-
-def test_backup_usa_exatamente_os_tres_secrets_e_o_environment_producao():
-    texto = _texto(BACKUP_DB)
-    assert _secrets_usados(texto) == SECRETS_DEPLOY
-    assert re.search(r"(?m)^    environment: producao\s*$", texto), "backup-db.yml precisa do environment: producao"
-
-
-def test_backup_nao_roda_em_pull_request_e_tem_os_tres_gatilhos_certos():
-    codigo = _texto_sem_comentarios(BACKUP_DB)
-    for gatilho in ("workflow_dispatch:", "schedule:", "workflow_call:"):
-        assert gatilho in codigo, f"backup-db.yml sem {gatilho}"
-    for proibido in ("pull_request", "pull_request_target", "push:"):
-        assert proibido not in codigo, f"backup-db.yml não pode rodar em {proibido} (a PR enxergaria os secrets)"
-
-
-def test_backup_nunca_imprime_nem_passa_a_senha_do_banco():
-    codigo = _texto_sem_comentarios(BACKUP_DB)
-    for proibido in ("--dry-run", "--password", "set -x", "echo \"$SUPABASE_DB_PASSWORD\"", "echo $SUPABASE_DB_PASSWORD"):
-        assert proibido not in codigo, f"backup-db.yml usa {proibido!r}: a senha do banco vazaria no log"
-    for linha in codigo.splitlines():
-        if "supabase db dump" in linha:
-            assert " -p " not in linha, "senha pela linha de comando aparece na lista de processos"
-            assert "--linked" in linha, "o dump é do projeto de produção ligado"
-
-
-def test_backup_confere_a_copia_antes_de_guardar_e_so_guarda_como_artefato_curto():
-    codigo = _texto_sem_comentarios(BACKUP_DB)
-    assert codigo.count("testar_restauracao.py") == 2, "estrutura e dados são conferidos separadamente"
-    assert "--so-dados" in codigo
-    assert codigo.index("testar_restauracao.py") < codigo.index("actions/upload-artifact")
-    assert "retention-days: 14" in codigo
-    assert "if-no-files-found: error" in codigo, "sem arquivo o upload tem de falhar, não passar calado"
-    for proibido in ("git push", "git commit", "gh release", "gh gist", "gh api -X"):
-        assert proibido not in codigo, f"backup-db.yml não pode mandar a cópia para {proibido}"
-
-
-def test_backup_nunca_e_cancelado_no_meio_do_dump():
-    codigo = _texto_sem_comentarios(BACKUP_DB)
-    assert re.search(r"(?ms)^concurrency:\s*\n\s+group: backup-db\s*\n\s+cancel-in-progress: false", codigo)

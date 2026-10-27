@@ -30,9 +30,10 @@ A data vem de `date +%F`. O arquivo só tem nomes e números, nunca valor de seg
 
 2. **Alertas do Supabase** (segurança e desempenho). Com o MCP do Supabase disponível: `get_advisors` com `type` `security` e de novo com `performance`. Sem MCP: `CASA=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)") && (cd "$CASA/sistemas/empresa-os" && supabase db advisors --linked --type all --level warn)` (flags conferidas com `--help` no CLI local). Antes de qualquer `--linked`, faça o passo 6a da skill `tecnologia-mudar-banco`: confirmar que o projeto ligado é o de produção; se não estiver ligado, pare e diga ao dono que falta ligar (a senha do banco só ele digita), sem ler `credenciais/`. Liste os de nível ERROR e WARN e compare com as linhas anteriores do arquivo do mês (e do mês passado): são "novos" os que não aparecem lá. Só os novos viram aviso ao dono; os antigos ficam na contagem da linha.
 
-3. **Últimas execuções do GitHub e deploy da Vercel.** Um comando para os três fluxos (`ci`, `deploy-db`, `keep-alive`):
-   `for w in ci deploy-db keep-alive; do echo "== $w"; gh run list --workflow "$w.yml" --limit 5 --json conclusion,createdAt,url --jq '.[] | "\(.createdAt) \(.conclusion) \(.url)"'; done`
-   A execução mais recente de cada um com `failure`, `startup_failure` ou `timed_out` é achado. Falha antiga já seguida de sucesso só entra no registro. `keep-alive` falhando importa: é ele que toca o banco por dia para o projeto grátis não pausar.
+3. **Últimas atualizações do banco pelo GitHub e deploy da Vercel.** No GitHub ficam só os dois fluxos que aplicam migration:
+   `for w in deploy-db deploy-db-homologacao; do echo "== $w"; gh run list --workflow "$w.yml" --limit 5 --json conclusion,createdAt,url --jq '.[] | "\(.createdAt) \(.conclusion) \(.url)"'; done`
+   A execução mais recente de cada um com `failure`, `startup_failure` ou `timed_out` é achado. Falha antiga já seguida de sucesso só entra no registro. Lista vazia é normal quando não houve migration.
+   Keep-alive: quem toca o banco por dia para o projeto grátis não pausar é o Cron da Vercel (`/api/keep-alive`). Confira em Vercel > projeto > Settings > Cron Jobs > View Logs: a última chamada com 200 é ok; 401 = falta o `CRON_SECRET` (rode `instalar_guardas.py --so cron_secret`); 502 ou 500 = o banco não respondeu, é achado.
 
    Depois, o deploy de produção da Vercel do último commit da `main` (a mesma consulta de deployments e statuses do passo 9.3 da `tecnologia-publicar`):
    ```bash

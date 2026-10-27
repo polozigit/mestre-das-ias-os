@@ -7,8 +7,10 @@ o `slug_os:` de `operacao/INSTALACAO.md`), conecta o git, gera e publica o token
 de QA, publica o e-mail do dono (PREVIEW_OWNER_EMAIL) no preview,
 cria o "Protection Bypass for Automation" da prévia (segredo no `credenciais/.env`),
 confere pelos NOMES que as variáveis do Supabase estão na Vercel (quem as grava
-é a skill `tecnologia-conectar`, subcomando `vercel-env`), copia os workflows e o
-dependabot para a raiz da Casa, grava os secrets do GitHub e liga o Dependabot.
+é a skill `tecnologia-conectar`, subcomando `vercel-env`), cria o CRON_SECRET do
+keep-alive na produção da Vercel, copia os 2 workflows de migration e o
+dependabot para a raiz da Casa (e tira de lá os workflows que saíram do kit em
+26/10/2026), grava os secrets do GitHub e liga o Dependabot.
 Só então registra um resumo (sem valor de segredo) em `operacao/INSTALACAO.md`.
 
 Stdlib puro (argparse/subprocess/pathlib/secrets/shutil/filecmp/os/sys/
@@ -75,8 +77,8 @@ NOMES_SUPABASE_ESPERADOS = (
     "SUPABASE_SERVICE_ROLE_KEY",
 )
 
-# Os 3 secrets que `deploy-db.yml` e `backup-db.yml` (workflows reais na raiz da
-# Casa depois de `copiar_guardas`) consomem, medidos nos arquivos do template:
+# Os 3 secrets que `deploy-db.yml` (workflow real na raiz da Casa depois de
+# `copiar_guardas`) consome, medidos no arquivo do template:
 # `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_ID`.
 NOMES_SECRETS_GITHUB = (
     "SUPABASE_ACCESS_TOKEN",
@@ -85,6 +87,17 @@ NOMES_SECRETS_GITHUB = (
 )
 
 ENDPOINTS_DEPENDABOT = ("vulnerability-alerts", "automated-security-fixes")
+
+# Workflows que saíram do kit em 26/10/2026 (a checagem passou a rodar no
+# computador do dono, `checar_local.py`, e o keep-alive no Cron da Vercel): a
+# Casa instalada antes ainda os tem na raiz e eles gastariam a cota grátis do
+# GitHub Actions. `copiar_guardas` os apaga de `.github/workflows/` da raiz.
+WORKFLOWS_FORA_DO_KIT = ("ci.yml", "gitleaks.yml", "keep-alive.yml", "backup-db.yml")
+
+# Segredo que a Vercel manda no `Authorization: Bearer` quando chama o Cron
+# (doc vercel.com/docs/cron-jobs/manage-cron-jobs, "Securing cron jobs"). Só a
+# Vercel precisa dele: não vai para credenciais/.env.
+NOME_CRON_SECRET = "CRON_SECRET"
 
 MARCADOR_INICIO = "<!-- DEPLOY:INICIO -->"
 MARCADOR_FIM = "<!-- DEPLOY:FIM -->"
@@ -224,18 +237,22 @@ def _com_valor_em_arquivo(prefixo: str, valor: str, comando: list[str], cwd: Pat
         caminho_temp.unlink(missing_ok=True)
 
 
-def _publicar_variavel_preview(ctx: Contexto, nome: str, valor: str) -> tuple[str | None, bool]:
-    """Publica `nome` no ambiente preview da Vercel. Devolve (erro, ja_existia):
+def _publicar_variavel(ctx: Contexto, nome: str, valor: str, ambiente: str) -> tuple[str | None, bool]:
+    """Publica `nome` no `ambiente` da Vercel. Devolve (erro, ja_existia):
     erro é None quando deu certo ou quando a variável já existia."""
     resultado = _com_valor_em_arquivo(
-        "tecnologia-preview-", valor, ["vercel", "env", "add", nome, "preview"], ctx.projeto,
+        f"tecnologia-{ambiente}-", valor, ["vercel", "env", "add", nome, ambiente], ctx.projeto,
     )
     saida = _saida(resultado)
     if resultado is not None and resultado.returncode == 0:
         return None, False
     if "already" in saida.lower() or "já existe" in saida.lower():
         return None, True
-    return f"`vercel env add {nome} preview` falhou: {saida}", False
+    return f"`vercel env add {nome} {ambiente}` falhou: {saida}", False
+
+
+def _publicar_variavel_preview(ctx: Contexto, nome: str, valor: str) -> tuple[str | None, bool]:
+    return _publicar_variavel(ctx, nome, valor, "preview")
 
 
 # ---------------------------------------------------------------------------
@@ -465,6 +482,23 @@ def conferir_integracao_supabase(ctx: Contexto) -> Resultado:
 
 
 # ---------------------------------------------------------------------------
+# Passo 7b
+
+
+def criar_cron_secret(ctx: Contexto) -> Resultado:
+    """Cria o CRON_SECRET na produção da Vercel: sem ele a rota /api/keep-alive
+    recusa o Cron e o banco Free pausa. Já existe: mantém (nunca troca sozinho).
+    O valor só existe na Vercel; nunca é impresso nem gravado na Casa."""
+    erro, ja_existia = _publicar_variavel(ctx, NOME_CRON_SECRET, secrets.token_urlsafe(32), "production")
+    if erro:
+        return Resultado(False, "", mensagem_erro=erro)
+    return Resultado(
+        True, f"ok: {NOME_CRON_SECRET} presente no ambiente production da Vercel (keep-alive diário)",
+        pulado=ja_existia,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Passo 8
 
 
@@ -490,9 +524,13 @@ def copiar_guardas(ctx: Contexto) -> Resultado:
         if destino.is_file() and filecmp.cmp(origem, destino, shallow=False):
             continue
         copiar_atomico(origem, destino)
+    for nome in WORKFLOWS_FORA_DO_KIT:
+        (destino_dir / "workflows" / nome).unlink(missing_ok=True)
     # O texto persistido é sempre o mesmo (estado final), não a ação desta rodada.
     return Resultado(
-        True, f"ok: .github/ sincronizado com sistemas/empresa-os/.github/ ({len(arquivos)} arquivo(s))",
+        True,
+        f"ok: .github/ sincronizado com sistemas/empresa-os/.github/ ({len(arquivos)} arquivo(s)); "
+        f"fora da raiz: {', '.join(WORKFLOWS_FORA_DO_KIT)}",
     )
 
 
@@ -564,6 +602,7 @@ PASSOS: list[tuple[str, str, "callable"]] = [
     ("owner_email", "Publicar o e-mail do dono na Vercel (preview)", publicar_email_dono_na_vercel),
     ("bypass_automacao", "Criar o bypass de automação da prévia (proteção continua ligada)", gravar_bypass_automacao),
     ("conferir_integracao_supabase", "Conferir variáveis do Supabase na Vercel", conferir_integracao_supabase),
+    ("cron_secret", "Criar o CRON_SECRET do keep-alive na Vercel (production)", criar_cron_secret),
     ("copiar_guardas", "Copiar workflows/dependabot para .github/ da raiz", copiar_guardas),
     ("gravar_secrets", "Gravar secrets do GitHub", gravar_secrets),
     ("ligar_dependabot", "Ligar Dependabot", ligar_dependabot),
