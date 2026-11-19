@@ -6,9 +6,9 @@
     {
       "name": "tecnologia-revisor-seguranca",
       "descricao": "Revisa a mudança do sistema antes do merge",
-      "quando": "Use antes de todo merge de mudança em sistemas/ (tela, banco, rota), chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito",
+      "quando": "Use só quando o diff toca migration, login ou autorização, arquivo protegido ou padrão de segredo, chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito",
       "instrucoes": "agentes/tecnologia-revisor-seguranca.md",
-      "claude": {"model": "opus", "effort": "high", "tools": ["Read", "Grep", "Glob"]},
+      "claude": {"model": "opus", "effort": "medium", "tools": ["Read", "Grep", "Glob"]},
       "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "medium", "sandbox_mode": "read-only"}
     }
   ],

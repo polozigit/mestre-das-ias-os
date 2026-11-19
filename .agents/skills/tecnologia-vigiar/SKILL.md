@@ -1,6 +1,6 @@
 ---
 name: tecnologia-vigiar
-description: "Rotina de saúde do sistema: alertas de segurança e desempenho do Supabase, site no ar, último deploy, e cópia semanal do banco com restauração testada. Use em 'como está o sistema', 'o sistema caiu?', 'faz o backup', e como rotina agendada diária."
+description: "Saúde do sistema: todo dia só site no ar e último deploy; alertas do Supabase, cópia do banco e restauração testada só quando o dono pedir. Use em 'como está o sistema', 'o sistema caiu?', 'faz o backup', e como rotina agendada diária."
 metadata:
   origem: polozi
   diretoria: tecnologia
@@ -8,7 +8,7 @@ metadata:
 
 # tecnologia-vigiar
 
-Olha o sistema todo dia, tira cópia do banco toda semana e prova todo mês que a cópia volta. Só observa e avisa. Corrigir é com `tecnologia-mudar-banco` (banco) ou `tecnologia-publicar` (código): nunca conserte em produção por aqui.
+Olha todo dia só o site e o deploy. Alertas do Supabase, cópia do banco e prova de restauração são SOB DEMANDA: só rodam quando o dono pedir ("faz o backup", "como está o banco"), nunca por rotina. Só observa e avisa. Corrigir é com `tecnologia-mudar-banco` (banco) ou `tecnologia-publicar` (código): nunca conserte em produção por aqui.
 
 Fatos do sistema (workflows, plano grátis, hook) em `.agents/skills/tecnologia-sistema/referencias/regras-do-sistema.md`, seções 7, 10 e 11. Comandos rodam da raiz da Casa.
 
@@ -18,32 +18,39 @@ Fatos do sistema (workflows, plano grátis, hook) em `.agents/skills/tecnologia-
 
 Tudo vai para `operacao/vigilancia/<AAAA-MM>.md` (um arquivo por mês; crie se não existir). Uma linha por rodada, neste formato:
 
-`AAAA-MM-DD | site: ok, fora ou não verificado | vercel: <estado do deploy de produção> | advisors: <E> erros, <W> avisos (<nomes>) | actions: ok ou falha em <workflow>`
+`AAAA-MM-DD | site: ok, fora ou não verificado | vercel: <estado do deploy de produção>`
+
+Quando o dono pedir o olhar no banco, a linha do dia ganha `| advisors: <E> erros, <W> avisos (<nomes>) | actions: ok ou falha em <workflow>`.
 
 A data vem de `date +%F`. O arquivo só tem nomes e números, nunca valor de segredo nem mensagem de erro inteira. O rascunho `operacao/vigilancia/entrada.json` e a pasta `operacao/backups/` não sobem para o GitHub.
 
-## Diário
+## Diário (só site e deploy)
 
 1. **Site no ar.** O endereço é a linha `SITE_URL: <endereço>` de `operacao/sistema.md`. Sem a linha, siga o passo 8a da skill `tecnologia-publicar` (nunca invente nem leia `credenciais/`). Depois:
    `python3 .agents/skills/tecnologia-publicar/scripts/checar_producao.py "$(grep -m1 '^SITE_URL:' operacao/sistema.md | sed 's/^SITE_URL:[[:space:]]*//')"`
    Saída 0 = no ar. Saída 1 = o script lista os motivos em português: é achado. Linhas que começam com "Não verificado" (401 ou 403) não são site fora: o endereço pede autorização; registre `site: não verificado` e acerte a linha `SITE_URL` (passo 8a da `tecnologia-publicar`).
 
-2. **Alertas do Supabase** (segurança e desempenho). Com o MCP do Supabase disponível: `get_advisors` com `type` `security` e de novo com `performance`. Sem MCP: `CASA=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)") && (cd "$CASA/sistemas/empresa-os" && supabase db advisors --linked --type all --level warn)` (flags conferidas com `--help` no CLI local). Antes de qualquer `--linked`, faça o passo 6a da skill `tecnologia-mudar-banco`: confirmar que o projeto ligado é o de produção; se não estiver ligado, pare e diga ao dono que falta ligar (a senha do banco só ele digita), sem ler `credenciais/`. Liste os de nível ERROR e WARN e compare com as linhas anteriores do arquivo do mês (e do mês passado): são "novos" os que não aparecem lá. Só os novos viram aviso ao dono; os antigos ficam na contagem da linha.
-
-3. **Últimas atualizações do banco pelo GitHub e deploy da Vercel.** No GitHub ficam só os dois fluxos que aplicam migration:
-   `for w in deploy-db deploy-db-homologacao; do echo "== $w"; gh run list --workflow "$w.yml" --limit 5 --json conclusion,createdAt,url --jq '.[] | "\(.createdAt) \(.conclusion) \(.url)"'; done`
-   A execução mais recente de cada um com `failure`, `startup_failure` ou `timed_out` é achado. Falha antiga já seguida de sucesso só entra no registro. Lista vazia é normal quando não houve migration.
-   Keep-alive: quem toca o banco por dia para o projeto grátis não pausar é o Cron da Vercel (`/api/keep-alive`). Confira em Vercel > projeto > Settings > Cron Jobs > View Logs: a última chamada com 200 é ok; 401 = falta o `CRON_SECRET` (rode `instalar_guardas.py --so cron_secret`); 502 ou 500 = o banco não respondeu, é achado.
-
-   Depois, o deploy de produção da Vercel do último commit da `main` (a mesma consulta de deployments e statuses do passo 9.3 da `tecnologia-publicar`):
+2. **Deploy da Vercel.** O deploy de produção da Vercel do último commit da `main` (a mesma consulta de deployments e statuses do passo 9.3 da `tecnologia-publicar`):
    ```bash
    SHA=$(gh api "repos/{owner}/{repo}/commits/main" --jq .sha); if [ -z "$SHA" ]; then echo "PARE: não li o último commit da main"; else DEP=$(gh api "repos/{owner}/{repo}/deployments?sha=$SHA" --jq '.[0].id // empty'); if [ -z "$DEP" ]; then echo "vercel: sem deploy para $SHA"; else gh api "repos/{owner}/{repo}/deployments/$DEP/statuses" --jq '"vercel: \(.[0].state // "pendente")"'; fi; fi
    ```
    `success` = ok. `failure` ou `error` = achado: o site ficou na versão anterior e a `main` tem mudança que não subiu (quem resolve é a `tecnologia-publicar`, passo 10). Sem deploy ou ainda pendente: registre e confira de novo na próxima rodada; o mesmo commit sem `success` em duas rodadas seguidas é achado.
 
-4. **Registrar a linha** do mês. Achado novo: avise o dono (abaixo). Sem achado: não incomode o dono.
+3. **Registrar a linha** do mês. Achado novo: avise o dono (abaixo). Sem achado: não incomode o dono.
 
-## Semanal: cópia do banco com prova
+## Sob demanda: alertas do banco e do GitHub
+
+Só quando o dono pedir ("como está o banco", "tem alerta?"). Antes de qualquer `--linked`, o passo 6a da `tecnologia-mudar-banco`.
+
+1. **Alertas do Supabase** (segurança e desempenho). Com o MCP do Supabase disponível: `get_advisors` com `type` `security` e de novo com `performance`. Sem MCP: `CASA=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)") && (cd "$CASA/sistemas/empresa-os" && supabase db advisors --linked --type all --level warn)` (flags conferidas com `--help` no CLI local). Antes de qualquer `--linked`, faça o passo 6a da skill `tecnologia-mudar-banco`: confirmar que o projeto ligado é o de produção; se não estiver ligado, pare e diga ao dono que falta ligar (a senha do banco só ele digita), sem ler `credenciais/`. Liste os de nível ERROR e WARN e compare com as linhas anteriores do arquivo do mês (e do mês passado): são "novos" os que não aparecem lá. Só os novos viram aviso ao dono; os antigos ficam na contagem da linha.
+
+2. **Últimas atualizações do banco pelo GitHub.** No GitHub ficam só os dois fluxos que aplicam migration:
+   `for w in deploy-db deploy-db-homologacao; do echo "== $w"; gh run list --workflow "$w.yml" --limit 5 --json conclusion,createdAt,url --jq '.[] | "\(.createdAt) \(.conclusion) \(.url)"'; done`
+   A execução mais recente de cada um com `failure`, `startup_failure` ou `timed_out` é achado. Falha antiga já seguida de sucesso só entra no registro. Lista vazia é normal quando não houve migration.
+   Keep-alive: quem toca o banco por dia para o projeto grátis não pausar é o Cron da Vercel (`/api/keep-alive`). Confira em Vercel > projeto > Settings > Cron Jobs > View Logs: a última chamada com 200 é ok; 401 = falta o `CRON_SECRET` (rode `instalar_guardas.py --so cron_secret`); 502 ou 500 = o banco não respondeu, é achado.
+
+
+## Sob demanda: cópia do banco com prova
 
 Primeiro o passo 6a da skill `tecnologia-mudar-banco` (confirmar que o projeto ligado é o de produção, ou parar e avisar o dono). Depois um bloco só, com os mesmos comandos do passo 6b, nome `<data>-semanal` no lugar de `<data>-antes-<migration>` e o mínimo de tabelas igual ao total do mapa da `main` do GitHub (o que está em produção):
 
@@ -54,11 +61,11 @@ mkdir -p "$B" && (cd "$CASA/sistemas/empresa-os" && supabase db dump --linked -f
 
 Saída 0 nos dois testes = cópia inteira. Saída 1 = a cópia desta semana não serve: é achado, e o motivo vem escrito pelo script. Aviso "Tem segredo no backup" não reprova: o arquivo continua sendo a cópia do dono; não o apague, não o envie, não o suba para o GitHub, e diga ao dono em 1 frase que a cópia tem algo parecido com uma senha e fica só neste computador. Regras do `db dump`: nunca `--dry-run` (imprime a senha), nunca `--password` na linha, nunca apagar backup (só o dono pede). Sem Docker ou sem a senha do banco, diga ao dono o que falta; não finja que fez.
 
-O plano grátis do Supabase não tem backup diário, então esta cópia é a única. A pasta `operacao/backups/` da pasta principal (`$CASA`) fica só neste computador (tem dado real do cliente). Uma cópia no mesmo computador não protege de perder o computador: uma vez por mês, lembre o dono de guardar uma cópia fora dele (disco externo ou nuvem pessoal dele). Você não envia o arquivo para lugar nenhum.
+O plano grátis do Supabase não tem backup diário, então esta cópia é a única. A pasta `operacao/backups/` da pasta principal (`$CASA`) fica só neste computador (tem dado real do cliente). Uma cópia no mesmo computador não protege de perder o computador: sempre que o dono pedir uma cópia, lembre-o de guardar uma cópia fora dele (disco externo ou nuvem pessoal dele). Você não envia o arquivo para lugar nenhum.
 
-## Mensal: restaurar de verdade num banco de teste
+## Sob demanda: restaurar de verdade num banco de teste
 
-Cópia que nunca foi restaurada é só esperança. Este caminho usa um banco local vazio, nunca o de produção. O script recusa qualquer endereço que não seja este computador e qualquer URL com o `SUPABASE_PROJECT_ID` de produção. A URL vai ao `psql` pelo ambiente, nunca pela linha de comando. Se `SUPABASE_PROJECT_ID` não estiver no ambiente, o script avisa que a única trava foi o endereço ser deste computador: registre o aviso junto do resultado.
+Cópia que nunca foi restaurada é só esperança; quando o dono pedir a cópia, ofereça também esta prova. Este caminho usa um banco local vazio, nunca o de produção. O script recusa qualquer endereço que não seja este computador e qualquer URL com o `SUPABASE_PROJECT_ID` de produção. A URL vai ao `psql` pelo ambiente, nunca pela linha de comando. Se `SUPABASE_PROJECT_ID` não estiver no ambiente, o script avisa que a única trava foi o endereço ser deste computador: registre o aviso junto do resultado.
 
 Este caminho local depende de Docker e de `psql`. Os comandos abaixo não foram executados na construção desta skill (sem Docker nem rede lá). Na primeira vez que rodar, se algum passo falhar, registre o erro literal e escreva "restauração NÃO provada"; não escreva "restaurado" sem o script ter dado saída 0.
 
@@ -90,7 +97,7 @@ Corrigir: banco passa por `tecnologia-mudar-banco`; código e site por `tecnolog
 
 ## Rotina agendada
 
-Diário: passos 1 a 4 (inclui o deploy da Vercel do passo 3), só avisando o dono se houver achado novo. Semanal: o bloco da cópia. Mensal: o bloco da restauração, mais o lembrete da cópia fora do computador.
+Diário: passos 1 a 3 (site e deploy da Vercel), só avisando o dono se houver achado novo. Alertas do banco, cópia e restauração: nunca por agenda; só com pedido do dono, e então valem os blocos "Sob demanda".
 
 ## Fontes
 

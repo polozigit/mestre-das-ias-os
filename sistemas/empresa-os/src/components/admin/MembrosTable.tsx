@@ -74,7 +74,7 @@ const COLUNAS: ResponsiveColumn<Membro>[] = [
 ];
 
 /**
- * Lista de pessoas + convite + gestão (permissões/acesso). Tocar numa linha abre
+ * Lista de pessoas + cadastro + gestão (permissões/acesso). Tocar numa linha abre
  * o painel da pessoa — funciona igual no desktop (painel lateral) e no
  * celular (bottom-sheet).
  */
@@ -104,7 +104,7 @@ export function MembrosTable({
           </CardTitle>
           <Button variant="primary" onClick={() => setConvidarAberto(true)}>
             <UserPlus size={16} />
-            Convidar pessoa
+            Cadastrar pessoa
           </Button>
         </CardHeader>
         <ResponsiveTable
@@ -117,7 +117,7 @@ export function MembrosTable({
             <Empty
               icon={Users}
               title="Ninguém por aqui ainda"
-              description="Convide as pessoas da sua empresa pelo botão acima."
+              description="Cadastre as pessoas da sua empresa pelo botão acima."
             />
           }
         />

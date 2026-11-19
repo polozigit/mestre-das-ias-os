@@ -1,6 +1,6 @@
 import { ClipboardList } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { filtrar } from "@/lib/tarefas/kanban";
+import { filtrar, areaDaTarefa } from "@/lib/tarefas/kanban";
 import { grupoDaBusca, hrefListaTarefas, TEXTOS_DO_GRUPO, trilhasDoGrupo } from "@/lib/tarefas/grupos";
 import { ROTULO_STATUS } from "@/lib/tarefas/status";
 import { nomeAmigavel } from "@/lib/agentes/nome";
@@ -53,6 +53,7 @@ export default async function TarefasPage({
   const filtroOrigem: TarefaOrigem | undefined =
     brutoOrigem === "humano" || brutoOrigem === "ia" ? brutoOrigem : undefined;
   const filtroDono = um(busca.dono) || undefined;
+  const filtroArea = um(busca.area)?.trim().toLowerCase() || undefined;
 
   const supabase = await createClient();
   // RLS (tarefas.read) já decide o que o usuário vê.
@@ -64,7 +65,7 @@ export default async function TarefasPage({
   const TETO_TAREFAS = 1000;
   const doGrupo = supabase
     .from("tarefas")
-    .select("id, titulo, status, origem, trilha, dono_id, agente_id, atualizada_em")
+    .select("id, titulo, status, origem, trilha, dono_id, agente_id, atualizada_em, metadata")
     .in("trilha", [...trilhasDoGrupo(grupo)]);
   const [tarefasRes, usuariosRes, agentesRes] = await Promise.all([
     // Dia a dia: o que mexeu por último vem primeiro. Curso: na ordem do plano (curso, depois os 90 dias),
@@ -108,21 +109,24 @@ export default async function TarefasPage({
   }
 
   // Links do alternador: o quadro é a URL limpa do grupo; a lista preserva os filtros ativos.
-  const hrefQuadro = hrefListaTarefas(grupo);
+  const hrefQuadro = hrefListaTarefas(grupo, { area: filtroArea });
   const hrefLista = hrefListaTarefas(grupo, {
     visao: "lista",
     status: filtroStatus,
     origem: filtroOrigem,
     dono: filtroDono,
+    area: filtroArea,
   });
 
   const linhas: TarefaLinha[] = filtrar(tarefas, {
     status: filtroStatus,
     origem: filtroOrigem,
     donoId: filtroDono,
+    area: filtroArea,
   }).map((t) => ({
     id: t.id,
     titulo: t.titulo,
+    area: areaDaTarefa(t.metadata),
     status: t.status,
     origem: t.origem,
     trilha: t.trilha,
@@ -131,9 +135,10 @@ export default async function TarefasPage({
     atualizadaEm: t.atualizada_em,
   }));
 
-  const cards = tarefas.map((t) => ({
+  const cards = filtrar(tarefas, { area: filtroArea }).map((t) => ({
     id: t.id,
     titulo: t.titulo,
+    area: areaDaTarefa(t.metadata),
     status: t.status,
     origem: t.origem,
     trilha: t.trilha,
@@ -141,7 +146,11 @@ export default async function TarefasPage({
     atualizadaEm: t.atualizada_em,
   }));
 
-  const temFiltro = !!(filtroStatus || filtroOrigem || filtroDono);
+  // A área escolhida entra na lista mesmo sem tarefa nela: o select nunca perde o valor da URL.
+  const areas = [
+    ...new Set([...tarefas.map((t) => areaDaTarefa(t.metadata)), ...(filtroArea ? [filtroArea] : [])]),
+  ].sort();
+  const temFiltro = !!(filtroStatus || filtroOrigem || filtroDono || filtroArea);
 
   return (
     <div className="space-y-5">
@@ -168,6 +177,20 @@ export default async function TarefasPage({
         </p>
       )}
 
+      <form method="get" action="/tarefas" className="flex items-center gap-2">
+        <input type="hidden" name="visao" value={visao} />
+        {grupo === "curso" && <input type="hidden" name="trilha" value="curso" />}
+        {filtroStatus && <input type="hidden" name="status" value={filtroStatus} />}
+        {filtroOrigem && <input type="hidden" name="origem" value={filtroOrigem} />}
+        {filtroDono && <input type="hidden" name="dono" value={filtroDono} />}
+        <label htmlFor="filtro-area" className="text-sm text-fg-2">Área</label>
+        <select id="filtro-area" name="area" defaultValue={filtroArea ?? ""} className={SELECT_FILTRO}>
+          <option value="">Todas as áreas</option>
+          {areas.map((area) => <option key={area} value={area}>{area === "geral" ? "Geral" : area}</option>)}
+        </select>
+        <Button type="submit" size="md">Filtrar</Button>
+      </form>
+
       {tarefas.length === 0 && !temFiltro ? (
         <Empty
           icon={ClipboardList}
@@ -190,6 +213,7 @@ export default async function TarefasPage({
             className="flex flex-wrap items-center gap-2"
           >
             <input type="hidden" name="visao" value="lista" />
+            {filtroArea && <input type="hidden" name="area" value={filtroArea} />}
             {grupo === "curso" && <input type="hidden" name="trilha" value="curso" />}
             <label htmlFor="filtro-status" className="sr-only">
               Filtrar por status

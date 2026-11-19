@@ -23,7 +23,7 @@ Modos:
       só reescreve o que mudou byte a byte.
       Time do kit (`times/<nome>/time.json` na Casa): confere que as skills
       dele estão em `.agents/skills/` (senão sai 2), GERA os tomls do
-      time.json (o mesmo texto do gerar_saidas.py do Native AI) e grava os
+      time.json (o mesmo texto do gerar_saidas.py do kit) e grava os
       que faltam ou mudaram. Aqui o 'claude' NÃO é recusado (o kit serve às
       duas plataformas) e o orçamento não é medido (as skills já estão na
       Casa e já entram na conta).
@@ -48,7 +48,7 @@ Modos:
 Resolução da ORIGEM de um time, nesta ordem, sem inventar caminho por
 convenção:
   1. `<casa>/times/<time>/time.json`: o time que já vive na própria Casa
-     (é assim que a Casa montada traz Native AI, Tecnologia, PMO e Marketing)
+     (é assim que a Casa montada traz Tecnologia, PMO e Marketing)
   2. entrada `local` do marketplace de repositório
      `<casa>/.agents/plugins/marketplace.json` [24a:plugins/f6, plugins/f7]
   3. glob no cache de plugin instalado
@@ -82,7 +82,6 @@ TETO_CHARS = 8000
 
 NOMES_NUCLEO = frozenset(
     {
-        "polozi-gerente-de-trabalho",
         "polozi-sistema-qa",
     }
 )
@@ -341,9 +340,9 @@ def resolver_origem_time(casa: Path, nome: str) -> Path:
 # A Casa montada traz cada time em `times/<nome>/` (time.json, agentes/*.md, LEIA-ME.md), as skills dele em
 # `.agents/skills/` e os subagentes já GERADOS em `.codex/agents/`. Não há plugin, marketplace nem cache.
 # Instalar = conferir as skills, gerar os tomls do time.json e registrar a linha `ativo`. O texto gerado é
-# o MESMO do gerar_saidas.py do time Native AI (um teste compara byte a byte com ele e com os tomls
-# versionados dos 4 times do kit); aqui ele é refeito porque esta skill é empacotada à parte e não pode
-# importar a do Native AI.
+# o MESMO do gerar_saidas.py do kit (`scripts/gerador_times/`; um teste compara byte a byte com ele e com os
+# tomls versionados dos 3 times do kit); aqui ele é refeito porque esta skill é empacotada à parte e não pode
+# importar o gerador.
 
 MARCA_TOML = "# GERADO de time.json - nao edite a mao"
 NOME_DO_TIME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
@@ -409,7 +408,7 @@ def _toml_multilinha(texto: str) -> str:
 
 
 def toml_do_agente(agente: dict, instrucoes: str) -> str:
-    """O `.codex/agents/<name>.toml` de um agente do time.json: igual ao do gerar_saidas.py do Native AI."""
+    """O `.codex/agents/<name>.toml` de um agente do time.json: igual ao do gerar_saidas.py do kit."""
     codex = agente["codex"]
     linhas = [
         MARCA_TOML,
@@ -591,12 +590,26 @@ def espelhar_catalogo(casa: Path) -> int:
     return codigo
 
 
+def aposentados_da_casa(casa: Path) -> dict:
+    """Lê `capacidades/APOSENTADOS.json` ({agentes, skills, times}); ausente ou ilegível vale vazio."""
+    arquivo = casa / "capacidades" / "APOSENTADOS.json"
+    try:
+        dados = json.loads(arquivo.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return dados if isinstance(dados, dict) else {}
+
+
 def instalar_time_da_casa(casa: Path, nome: str, raiz_time: Path, dry_run: bool) -> int:
     """`--instalar` de um time do kit (`times/<nome>/time.json` na Casa): confere as skills, gera os tomls do
     time.json, grava os que faltam ou mudaram e registra a linha `ativo`. Aqui NÃO há recusa de 'outra
     plataforma' (o kit serve às duas) nem medida de orçamento (as skills já estão em `.agents/skills/` e já
     entram na conta)."""
     dados = ler_time_json(raiz_time)
+    if nome in aposentados_da_casa(casa).get("times", []):
+        raise ErroTime(
+            "Time aposentado nesta Casa (capacidades/APOSENTADOS.json); restauração exige pedido explícito do dono.", 2
+        )
     ausentes = skills_do_time_ausentes(casa, dados)
     if ausentes:
         raise ErroTime(

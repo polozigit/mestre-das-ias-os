@@ -195,7 +195,7 @@ export default async function PaginaAgentes({ searchParams }: { searchParams: Pr
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          <div className="entrada grid grid-cols-2 gap-3 md:grid-cols-3">
             <KpiCard label="Instalados" value={instalados} />
             <KpiCard label="Times" value={grupos.length} />
             {veExecucoes && <KpiCard label="Execuções (7 dias)" value={execucoes7d} />}

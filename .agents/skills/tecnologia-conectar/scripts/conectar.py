@@ -4,8 +4,17 @@
 Subcomandos (todos IDEMPOTENTES: rodar de novo nao duplica nada):
 
   projeto     confere que o projeto da Vercel ligado a esta Casa tem o nome `slug_os`
-  vercel-env  grava as 3 variaveis do Supabase na Vercel (production e preview)
-              e prova por NOME que chegaram
+  banco       cria (ou reaproveita) o projeto Supabase de PRODUCAO `<slug_os>` so com o
+              SUPABASE_ACCESS_TOKEN (senha do banco gerada pelo script), espera ficar no
+              ar, expoe os schemas e grava as 5 variaveis no credenciais/.env. Projeto
+              ja anotado no .env e reaproveitado; nunca cria um segundo por cima
+  homologacao cria (ou reaproveita) o projeto Supabase `<slug_os>-homolog` com o
+              mesmo token da etapa 7-banco, espera ficar no ar, expoe os schemas
+              e grava as 5 variaveis `_HOMOLOG` no credenciais/.env
+  vercel-env  grava as variaveis do Supabase na Vercel: production le o banco de
+              producao, preview le o de HOMOLOGACAO (rode `homologacao` antes);
+              prova por NOME que chegaram. `--sem-preview` (so com a homologacao
+              pendente) publica so a producao e avisa [pendente]
   auth-urls   grava o site_url e as Redirect URLs do Auth do Supabase e le de volta
   provar      3 provas (site responde 200, nomes na Vercel, Auth relido);
               imprime TUDO LIGADO so se as 3 passarem
@@ -20,8 +29,10 @@ binario por `shutil.which`, permissao do temporario por `icacls` no Windows.
 Regra de segredo: valor NUNCA vai como argumento de comando e NUNCA e impresso.
 Anda do `credenciais/.env` para o STDIN de um arquivo temporario restrito ao
 dono (apagado no `finally`). Toda mensagem de erro passa por `mascarar`.
-Este script NUNCA escreve no `credenciais/.env` (o `vault` guarda uma COPIA mestre
-no Vault e o `.env` fica como esta) e NUNCA le o Vault: so grava pela RPC.
+So os subcomandos `banco` e `homologacao` escrevem no `credenciais/.env`, e so os 5
+nomes do seu banco (atomico, permissao restrita, o resto do arquivo fica igual). Os demais
+nunca tocam o `.env` (o `vault` guarda uma COPIA mestre no Vault e o `.env` fica como
+esta). O script NUNCA le o Vault: so grava pela RPC.
 
 Exit 0 = provado. Exit 2 = parou, com mensagem em portugues no stderr.
 """
@@ -32,10 +43,12 @@ import datetime
 import json
 import os
 import re
+import secrets
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -53,20 +66,53 @@ PUBLICOS = (
     "NEXT_PUBLIC_SUPABASE_URL",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY",
     "SUPABASE_PROJECT_ID",
+    "SUPABASE_PROJECT_ID_HOMOLOG",
+    "NEXT_PUBLIC_SUPABASE_URL_HOMOLOG",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG",
 )
 TAMANHO_MIN_MASCARA = 4
 
 ALVOS_VERCEL = ("production", "preview")
-# (nome na Vercel = nome no .env, alvo). D-02: o preview usa o MESMO banco da
-# producao, por isso os 2 alvos leem o mesmo nome do .env.
+# (nome na Vercel, alvo, nome no .env). O preview le o banco de HOMOLOGACAO
+# (`_HOMOLOG`, criado pelo subcomando `homologacao`): um teste no preview nunca
+# mexe em dado real. A producao le o banco de producao e ainda recebe as 2
+# variaveis publicas de homologacao, que o keep-alive usa para manter o banco de
+# teste acordado (o plano gratuito pausa projeto parado ~7 dias).
 MAPA_VERCEL = (
-    ("NEXT_PUBLIC_SUPABASE_URL", "production"),
-    ("NEXT_PUBLIC_SUPABASE_ANON_KEY", "production"),
-    ("SUPABASE_SERVICE_ROLE_KEY", "production"),
-    ("NEXT_PUBLIC_SUPABASE_URL", "preview"),
-    ("NEXT_PUBLIC_SUPABASE_ANON_KEY", "preview"),
-    ("SUPABASE_SERVICE_ROLE_KEY", "preview"),
+    ("NEXT_PUBLIC_SUPABASE_URL", "production", "NEXT_PUBLIC_SUPABASE_URL"),
+    ("NEXT_PUBLIC_SUPABASE_ANON_KEY", "production", "NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    ("SUPABASE_SERVICE_ROLE_KEY", "production", "SUPABASE_SERVICE_ROLE_KEY"),
+    ("NEXT_PUBLIC_SUPABASE_URL_HOMOLOG", "production", "NEXT_PUBLIC_SUPABASE_URL_HOMOLOG"),
+    ("NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG", "production", "NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG"),
+    ("NEXT_PUBLIC_SUPABASE_URL", "preview", "NEXT_PUBLIC_SUPABASE_URL_HOMOLOG"),
+    ("NEXT_PUBLIC_SUPABASE_ANON_KEY", "preview", "NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG"),
+    ("SUPABASE_SERVICE_ROLE_KEY", "preview", "SUPABASE_SERVICE_ROLE_KEY_HOMOLOG"),
 )
+
+# Nomes que os subcomandos `banco` (producao) e `homologacao` gravam no .env (e so eles).
+NOMES_PRODUCAO = (
+    "SUPABASE_PROJECT_ID",
+    "SUPABASE_DB_PASSWORD",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+)
+NOMES_HOMOLOG = (
+    "SUPABASE_PROJECT_ID_HOMOLOG",
+    "SUPABASE_DB_PASSWORD_HOMOLOG",
+    "NEXT_PUBLIC_SUPABASE_URL_HOMOLOG",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG",
+    "SUPABASE_SERVICE_ROLE_KEY_HOMOLOG",
+)
+# Espera do projeto novo (ou despausado) ficar no ar. Constantes de modulo: o teste troca.
+INTERVALO_HOMOLOG = 10
+TIMEOUT_HOMOLOG = 600
+STATUS_NO_AR = "ACTIVE_HEALTHY"
+STATUS_PAUSADO = "INACTIVE"
+STATUS_FALHOU = ("INIT_FAILED", "RESTORE_FAILED", "REMOVED", "PAUSE_FAILED")
+SCHEMAS_EXTRAS_HOMOLOG = ("tarefas", "organograma")
+REGIAO_PADRAO = "sa-east-1"  # Sao Paulo
+PADRAO_LIMITE_PLANO = re.compile(r"limit|free|maximum|quota|upgrade", re.I)
 
 MENSAGEM_SEM_VERCEL = (
     "A CLI da Vercel não está instalada neste computador. Instale com `npm i -g vercel` "
@@ -334,12 +380,24 @@ def nomes_presentes(texto: str, esperados) -> set[str]:
     return {nome for nome in esperados if re.search(rf"(?m)^\s*{re.escape(nome)}\b", texto)}
 
 
-def conferir_nomes_na_vercel(casa: Path) -> dict[str, int]:
+def mapa_vercel(sem_preview: bool = False):
+    """O mapa inteiro, ou (`--sem-preview`) so as 3 variaveis do banco real na
+    producao: o aluno sem vaga no plano gratuito do Supabase segue com o sistema
+    no ar e o preview fica sem banco ate a homologacao existir."""
+    if not sem_preview:
+        return MAPA_VERCEL
+    return tuple(item for item in MAPA_VERCEL if item[1] == "production" and not item[2].endswith("_HOMOLOG"))
+
+
+def conferir_nomes_na_vercel(casa: Path, mapa=None) -> dict[str, int]:
     """Prova por NOME (`vercel env ls <alvo>`): a doc nao garante formato de
     saida. Faltou nome = ErroConectar. Devolve quantos nomes cada alvo tem."""
+    mapa = MAPA_VERCEL if mapa is None else mapa
     contagem: dict[str, int] = {}
     for alvo in ALVOS_VERCEL:
-        esperados = [nome for nome, a in MAPA_VERCEL if a == alvo]
+        esperados = [nome for nome, a, _origem in mapa if a == alvo]
+        if not esperados:
+            continue
         resultado = _rodar(["vercel", "env", "ls", alvo], cwd=projeto_dir(casa))
         ausentes = sorted(set(esperados) - nomes_presentes(_saida(resultado), esperados))
         if ausentes:
@@ -356,35 +414,329 @@ def tipo_vercel(nome: str) -> str:
     return "config" if nome.startswith("NEXT_PUBLIC_") else "secret"
 
 
-def cmd_vercel_env(casa: Path) -> int:
+def cmd_vercel_env(casa: Path, sem_preview: bool = False) -> int:
     if not caminho_project_json(casa).is_file():
         raise ErroConectar(
             "sistemas/empresa-os/.vercel/project.json não existe: rode o "
             ".agents/skills/tecnologia-publicar/scripts/instalar_guardas.py antes."
         )
     env = ler_env(casa)
-    faltando = sorted({nome for nome, _alvo in MAPA_VERCEL if not env.get(nome)})
+    mapa = mapa_vercel(sem_preview)
+    faltando = sorted({origem for _nome, _alvo, origem in mapa
+                       if not env.get(origem) and not origem.endswith("_HOMOLOG")})
     if faltando:
         raise ErroConectar(
             f"credenciais/.env sem valor para: {', '.join(faltando)}. "
             "Esses valores entram na etapa 7-banco do instalador (ou pela skill tecnologia-acessos)."
         )
-    for nome, alvo in MAPA_VERCEL:
+    sem_homolog = sorted({origem for _nome, _alvo, origem in mapa
+                          if not env.get(origem) and origem.endswith("_HOMOLOG")})
+    if sem_homolog:
+        # Sem queda silenciosa para o banco de producao: o preview sem homologacao
+        # abriria sessao de dono em dado real.
+        raise ErroConectar(
+            f"credenciais/.env sem os valores do banco de homologação: {', '.join(sem_homolog)}. "
+            "Rode `conectar.py homologacao` antes (cria o banco de teste do preview) e depois vercel-env de novo."
+        )
+    if sem_preview:
+        linha("pendente", "vercel-env",
+              "preview SEM banco: a homologação ainda não existe. Rode `conectar.py homologacao` quando "
+              "houver vaga no plano gratuito do Supabase e depois vercel-env sem --sem-preview.")
+    for nome, alvo, origem in mapa:
+        if alvo == "preview":
+            # Casa instalada antes da homologacao tem o preview apontando para a producao:
+            # remove a variavel antes de gravar, senao rodar de novo nao troca o banco.
+            remocao = _rodar(["vercel", "env", "rm", nome, alvo, "--yes"], cwd=projeto_dir(casa))
+            if remocao is None:
+                raise ErroConectar(f"`vercel env rm {nome} {alvo}` não rodou: {_saida(remocao)}")
         # --type: exigido pela CLI 63.1.0 em NEXT_PUBLIC_* (ver tipo_vercel).
         # --yes: sem ele a CLI pode perguntar a branch de preview mesmo com STDIN
         resultado = _rodar(
             ["vercel", "env", "add", nome, alvo, "--type", tipo_vercel(nome), "--yes"],
-            cwd=projeto_dir(casa), entrada=env[nome],
+            cwd=projeto_dir(casa), entrada=env[origem],
         )
         saida = _saida(resultado)
         if resultado is not None and resultado.returncode == 0:
-            linha("ok", "vercel-env", f"{nome} ({alvo})")
-        elif "already" in saida.lower():
+            linha("ok", "vercel-env", f"{nome} ({alvo})" + (f" <- {origem}" if origem != nome else ""))
+        elif "already" in saida.lower() and alvo == "production":
             linha("pulado", "vercel-env", f"{nome} ({alvo}) já existe")
+        elif "already" in saida.lower():
+            # No preview, "já existe" depois do rm = ainda aponta para o banco antigo.
+            raise ErroConectar(
+                f"{nome} ({alvo}) continua com o valor antigo (a remoção não valeu). "
+                f"Remova no painel da Vercel e rode vercel-env de novo: {mascarar(saida, env)}"
+            )
         else:
             raise ErroConectar(f"`vercel env add {nome} {alvo}` falhou: {mascarar(saida, env)}")
-    for alvo, quantos in conferir_nomes_na_vercel(casa).items():
+    for alvo, quantos in conferir_nomes_na_vercel(casa, mapa).items():
         linha("ok", "vercel-env", f"prova {alvo}: {quantos}/{quantos} nomes")
+    return 0
+
+
+# --- homologacao -----------------------------------------------------------
+
+
+def _dormir(segundos: float) -> None:
+    time.sleep(segundos)
+
+
+class Banco:
+    """Qual banco o subcomando prepara: produção (`banco`) ou homologação (`homologacao`).
+    Os dois seguem o MESMO caminho; só mudam o rótulo e o sufixo dos nomes no .env."""
+
+    def __init__(self, rotulo: str, comando: str, sufixo: str):
+        self.rotulo, self.comando, self.sufixo = rotulo, comando, sufixo
+        self.nomes = tuple(f"{nome}{sufixo}" for nome in NOMES_PRODUCAO)
+
+    def n(self, base: str) -> str:
+        return f"{base}{self.sufixo}"
+
+
+PRODUCAO = Banco("produção", "banco", "")
+HOMOLOGACAO = Banco("homologação", "homologacao", "_HOMOLOG")
+
+
+def gravar_env_banco(casa: Path, valores: dict[str, str], permitidos) -> None:
+    """Upsert atomico no credenciais/.env, SO dos nomes do banco (`permitidos`). Mantem as
+    outras linhas (e comentarios) como estao e restringe o arquivo ao dono."""
+    for nome in valores:
+        if nome not in permitidos:
+            raise ErroConectar(f"o conectar só grava no .env os nomes do banco, não {nome}.")
+    arquivo = caminho_env(casa)
+    linhas = arquivo.read_text(encoding="utf-8-sig").splitlines() if arquivo.is_file() else []
+    pendentes = dict(valores)
+    saida: list[str] = []
+    for bruta in linhas:
+        achado = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)=", bruta.strip())
+        nome = achado.group(1) if achado else None
+        if nome in valores:
+            if nome in pendentes:  # nome repetido no arquivo: so a 1a ocorrencia fica
+                saida.append(f"{nome}={pendentes.pop(nome)}")
+        else:
+            saida.append(bruta)
+    saida.extend(f"{nome}={valor}" for nome, valor in pendentes.items())
+    escrever_atomico(arquivo, "\n".join(saida) + "\n")
+    aplicar_600(arquivo)
+
+
+def gravar_env_homolog(casa: Path, valores: dict[str, str]) -> None:
+    gravar_env_banco(casa, valores, NOMES_HOMOLOG)
+
+
+def _api_projeto(cab: dict, ref: str, rota: str = "") -> tuple[int, object]:
+    return _http("GET", f"{API_SUPABASE}/v1/projects/{ref}{rota}", cab)
+
+
+def _erro_criacao(status: int, corpo, banco: Banco = HOMOLOGACAO) -> ErroConectar:
+    detalhe = corpo.get("message", "") if isinstance(corpo, dict) else ""
+    if status == 402 or (status in (400, 403, 409, 422) and PADRAO_LIMITE_PLANO.search(str(detalhe))):
+        return ErroConectar(
+            f"o Supabase não deixou criar o projeto de {banco.rotulo}: o plano gratuito permite 2 projetos "
+            "ativos e você já usa os 2 (ou o plano exige pagamento). Pause ou apague um projeto gratuito "
+            f"que você não usa no painel do Supabase (supabase.com/dashboard) e rode `conectar.py {banco.comando}` de novo. "
+            f"(HTTP {status})"
+        )
+    return ErroConectar(f"o Supabase recusou criar o projeto de {banco.rotulo} (HTTP {status}): {detalhe}")
+
+
+def _esperar_no_ar(cab: dict, ref: str, status_atual: str, banco: Banco = HOMOLOGACAO) -> None:
+    """Espera `ACTIVE_HEALTHY`. Projeto pausado (`INACTIVE`) e despausado uma vez."""
+    despausou = False
+    tentativas = max(1, int(TIMEOUT_HOMOLOG // INTERVALO_HOMOLOG)) if INTERVALO_HOMOLOG else 1
+    for _ in range(tentativas + 1):
+        if status_atual == STATUS_NO_AR:
+            return
+        if status_atual in STATUS_FALHOU:
+            raise ErroConectar(
+                f"o projeto de {banco.rotulo} ficou em {status_atual}. Apague-o no painel do Supabase e rode "
+                f"`conectar.py {banco.comando}` de novo."
+            )
+        if status_atual == STATUS_PAUSADO and not despausou:
+            codigo, _corpo = _http("POST", f"{API_SUPABASE}/v1/projects/{ref}/restore", cab, {})
+            if codigo not in (200, 201, 202):
+                raise ErroConectar(f"não consegui despausar o projeto de {banco.rotulo} (HTTP {codigo}).")
+            despausou = True
+            linha("ok", banco.comando, "projeto pausado: pedi para despausar")
+        _dormir(INTERVALO_HOMOLOG)
+        codigo, corpo = _api_projeto(cab, ref)
+        if codigo != 200 or not isinstance(corpo, dict):
+            raise ErroConectar(f"não consegui ler o estado do projeto de {banco.rotulo} (HTTP {codigo}).")
+        status_atual = str(corpo.get("status", ""))
+    raise ErroConectar(
+        f"o projeto de {banco.rotulo} não ficou no ar em {TIMEOUT_HOMOLOG // 60} minutos (último estado: "
+        f"{status_atual}). Espere um pouco e rode `conectar.py {banco.comando}` de novo: ele continua de onde parou."
+    )
+
+
+def _chaves(itens, nome_legado: str, tipo_novo: str, banco: Banco = HOMOLOGACAO) -> str:
+    """Chave pelo `name` (legado: anon / service_role); cai no `type` novo se faltar."""
+    lista = [i for i in itens if isinstance(i, dict) and i.get("api_key")]
+    for item in lista:
+        if item.get("name") == nome_legado:
+            return str(item["api_key"])
+    for item in lista:
+        if item.get("type") == tipo_novo:
+            return str(item["api_key"])
+    raise ErroConectar(f"a API do Supabase não devolveu a chave `{nome_legado}` do projeto de {banco.rotulo}.")
+
+
+def _preparar_projeto(casa: Path, env: dict[str, str], cab: dict, banco: Banco, nome: str,
+                      campo_org: str, org: str, regiao: str, ref_proibido: str,
+                      exigir_nome: bool) -> str:
+    """Cria (ou reaproveita) o projeto, espera no ar, grava as 5 variaveis do banco no
+    .env e expoe os schemas. `ref_proibido` e o OUTRO banco: nunca pode ser o mesmo."""
+    gravar = lambda valores: gravar_env_banco(casa, valores, banco.nomes)  # noqa: E731
+    nome_ref, nome_senha = banco.n("SUPABASE_PROJECT_ID"), banco.n("SUPABASE_DB_PASSWORD")
+    outro = "homologação" if banco is PRODUCAO else "produção"
+
+    def mesma_org(projeto: dict) -> bool:
+        return org in (projeto.get("organization_slug"), projeto.get("organization_id"))
+
+    def ref_valido(ref: str) -> str:
+        if not PADRAO_REF.match(ref) or (ref_proibido and ref == ref_proibido):
+            raise ErroConectar(f"a API do Supabase devolveu um código de projeto inválido para a {banco.rotulo}.")
+        return ref
+
+    achado = None
+    ref_env = env.get(nome_ref, "")
+    if ref_env:
+        if not PADRAO_REF.match(ref_env):
+            raise ErroConectar(f"{nome_ref} do .env não é um código de projeto válido.")
+        if ref_proibido and ref_env == ref_proibido:
+            raise ErroConectar(
+                f"{nome_ref} é igual ao projeto de {outro}. Recusado: produção e homologação têm que ser "
+                "bancos diferentes. Apague essa linha do credenciais/.env e rode de novo."
+            )
+        codigo, existente = _api_projeto(cab, ref_env)
+        if codigo == 200 and isinstance(existente, dict) and (existente.get("name") == nome or not exigir_nome):
+            achado = existente
+        elif not exigir_nome:
+            # Producao ja anotada no .env que o token nao abre: NUNCA cria outra por cima.
+            raise ErroConectar(
+                f"o credenciais/.env aponta {nome_ref}, mas o token do Supabase não abriu esse projeto "
+                f"(HTTP {codigo}). Nada foi criado. Confira o SUPABASE_ACCESS_TOKEN."
+            )
+    if achado is None:
+        codigo, todos = _http("GET", f"{API_SUPABASE}/v1/projects", cab)
+        if codigo != 200 or not isinstance(todos, list):
+            raise ErroConectar(f"não consegui listar os projetos do Supabase (HTTP {codigo}). Nada foi criado.")
+        for projeto in todos:
+            if isinstance(projeto, dict) and projeto.get("name") == nome and mesma_org(projeto):
+                achado = projeto
+                break
+    if achado is not None and ref_proibido and achado.get("ref") == ref_proibido:
+        raise ErroConectar(f"o projeto de {banco.rotulo} achado é o de {outro}. Recusado.")
+
+    if achado is not None:
+        ref = ref_valido(str(achado.get("ref") or achado.get("id") or ""))
+        linha("pulado", banco.comando, f"{achado.get('name') or nome} já existe (ref {ref})")
+        gravar({nome_ref: ref})
+        estado = str(achado.get("status", ""))
+        senha_conhecida = bool(env.get(nome_senha))
+    else:
+        senha = secrets.token_urlsafe(32)
+        corpo = {"name": nome, campo_org: org, "db_pass": senha,
+                 "region_selection": {"type": "specific", "code": regiao}}
+        codigo, criado = _http("POST", f"{API_SUPABASE}/v1/projects", cab, corpo)
+        if codigo not in (200, 201) or not isinstance(criado, dict):
+            raise _erro_criacao(codigo, criado, banco)
+        ref = ref_valido(str(criado.get("ref") or criado.get("id") or ""))
+        # Antes de qualquer espera: se o computador cair agora, a senha nao se perde.
+        gravar({nome_ref: ref, nome_senha: senha})
+        linha("ok", banco.comando, f"projeto {nome} criado (ref {ref})")
+        estado = str(criado.get("status", "COMING_UP"))
+        senha_conhecida = True
+
+    _esperar_no_ar(cab, ref, estado, banco)
+    linha("ok", banco.comando, f"{nome} no ar ({STATUS_NO_AR})")
+
+    codigo, chaves = _http("GET", f"{API_SUPABASE}/v1/projects/{ref}/api-keys?reveal=true", cab)
+    if codigo != 200 or not isinstance(chaves, list):
+        raise ErroConectar(f"não consegui ler as chaves do projeto de {banco.rotulo} (HTTP {codigo}).")
+    gravar({
+        nome_ref: ref,
+        banco.n("NEXT_PUBLIC_SUPABASE_URL"): f"https://{ref}.supabase.co",
+        banco.n("NEXT_PUBLIC_SUPABASE_ANON_KEY"): _chaves(chaves, "anon", "publishable", banco),
+        banco.n("SUPABASE_SERVICE_ROLE_KEY"): _chaves(chaves, "service_role", "secret", banco),
+    })
+    linha("ok", banco.comando, f"credenciais/.env com as variáveis do banco de {banco.rotulo} (só nomes)")
+
+    codigo, rest = _api_projeto(cab, ref, "/postgrest")
+    if codigo != 200 or not isinstance(rest, dict):
+        raise ErroConectar(f"não consegui ler os schemas expostos da {banco.rotulo} (HTTP {codigo}).")
+    atuais = [s.strip() for s in str(rest.get("db_schema") or "public").split(",") if s.strip()]
+    novos = atuais + [s for s in SCHEMAS_EXTRAS_HOMOLOG if s not in atuais]
+    if novos == atuais:
+        linha("pulado", banco.comando, f"schemas já expostos: {','.join(atuais)}")
+    else:
+        codigo, _corpo = _http("PATCH", f"{API_SUPABASE}/v1/projects/{ref}/postgrest", cab,
+                               {"db_schema": ",".join(novos)})
+        if codigo not in (200, 201, 204):
+            raise ErroConectar(f"PATCH postgrest da {banco.rotulo} devolveu HTTP {codigo}.")
+        linha("ok", banco.comando, f"schemas expostos: {','.join(novos)}")
+
+    if not senha_conhecida:
+        reserva = ("troque a senha no painel do Supabase (Database, Reset database password) e traga a nova "
+                   f"para o .env como {nome_senha} pelo comando de chave de uma linha")
+        linha("pendente", banco.comando,
+              f"o projeto já existia e o .env não tem {nome_senha}: o deploy do banco (GitHub) precisa dela; {reserva}.")
+    return ref
+
+
+def _organizacao(cab: dict, org_pedida: str | None) -> tuple[str, str]:
+    """(campo, valor) da organizacao onde o projeto nasce. Uma so: ela. Varias: exige --org."""
+    codigo, orgs = _http("GET", f"{API_SUPABASE}/v1/organizations", cab)
+    if codigo != 200 or not isinstance(orgs, list):
+        raise ErroConectar(
+            f"o token do Supabase não listou as organizações (HTTP {codigo}). Nada foi criado. "
+            "Confira o SUPABASE_ACCESS_TOKEN (etapa 7-banco)."
+        )
+    orgs = [o for o in orgs if isinstance(o, dict) and (o.get("slug") or o.get("id"))]
+    if org_pedida:
+        orgs = [o for o in orgs if org_pedida in (o.get("slug"), o.get("id"))]
+        if not orgs:
+            raise ErroConectar(f"a organização `{org_pedida}` não está entre as que o token abre. Nada foi criado.")
+    if len(orgs) != 1:
+        nomes = "; ".join(f"{o.get('name')} (--org {o.get('slug') or o.get('id')})" for o in orgs) or "nenhuma"
+        raise ErroConectar(
+            f"o token abre {len(orgs)} organizações do Supabase e eu não escolho por você: {nomes}. "
+            "Rode de novo com --org da organização da empresa. Nada foi criado."
+        )
+    campo = "organization_slug" if orgs[0].get("slug") else "organization_id"
+    return campo, str(orgs[0].get("slug") or orgs[0].get("id"))
+
+
+def cmd_banco(casa: Path, org_pedida: str | None = None, regiao: str = REGIAO_PADRAO) -> int:
+    env = ler_env(casa)
+    slug = ler_slug_os(casa)
+    cab = _pat(env)
+    if not PADRAO_TIME.match(regiao):
+        raise ErroConectar("--regiao inválida (ex.: sa-east-1).")
+    ref_homolog = env.get("SUPABASE_PROJECT_ID_HOMOLOG", "")
+    # Producao ja anotada no .env: reaproveita (ou para, sem criar outra); a organizacao nem e lida.
+    campo_org, org = ("organization_id", "") if env.get("SUPABASE_PROJECT_ID") else _organizacao(cab, org_pedida)
+    _preparar_projeto(casa, env, cab, PRODUCAO, slug, campo_org, org, regiao, ref_homolog, exigir_nome=False)
+    return 0
+
+
+def cmd_homologacao(casa: Path) -> int:
+    env = ler_env(casa)
+    slug = ler_slug_os(casa)
+    ref_prod = _ref(env)
+    cab = _pat(env)
+
+    status, prod = _api_projeto(cab, ref_prod)
+    if status != 200 or not isinstance(prod, dict):
+        raise ErroConectar(
+            f"o token do Supabase não abriu o projeto de produção (HTTP {status}). "
+            "Nada foi criado. Confira o SUPABASE_ACCESS_TOKEN (etapa 7-banco)."
+        )
+    campo_org = "organization_slug" if prod.get("organization_slug") else "organization_id"
+    org, regiao = prod.get(campo_org), prod.get("region") or REGIAO_PADRAO
+    if not org:
+        raise ErroConectar("a API do Supabase não disse a organização do projeto de produção.")
+    _preparar_projeto(casa, env, cab, HOMOLOGACAO, f"{slug}-homolog", campo_org, str(org), str(regiao),
+                      ref_prod, exigir_nome=True)
     return 0
 
 
@@ -445,8 +797,8 @@ def _prova_site(dominio: str) -> str:
     return f"200 https://{dominio}/login (o site falou com o Supabase)"
 
 
-def _prova_nomes_vercel(casa: Path) -> str:
-    contagem = conferir_nomes_na_vercel(casa)
+def _prova_nomes_vercel(casa: Path, sem_preview: bool = False) -> str:
+    contagem = conferir_nomes_na_vercel(casa, mapa_vercel(sem_preview))
     return ", ".join(f"{alvo} {quantos}/{quantos}" for alvo, quantos in contagem.items())
 
 
@@ -466,7 +818,7 @@ def _prova_auth(casa: Path, dominio: str, time_vercel: str) -> str:
     return f"site_url = {site} e a allow list tem o domínio e a prévia"
 
 
-def cmd_provar(casa: Path, dominio: str, time_vercel: str) -> int:
+def cmd_provar(casa: Path, dominio: str, time_vercel: str, sem_preview: bool = False) -> int:
     if not PADRAO_DOMINIO.match(dominio):
         raise ErroConectar("passe só o domínio, sem https:// nem barra (ex.: minha-empresa.vercel.app).")
     _validar_time(time_vercel)
@@ -474,7 +826,7 @@ def cmd_provar(casa: Path, dominio: str, time_vercel: str) -> int:
     provas: list[tuple[bool, str]] = []
     for rotulo, funcao in (
         ("site no ar", lambda: _prova_site(dominio)),
-        ("nomes na Vercel", lambda: _prova_nomes_vercel(casa)),
+        ("nomes na Vercel", lambda: _prova_nomes_vercel(casa, sem_preview)),
         ("Auth do Supabase", lambda: _prova_auth(casa, dominio, time_vercel)),
     ):
         try:
@@ -625,7 +977,17 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--casa", required=True)
     p.add_argument("--projeto-id", help="id do projeto devolvido pelo conector, se o project.json não tiver o nome")
 
-    p = sub.add_parser("vercel-env", help="variáveis do Supabase na Vercel (production e preview), prova por nomes")
+    p = sub.add_parser("vercel-env", help="variáveis do Supabase na Vercel (production: banco real; preview: homologação), prova por nomes")
+    p.add_argument("--casa", required=True)
+    p.add_argument("--sem-preview", action="store_true",
+                   help="só a produção (homologação ainda pendente por falta de vaga no plano gratuito do Supabase)")
+
+    p = sub.add_parser("banco", help="cria (ou reaproveita) o projeto Supabase <slug_os> de produção e grava as 5 variáveis no .env")
+    p.add_argument("--casa", required=True)
+    p.add_argument("--org", help="slug da organização do Supabase (só se o token abrir mais de uma)")
+    p.add_argument("--regiao", default="sa-east-1", help="região do projeto novo (padrão sa-east-1, São Paulo)")
+
+    p = sub.add_parser("homologacao", help="cria o projeto Supabase <slug_os>-homolog e grava as variáveis _HOMOLOG no .env")
     p.add_argument("--casa", required=True)
 
     p = sub.add_parser("auth-urls", help="site_url e Redirect URLs do Auth do Supabase")
@@ -637,6 +999,7 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--casa", required=True)
     p.add_argument("--dominio", required=True)
     p.add_argument("--time-vercel", required=True)
+    p.add_argument("--sem-preview", action="store_true", help="prova só os nomes da produção (homologação pendente)")
 
     p = sub.add_parser("vault", help="segredos no Vault + public.conexao + espelho no CONEXOES.md (o .env não muda)")
     p.add_argument("--casa", required=True)
@@ -650,9 +1013,11 @@ def _parser() -> argparse.ArgumentParser:
 
 COMANDOS = {
     "projeto": lambda a, casa: cmd_projeto(casa, a.projeto_id),
-    "vercel-env": lambda a, casa: cmd_vercel_env(casa),
+    "vercel-env": lambda a, casa: cmd_vercel_env(casa, a.sem_preview),
+    "banco": lambda a, casa: cmd_banco(casa, a.org, a.regiao),
+    "homologacao": lambda a, casa: cmd_homologacao(casa),
     "auth-urls": lambda a, casa: cmd_auth_urls(casa, a.dominio_prod, a.time_vercel),
-    "provar": lambda a, casa: cmd_provar(casa, a.dominio, a.time_vercel),
+    "provar": lambda a, casa: cmd_provar(casa, a.dominio, a.time_vercel, a.sem_preview),
     "vault": lambda a, casa: cmd_vault(casa, a.repo, a.org_supabase, a.time_vercel, a.projeto_vercel, a.escopo_token),
 }
 

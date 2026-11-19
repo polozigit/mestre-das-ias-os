@@ -11,6 +11,7 @@ import { Composer } from "./Composer";
 import { MessageAttachment } from "./MessageAttachment";
 import { Drafts } from "./Drafts";
 import {aplicarThread,aplicarMudanca,type LeitorState} from "@/lib/mensageria/thread-state";
+import {AVISO_TELEFONE,mascararTelefone,telefoneCompleto} from "@/lib/mensageria/telefone";
 
 const selectClass="h-10 min-w-0 rounded-md border border-borda bg-bg-elevada px-2 text-xs text-fg-1";
 const hora=(data:string|null)=>data?new Date(data).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"";
@@ -73,8 +74,10 @@ export function Inbox({usuarioId,podeEscrever,podeGerir}:{usuarioId:string;podeE
   }
   async function novaConversa(e:React.FormEvent){e.preventDefault();await acao(async()=>{
     const raw=novoNumero.trim();const grupo=raw.endsWith("@g.us");
-    const jid=raw.includes("@")?raw:raw.replace(/\D/g,"")+"@s.whatsapp.net";
-    if(!/^[0-9]{8,15}@s\.whatsapp\.net$/.test(jid)&&!/^\d+(?:-\d+)?@g\.us$/.test(jid))throw new Error("Informe telefone com DDI ou o identificador do grupo.");
+    if(raw.includes("@")&&!/^\d+(?:-\d+)?@g\.us$/.test(raw))throw new Error("Identificador de grupo inválido. Ele termina em @g.us.");
+    const numero=raw.includes("@")?null:telefoneCompleto(raw);
+    if(!raw.includes("@")&&!numero)throw new Error(AVISO_TELEFONE);
+    const jid=grupo?raw:`${numero}@s.whatsapp.net`;
     const result=await executar<Conversa>("conversa_criar",{conta_id:novaConta||painel?.contas[0]?.id,jid,grupo});
     setNova(false);setNovoNumero("");abrir(result);
   });}
@@ -102,7 +105,7 @@ export function Inbox({usuarioId,podeEscrever,podeGerir}:{usuarioId:string;podeE
             <input type="search" aria-label="Buscar conversas" placeholder="Buscar nome, número ou mensagem" value={filtros.busca||""} onChange={e=>setFiltros(f=>({...f,busca:e.target.value}))} className="h-10 w-full rounded-md border border-borda bg-bg px-3 text-xs"/>
             <div className="grid grid-cols-2 gap-2"><select aria-label="Estado do atendimento" value={filtros.estado||""} onChange={e=>setFiltros(f=>({...f,estado:e.target.value}))} className={selectClass}><option value="">Todos os estados</option><option value="aberta">Abertas</option><option value="pendente">Pendentes</option><option value="resolvida">Resolvidas</option></select><select aria-label="Responsável" value={filtros.responsavel||""} onChange={e=>setFiltros(f=>({...f,responsavel:e.target.value}))} className={selectClass}><option value="">Toda a equipe</option><option value="minhas">Minhas</option><option value="sem">Sem responsável</option>{painel.usuarios.map(u=><option key={u.id} value={u.id}>{u.nome}</option>)}</select></div>
             <div className="flex gap-3 text-xs"><label className="flex items-center gap-1"><input type="checkbox" checked={!!filtros.naoLidas} onChange={e=>setFiltros(f=>({...f,naoLidas:e.target.checked}))}/>Não lidas</label><label className="flex items-center gap-1"><input type="checkbox" checked={filtros.grupos===true} onChange={e=>setFiltros(f=>({...f,grupos:e.target.checked?true:undefined}))}/>Grupos</label></div>
-            {nova&&<form onSubmit={e=>void novaConversa(e)} className="space-y-2 rounded-md border border-borda bg-bg-sutil p-2"><select aria-label="Número para nova conversa" className={`${selectClass} w-full`} value={novaConta||painel.contas[0]?.id} onChange={e=>setNovaConta(e.target.value)}>{painel.contas.map(c=><option key={c.id} value={c.id}>{c.nome}</option>)}</select><input aria-label="Telefone ou grupo" required value={novoNumero} onChange={e=>setNovoNumero(e.target.value)} placeholder="Telefone com DDI ou ID do grupo" className="h-9 w-full rounded-md border border-borda bg-bg px-2 text-xs"/><Button size="sm" type="submit" disabled={busy}>Abrir conversa</Button></form>}
+            {nova&&<form onSubmit={e=>void novaConversa(e)} className="space-y-2 rounded-md border border-borda bg-bg-sutil p-2"><select aria-label="Número para nova conversa" className={`${selectClass} w-full`} value={novaConta||painel.contas[0]?.id} onChange={e=>setNovaConta(e.target.value)}>{painel.contas.map(c=><option key={c.id} value={c.id}>{c.nome}</option>)}</select><input aria-label="Telefone ou grupo" required type="tel" inputMode="tel" autoComplete="off" title={AVISO_TELEFONE} value={novoNumero} onChange={e=>{const v=e.target.value;setNovoNumero(v.includes("@")?v.trim():mascararTelefone(v));}} placeholder="(11) 91234-5678 ou ID do grupo" className="h-9 w-full rounded-md border border-borda bg-bg px-2 text-xs"/><Button size="sm" type="submit" disabled={busy}>Abrir conversa</Button></form>}
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">{visiveis.length?visiveis.map(c=><button type="button" key={c.id} onClick={()=>abrir(c)} aria-current={selecionada===c.id?"true":undefined} className={`w-full border-b border-borda-suave p-3 text-left hover:bg-bg-sutil ${selecionada===c.id?"bg-acento-suave":""}`}><div className="flex items-center justify-between gap-2"><span className="flex min-w-0 items-center gap-2 truncate text-sm font-semibold">{c.grupo&&<Users size={14}/>}<span className="truncate">{c.nome||c.jid.split("@")[0]}</span></span><time className="shrink-0 text-xs text-fg-3">{hora(c.ultima_em)}</time></div><div className="mt-1 flex items-center justify-between gap-2"><p className="truncate text-xs text-fg-3">{c.ultima_mensagem||"Sem mensagens"}</p>{c.nao_lidas>0&&<span className="rounded-full bg-acento px-1.5 py-0.5 text-xs text-fg-sobre-acento">{c.nao_lidas}</span>}</div><p className="mt-1 text-[11px] text-fg-3">{painel.contas.find(a=>a.id===c.conta_id)?.nome} · {estadoLegivel(c.estado)}</p></button>):<p className="p-6 text-sm text-fg-3">Nenhuma conversa com estes filtros.</p>}</div>
           <button type="button" onClick={()=>void verLegado()} className="border-t border-borda p-3 text-left text-xs text-fg-3 underline">Ver registros anteriores à caixa</button>

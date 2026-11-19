@@ -9,12 +9,12 @@ import { useMobileNav } from "./MobileNavProvider";
 export function TopBar() {
   const { toggle } = useMobileNav();
   return (
-    <header className="sticky top-0 z-30 flex h-[var(--topbar-h)] items-center gap-2 border-b border-borda bg-bg-elevada px-4 lg:px-6">
+    <header className="sticky top-0 z-30 flex h-[var(--topbar-h)] items-center gap-2 border-b border-borda bg-bg-elevada/80 px-4 backdrop-blur-md lg:px-6">
       <button
         type="button"
         onClick={toggle}
         aria-label="Abrir menu"
-        className="-ml-2 grid size-11 place-items-center rounded-md text-fg-2 hover:bg-bg-sutil lg:hidden"
+        className="-ml-2 grid size-11 place-items-center rounded-md text-fg-2 transition-colors hover:bg-bg-sutil lg:hidden"
       >
         <Menu size={20} aria-hidden />
       </button>

@@ -40,7 +40,7 @@ Nessa ordem, o script: (1) copia `assets/modelo-empresa-ia-v3/` INCLUSIVE `.code
 
 1. Confirmar `AGENTS.md`, `EMPRESA-IA.md`, `MAPA-DA-EMPRESA-IA.md` e `operacao/STATUS-ATUAL.md`, com nome da empresa e nome do dono já preenchidos — nenhum `{{` sobrando em nenhum `.md`.
 2. Confirmar que `.git` existe, `git branch --show-current` retorna `main`, `git config core.hooksPath` retorna `.githooks` e `git log --oneline` mostra o commit "casa inicial da NOME IA".
-3. Confirmar os agentes-núcleo em `.codex/agents/*.toml`: `polozi-gerente-de-trabalho` e `polozi-sistema-qa` (a lista exata vem de `assets/agents-spec/agentes.json`).
+3. Confirmar o agente-núcleo em `.codex/agents/*.toml`: `polozi-sistema-qa` (a lista exata vem de `assets/agents-spec/agentes.json`). O `polozi-gerente-de-trabalho` está arquivado desde 14/11/2026 (`capacidades/APOSENTADOS.json`): não deve existir na Casa.
 4. Confirmar que `.codex/config.toml` existe no destino.
 5. Confirmar que `credenciais/.env` existe, vazio, permissão 600 — nunca ler o conteúdo em voz alta nem colar no chat.
 6. Confirmar que nenhum arquivo empresarial fictício (dossiê, persona, identidade visual) foi criado — todos os papéis nascem `ausente` no MAPA (`operacao/mapa.json`).

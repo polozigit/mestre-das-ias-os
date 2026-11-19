@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
@@ -10,15 +11,17 @@ import {
   sheetPanelClasses,
 } from "@/components/ui/Sheet";
 import { formatarData } from "@/lib/format";
-import { salvarPermissoes, alternarAtivo } from "@/app/(app)/usuarios/actions";
+import { salvarPermissoes, alternarAtivo, redefinirSenha } from "@/app/(app)/usuarios/actions";
 import { podeEditarUsuario, statusDoMembro } from "@/app/(app)/usuarios/regras";
+import { podeRedefinirSenha } from "@/lib/senha-equipe";
 import type { GrupoPermissoes, Membro } from "./MembrosTable";
+import { MensagemDeAcesso } from "./MensagemDeAcesso";
 
 const ROTULO_ACAO: Record<string, string> = { read: "Ver", write: "Editar", manage: "Gerir" };
 
 /**
- * Painel de uma pessoa: permissões por módulo (checkbox por slug) e
- * desativar/reativar acesso. A server action revalida tudo (o dono não é
+ * Painel de uma pessoa: permissões por módulo (checkbox por slug),
+ * desativar/reativar acesso e redefinir a senha (volta pra provisória, sem e-mail). A server action revalida tudo (o dono não é
  * editado, `usuarios.manage` é do dono, módulo desligado não concede); aqui a
  * UI só esconde o que não faz sentido oferecer.
  */
@@ -46,10 +49,14 @@ export function GerenciarMembroSheet({
   const [exibido, setExibido] = useState<Membro | null>(membro);
   const [marcadas, setMarcadas] = useState<string[]>(membro?.permissoes ?? []);
   const [erro, setErro] = useState<string | null>(null);
+  const [confirmandoSenha, setConfirmandoSenha] = useState(false);
+  const [acesso, setAcesso] = useState<{ texto: string; info?: string } | null>(null);
   if (membro && membro !== exibido) {
     setExibido(membro);
     setMarcadas(membro.permissoes);
     setErro(null); // erro é do membro anterior — não pode vazar pro próximo
+    setConfirmandoSenha(false);
+    setAcesso(null); // a mensagem com a senha também não vaza pra outra pessoa
   }
 
   const [pendente, startTransition] = useTransition();
@@ -96,6 +103,17 @@ export function GerenciarMembroSheet({
     });
   }
 
+  function confirmarRedefinicao() {
+    if (!exibido) return;
+    setErro(null);
+    startTransition(async () => {
+      const res = await redefinirSenha(exibido.id);
+      setConfirmandoSenha(false);
+      if (res.ok && res.acesso) setAcesso({ texto: res.acesso, info: res.info });
+      else setErro(res.error ?? "Não deu pra redefinir a senha.");
+    });
+  }
+
   const ehDono = exibido?.e_dono === true;
   const editavel = exibido ? podeEditarUsuario(exibido, { eDono: sessaoEDono }) : false;
   const mudou =
@@ -103,6 +121,7 @@ export function GerenciarMembroSheet({
     (marcadas.length !== exibido.permissoes.length || marcadas.some((s) => !exibido.permissoes.includes(s)));
   const ehVoceMesmo = exibido?.id === sessaoUsuarioId;
   const status = exibido ? statusDoMembro(exibido) : null;
+  const senha = exibido ? podeRedefinirSenha({ usuarioId: sessaoUsuarioId, eDono: sessaoEDono }, exibido) : null;
 
   return (
     <>
@@ -150,10 +169,20 @@ export function GerenciarMembroSheet({
             </div>
 
             {ehDono || !editavel ? (
-              <p className="rounded-md bg-bg-sutil px-3 py-2.5 text-sm text-fg-3">
-                Este é o dono da empresa. Ele já tem todas as permissões e o
-                acesso dele não pode ser desativado.
-              </p>
+              <div className="space-y-3">
+                <p className="rounded-md bg-bg-sutil px-3 py-2.5 text-sm text-fg-3">
+                  Este é o dono da empresa. Ele já tem todas as permissões e o
+                  acesso dele não pode ser desativado.
+                </p>
+                {ehVoceMesmo && (
+                  <Link
+                    href="/conta/senha"
+                    className="inline-flex min-h-11 items-center text-sm font-medium text-acento-texto underline-offset-4 hover:underline md:min-h-0"
+                  >
+                    Trocar a minha senha
+                  </Link>
+                )}
+              </div>
             ) : (
               <>
                 <div>
@@ -221,6 +250,68 @@ export function GerenciarMembroSheet({
                         disabled={pendente}
                       >
                         {pendente ? "Aguarde..." : exibido.ativo ? "Desativar acesso" : "Reativar acesso"}
+                      </Button>
+                    </>
+                  )}
+                </div>
+
+                <div className="border-t border-borda-suave pt-4">
+                  <p className="mb-2 text-sm font-medium text-fg-2">Senha</p>
+                  {acesso ? (
+                    <div className="space-y-3">
+                      <MensagemDeAcesso titulo="Senha redefinida" texto={acesso.texto} />
+                      {acesso.info && <p className="text-xs text-fg-3">{acesso.info}</p>}
+                    </div>
+                  ) : ehVoceMesmo ? (
+                    <p className="text-sm text-fg-3">
+                      Pra trocar a sua senha, use{" "}
+                      <Link href="/conta/senha" className="font-medium text-acento-texto underline-offset-4 hover:underline">
+                        Trocar senha
+                      </Link>
+                      .
+                    </p>
+                  ) : senha && !senha.pode ? (
+                    <p className="text-sm text-fg-3">{senha.motivo}</p>
+                  ) : confirmandoSenha ? (
+                    <div className="space-y-3 rounded-md border border-alerta bg-alerta-suave px-3 py-3">
+                      <p className="text-sm text-fg-1">
+                        A senha de {exibido.nome} volta a ser a provisória. Confirmar?
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          className="min-h-11 md:min-h-0"
+                          onClick={confirmarRedefinicao}
+                          disabled={pendente}
+                        >
+                          {pendente ? "Redefinindo..." : "Confirmar"}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="min-h-11 md:min-h-0"
+                          onClick={() => setConfirmandoSenha(false)}
+                          disabled={pendente}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="mb-2 text-xs text-fg-3">
+                        Esqueceu a senha? Volte pra provisória e mande a mensagem pra pessoa.
+                        No próximo acesso o sistema pede pra ela trocar.
+                      </p>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="min-h-11 md:min-h-0"
+                        onClick={() => setConfirmandoSenha(true)}
+                        disabled={pendente}
+                      >
+                        Redefinir senha
                       </Button>
                     </>
                   )}

@@ -26,8 +26,8 @@ link — a UI é cosmética, nunca a defesa).
 - **Migration nova**: seguir o molde de `supabase/migrations/` (RLS + REVOKE +
   GRANT mínimo + policy + smoke que prova o GRANT). O especialista de banco do
   time de sistema valida ANTES de aplicar; nunca aplicar direto em produção.
-- **Mudança de tela vai ao ar com o "aprovado" do dono**: CI verde (os testes
-  automáticos continuam obrigatórios) → link do preview da Vercel → o DONO abre
+- **Mudança de tela vai ao ar com o "aprovado" do dono**: checagem local verde (os
+  testes automáticos continuam obrigatórios) → link do preview da Vercel → o DONO abre
   o link, olha a tela que mudou e responde "aprovado" → produção. Não existe QA
   de tela obrigatório, usuário de teste, agente de QA no caminho nem ciclo
   extra. A primeira resposta da IA no preview diz ao dono o único passo dele:

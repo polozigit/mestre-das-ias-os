@@ -1,0 +1,11 @@
+{
+  "migration": "20261117120000_mensageria_ligar_computador.sql",
+  "sha256": "b54416c21c530145e9227001b77853f38c96d724a7e38002578eaa6a48e10904",
+  "classe": "acrescenta",
+  "achados": [],
+  "resultado": "APPROVED",
+  "revisor": "tecnologia-revisor-seguranca",
+  "aprovado_por_dono": null,
+  "nota": "migration do modelo do kit (Mestre das IAs), revisada na construção do template; veredito gravado pelo montador do repositório-modelo; prova: aplicada no ambiente de homologação do kit (lista de migrations aplicadas lida em 2026-11-18T12:36:15Z, sha256 igual ao arquivo) e verificação pgTAP do kit",
+  "data": "2026-11-19"
+}

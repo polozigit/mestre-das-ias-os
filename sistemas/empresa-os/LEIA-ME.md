@@ -72,12 +72,13 @@ schemas**, acrescente `tarefas` e `organograma` à lista (mantenha os que já
 estão) e salve. Sem isso o setup para com o erro `PGRST106`, que repete essa
 instrução.
 
-**6. Seed + convite do dono.** `source credenciais/.env && SITE_URL=<url do
+**6. Seed + login do dono.** `source credenciais/.env && SITE_URL=<url do
 passo 7, ou http://localhost:3000 por enquanto> node scripts/setup-inicial.mjs`.
 Isso cria a empresa e o dono, carrega o organograma de referência
 e o plano do curso (já com o cronograma de tarefas), registra os agentes do núcleo na tela Time de Agentes, coloca os agentes instalados nas
-posições do Time de IA do organograma e manda o e-mail de convite
-pro dono definir a senha. O cronograma começa em `CURSO_INICIO`
+posições do Time de IA do organograma e cria o login do dono com a senha
+provisória `mudar@123` e o e-mail já confirmado (nenhum e-mail sai do Supabase:
+o envio padrão só entrega para membro da organização, 2 por hora e em inglês). O cronograma começa em `CURSO_INICIO`
 (`AAAA-MM-DD`, o Dia 1 do curso); sem essa variável, começa hoje. Idempotente:
 rodar de novo não duplica nada; se o cronograma já existe, mantém o início
 gravado (e para com aviso se `CURSO_INICIO` for outra data). Se o plano
@@ -97,9 +98,16 @@ aceita os dois nomes de cada uma (leitura única em `config/supabase-env.mjs` e
 `config/supabase-env-servidor.mjs`; ver `conexao.md`) e a skill grava o primeiro nome
 de cada par. Não ligue também a integração do Marketplace Supabase → Vercel: ela grava os
 outros nomes e duplica as variáveis. A IA só PROVA por `vercel env ls` que os nomes
-apareceram, nunca cadastra isso na mão no painel. O preview usa o MESMO banco da
-produção até existir homologação: um teste no preview mexe em dado real (risco aceito,
-anotado como pendência na etapa `7-banco` do instalador).
+apareceram, nunca cadastra isso na mão no painel. O preview usa o banco de
+HOMOLOGAÇÃO (`<slug>-homolog`, um 2º projeto Supabase criado pelo `conectar.py homologacao`
+na etapa `7-banco` do instalador, com o mesmo token de acesso e sem nenhuma ação sua): um
+teste no preview nunca mexe em dado real, e o login do dono pelo preview abre sessão no
+banco de teste. A produção recebe só a URL e a chave pública dele, para o keep-alive diário
+manter o banco de teste acordado. O plano gratuito do Supabase aceita 2 projetos ativos; sem
+vaga, a homologação fica pendente (`vercel-env --sem-preview`) e o preview sem banco até você
+pausar ou apagar um projeto gratuito que não usa e rodar de novo. Casa instalada antes disso:
+rode `conectar.py homologacao` e depois `conectar.py vercel-env` (idempotentes; trocam o preview
+do banco real para o de teste).
 O token da conferência opcional do preview (`PREVIEW_TEST_TOKEN`) e o e-mail do dono (`PREVIEW_OWNER_EMAIL`,
 lido do `operacao/INSTALACAO.md`) entram por CLI (`vercel env add ... preview`,
 valor vindo de arquivo, nunca do chat): quem faz isso é o `instalar_guardas.py` da
@@ -112,10 +120,11 @@ Redirect URLs `https://<dominio>/**` e `https://*-<time-da-vercel>.vercel.app/**
 sem apagar as que já existem. Mudança de tela: CI verde → link do preview → o dono olha a tela que mudou
 e responde "aprovado" → produção (regra no AGENTS.md). Na instalação, a 1ª publicação vai
 direto, sem QA de tela nem usuário de teste. Com o sistema publicado, rode o setup do passo 6 de novo com o
-`SITE_URL` definitivo: é ele que conclui o passo "sistema no ar". Convite já
-enviado só sai de novo com `REENVIAR_CONVITE=1`.
+`SITE_URL` definitivo: é ele que conclui o passo "sistema no ar". Rodar de novo
+não troca a senha de quem já trocou; `ZERAR_SENHA=1` volta para a provisória.
 
-**8. Primeiro login.** O dono abre o e-mail de convite, define a senha (2x) e
+**8. Primeiro login.** O dono entra com o e-mail dele e a senha provisória
+`mudar@123` (o sistema avisa para trocar, em Trocar senha no menu do usuário) e
 entra — de preferência pelo CELULAR, pra sentir o "eu tenho um sistema". Mostre:
 Início, Cronograma, Tarefas, Organograma, Time de Agentes (clique num agente
 pra ver o que ele faz), Marca, Usuários (convidar sócio/esposa), Atividade e Configurações. No topo há o botão de tema
@@ -160,7 +169,7 @@ regra: "No Expiration", escopo só no time da empresa.)
 ## Ordem importa
 
 Migrations e liberação dos schemas na Data API (5) ANTES do seed (6); seed ANTES do primeiro login (8) — se o dono
-abrir a URL antes do convite, ele cai na tela de login sem conta, e está tudo
+abrir a URL antes do seed, ele cai na tela de login sem conta, e está tudo
 bem: é só seguir os passos.
 
 ## Depois da instalação

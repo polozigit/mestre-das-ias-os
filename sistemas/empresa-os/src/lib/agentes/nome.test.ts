@@ -5,7 +5,7 @@ import { LEGENDA_DOS_MODELOS, nomeAmigavel, rotuloEsforco, rotuloModelo } from "
 test("nome amigável tira o prefixo da diretoria (o time) e vira frase com inicial maiúscula", () => {
   assert.equal(nomeAmigavel("marketing-diretor", "marketing"), "Diretor");
   assert.equal(nomeAmigavel("contratacao-auditor", "contratacao"), "Auditor");
-  assert.equal(nomeAmigavel("native-ai-avaliador", "native-ai"), "Avaliador");
+  assert.equal(nomeAmigavel("gestao-pessoas-avaliador", "gestao-pessoas"), "Avaliador");
   assert.equal(nomeAmigavel("tecnologia-revisor-seguranca", "tecnologia"), "Revisor segurança");
 });
 
@@ -91,5 +91,5 @@ test("esforço em português; valor desconhecido passa como veio", () => {
 test("o time pode vir com acento, maiúscula ou espaço e o prefixo da diretoria ainda sai", () => {
   assert.equal(nomeAmigavel("contratacao-diretor", "Contratação"), "Diretor");
   assert.equal(nomeAmigavel("gestao-auditor", "gestão"), "Auditor");
-  assert.equal(nomeAmigavel("native-ai-avaliador", "Native AI"), "Avaliador");
+  assert.equal(nomeAmigavel("gestao-pessoas-avaliador", "Gestão Pessoas"), "Avaliador");
 });

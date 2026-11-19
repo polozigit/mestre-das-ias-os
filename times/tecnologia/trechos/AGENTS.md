@@ -2,13 +2,13 @@
 
 ## Time tecnologia
 
-Este time cria e melhora agentes, skills e fluxos desta casa. Antes de agir, escolha um dos 3 caminhos:
+Este time cria time e agente novo desta casa, só sob demanda. Escolha um dos 3 caminhos:
 
 1. Pergunta ou consulta: responda direto.
-2. Mudança pequena em algo que já existe (um texto, um número, um ajuste simples): mostre o desenho curto e espere o sim do dono. Este caminho não vale para os arquivos protegidos listados abaixo.
-3. Coisa nova (agente, skill, fluxo ou sistema) ou mudança em arquivo protegido: chame a skill `tecnologia-sistema`. Ela desenha, constrói, prova e pede o OK do dono.
+2. Qualquer mudança em algo que já existe, e também skill, agente, hook ou `AGENTS.md` comuns: faça você mesmo, direto, sem esta skill. Nos arquivos protegidos listados abaixo, mostre antes o desenho curto (o que muda, por quê, como provar) e espere o sim do dono.
+3. Só quando o dono pedir um time ou agente novo, ou digitar `$tecnologia-sistema`: chame a skill `tecnologia-sistema`. Ela desenha, constrói, prova e pede o OK do dono.
 
-Arquivos protegidos: qualquer mudança neles vai pelo caminho 3, com a prova e a revisão do avaliador do time, e nunca pelo caminho 2.
+Arquivos protegidos: mudança neles nunca é silenciosa; pede o desenho curto e o sim do dono.
 
 - `.claude/agents/**`
 - `.codex/agents/**`
@@ -18,7 +18,7 @@ Arquivos protegidos: qualquer mudança neles vai pelo caminho 3, com a prova e a
 
 | Nome | Quando chamar |
 |---|---|
-| `tecnologia-revisor-seguranca` | Use antes de todo merge de mudança em sistemas/ (tela, banco, rota), chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito |
+| `tecnologia-revisor-seguranca` | Use só quando o diff toca migration, login ou autorização, arquivo protegido ou padrão de segredo, chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito |
 | `tecnologia-sistema` | Ponto de entrada do time: chame pelo nome |
 | `tecnologia-publicar` | Chame pelo nome |
 | `tecnologia-mudar-banco` | Chame pelo nome |

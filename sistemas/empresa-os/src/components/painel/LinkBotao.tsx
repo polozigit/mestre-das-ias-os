@@ -19,7 +19,7 @@ export function LinkBotao({
     <Link
       href={href}
       className={cn(
-        "inline-flex h-9 items-center justify-center gap-2 rounded-md border border-borda bg-bg-elevada px-4 text-sm font-semibold text-fg-1 transition-colors hover:bg-bg-sutil",
+        "inline-flex h-9 items-center justify-center gap-2 rounded-md border border-borda bg-bg-elevada px-4 text-sm font-semibold text-fg-1 transition-[background-color,border-color,scale] duration-150 ease-saida hover:bg-bg-sutil motion-safe:active:scale-[0.97]",
         className,
       )}
     >

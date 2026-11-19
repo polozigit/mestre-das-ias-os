@@ -99,8 +99,8 @@ test("validarAlternarAtivo: auto-desativação e dono são bloqueados; reativar 
 test("statusDoMembro: Inativo ganha de pendente; só logou = Ativo", () => {
   assert.deepEqual(statusDoMembro({ ativo: false, auth_user_id: null, aceitou_convite: false }), { label: "Inativo", tone: "neutral" });
   assert.deepEqual(statusDoMembro({ ativo: false, auth_user_id: "abc", aceitou_convite: true }), { label: "Inativo", tone: "neutral" });
-  assert.deepEqual(statusDoMembro({ ativo: true, auth_user_id: "abc", aceitou_convite: false }), { label: "Aguardando convite", tone: "warning" });
-  assert.deepEqual(statusDoMembro({ ativo: true, auth_user_id: null, aceitou_convite: false }), { label: "Aguardando convite", tone: "warning" });
+  assert.deepEqual(statusDoMembro({ ativo: true, auth_user_id: "abc", aceitou_convite: false }), { label: "Ainda não entrou", tone: "warning" });
+  assert.deepEqual(statusDoMembro({ ativo: true, auth_user_id: null, aceitou_convite: false }), { label: "Ainda não entrou", tone: "warning" });
   assert.deepEqual(statusDoMembro({ ativo: true, auth_user_id: "abc", aceitou_convite: true }), { label: "Ativo", tone: "success" });
 });
 

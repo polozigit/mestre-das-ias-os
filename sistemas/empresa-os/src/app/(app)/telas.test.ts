@@ -77,8 +77,9 @@ test("Tarefas: a lista escreve a data (dia/mês/ano) e guarda o relativo na dica
 });
 
 test("Tarefas: o alternador quadro/lista e o filtro guardam o grupo da URL", () => {
-  assert.match(tarefas, /hrefListaTarefas\(grupo\)/);
-  assert.match(tarefas, /hrefListaTarefas\(grupo, \{/);
+  // O quadro é a URL limpa do grupo, só com a área escolhida (o filtro de área vale nas duas visões).
+  assert.match(tarefas, /hrefQuadro = hrefListaTarefas\(grupo, \{ area: filtroArea \}\)/);
+  assert.match(tarefas, /hrefListaTarefas\(grupo, \{\s*visao: "lista"/);
   assert.match(tarefas, /\{grupo === "curso" && <input type="hidden" name="trilha" value="curso" \/>\}/);
 });
 

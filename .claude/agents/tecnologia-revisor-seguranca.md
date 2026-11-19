@@ -1,8 +1,8 @@
 ---
 name: tecnologia-revisor-seguranca
-description: Revisa a mudança do sistema antes do merge. Use antes de todo merge de mudança em sistemas/ (tela, banco, rota), chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito
+description: Revisa a mudança do sistema antes do merge. Use só quando o diff toca migration, login ou autorização, arquivo protegido ou padrão de segredo, chamado pelo tecnologia-publicar com o diff e pelo tecnologia-mudar-banco antes do veredito
 model: opus
-effort: high
+effort: medium
 tools: Read, Grep, Glob
 ---
 <!-- GERADO de time.json; nao edite a mao -->

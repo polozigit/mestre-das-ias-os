@@ -3,14 +3,14 @@ version: alpha
 name: "Empresa OS"
 description: "Tema padrão do molde. A marca da empresa entra pela skill tecnologia-aplicar-marca."
 colors:
-  primary: "#4F46E5"
-  primary-hover: "#4338CA"
+  primary: "#171717"
+  primary-hover: "#3A3A3A"
   on-primary: "#FFFFFF"
-  primary-text: "#4338CA"
-  surface: "#FCFCFD"
-  surface-dark: "#111114"
-  on-surface: "#111114"
-  neutral: "#6A6A78"
+  primary-text: "#171717"
+  surface: "#FFFFFF"
+  surface-dark: "#0A0A0A"
+  on-surface: "#0A0A0A"
+  neutral: "#6B6B6B"
   error: "#B5371F"
 typography:
   titulos:
@@ -36,7 +36,7 @@ rounded:
 | Arquivo | O que é | Pode editar? |
 |---|---|---|
 | `src/app/theme.css` | TODOS os tokens de marca (cores, tipo, raio, sombra) | SÓ pela skill `tecnologia-aplicar-marca` |
-| `src/app/globals.css` | mecânica fixa (mapeamento Tailwind, reset, tabela-card) | NÃO |
+| `src/app/globals.css` | mecânica fixa (mapeamento Tailwind, reset, tabela-card, movimento e luz) | NÃO |
 | `public/marca/logo.*` (+ `logo-fundo-escuro.*`) | logo da empresa, claro e escuro | SÓ pela skill `tecnologia-aplicar-marca` |
 | `src/app/icon.*` | ícone da aba do navegador | SÓ pela skill `tecnologia-aplicar-marca` |
 | `config/marca.ts` | logo claro/escuro, fonte do Google e cor da barra do navegador | SÓ pela skill `tecnologia-aplicar-marca` |
@@ -86,6 +86,35 @@ de cor fora disso: componente usa só as classes semânticas.
 O menu lateral também é estado do navegador: recolhível no desktop
 (`data-sidebar` no `<html>`) e gaveta no celular. Isso é estrutura, não marca,
 e não se mexe por tema.
+
+## Movimento e luz
+
+O movimento é mecânica fixa (`src/app/globals.css`, seção "Movimento e luz"), não é marca: você não
+edita. A regra que amarra tudo: **a cor da marca é a luz do sistema.** Trocou o `--acento` no
+`theme.css`, a luz troca junto, sem tocar em mais nada.
+
+| Onde | O que acontece | Classe |
+|---|---|---|
+| Cartão que abre algo | acende na cor da marca no ponto do cursor e sobe 2px | `luz` |
+| Lista de cartões | os itens entram em cascata curta | `entrada` (no pai) |
+| Barra de progresso | enche até o valor e uma luz passa por ela | `barra-enche` |
+| Número do KpiCard | conta de 0 até o valor (só inteiro simples ou "41%") | automático |
+| Passo concluído | o visto se desenha, um depois do outro | `traco-acende` |
+| Onde a pessoa está | um anel sai do ponto, na cor do ponto | `ponto-vivo` |
+| Menu e abas | uma só marca desliza até o item escolhido | automático |
+| Troca de página | fio de luz no topo enquanto carrega; a página chega de leve | automático |
+| Troca de tema | o tema novo abre em círculo a partir do botão | automático |
+| Login | a luz da marca desce do topo e acompanha o cursor | `palco-luz` |
+| Menu, balão, aviso | abre a partir de um ponto | `surgir` |
+| Carregando | faixa de luz atravessando o bloco | `Skeleton` |
+
+Tela nova usa as classes da tabela, nunca animação escrita à mão. Três regras:
+
+- Animação nunca fica aplicada depois de terminar (`forwards` ou `both`): ela desloca os painéis
+  laterais. O teste `src/app/movimento.test.ts` reprova.
+- Toda classe que se move tem saída em "movimento reduzido" (o bloco no fim do `globals.css`).
+- Movimento explica alguma coisa (o clique valeu, de onde isso veio, onde eu estou). Enfeite que não
+  explica nada fica de fora.
 
 ## Procedimento: aplicar a marca
 

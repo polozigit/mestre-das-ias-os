@@ -69,7 +69,7 @@ vira `<SKILL_DIR>` — a pasta que contém `scripts/instalar_time.py` (sem o
 `scripts/instalar_time.py` no final).
 
 Nenhum caminho achou → **PARE**: esta skill está instalada incompleta.
-Peça pra reinstalar o `polozi-fundacao.zip` e reiniciar o app. Não
+Peça pra baixar o zip do kit de novo, descompactar e abrir no aplicativo a pasta que tem o `AGENTS.md` dentro, não a de fora. Não
 improvise caminho, não rode nada relativo.
 
 ## Comando do Python (faça isto antes de qualquer comando)
@@ -156,10 +156,15 @@ do comando já lista quais).
 do time estão em `.agents/skills/` (faltou alguma, sai 2 e a mensagem diz
 quais: a Casa veio incompleta, clone de novo o repositório-modelo, que já
 traz o time; esta skill não cria skill), gera os subagentes do `time.json`
-(o mesmo texto do gerador do Native AI) e grava só os que faltam ou mudaram.
+(o mesmo texto do `scripts/gerador_times/gerar_saidas.py` do kit) e grava só os que faltam ou mudaram.
 Aqui NÃO há recusa de "outra plataforma" (o kit serve às duas) nem medida de
 orçamento (as skills já estão na Casa e já entram na conta). Rodar de novo
 não muda nenhum byte.
+
+**Aposentados:** `capacidades/APOSENTADOS.json` (`agentes`, `skills`, `times`) lista o que saiu da Casa de
+propósito. `--instalar` de time aposentado sai 2 sem gravar nada: restaurar exige pedido explícito do dono e
+segue o MANIFESTO do arquivo do kit (`arquivo-capacidades/`). O `sincronizar_catalogo.py` marca esses itens como
+`aposentado` no catálogo. A skill nunca edita o `APOSENTADOS.json`.
 
 ### P5 — Espelho no banco (se existir)
 
@@ -226,8 +231,8 @@ Pra um módulo virar "time instalável" por esta skill, precisa:
 
 Faltando a entrada E o cache = o módulo não está no zip = **PARE**.
 
-Agente, skill ou time **novo do próprio aluno** não passa por aqui: é com o
-time Native AI (`native-ai-construir`).
+Agente, skill ou time **novo do próprio aluno** não passa por aqui: é com a IA
+principal: o aluno pede e ela cria as skills em `.agents/skills/<area>-<nome>/`.
 
 ## Remover (três gestos, três donos — nunca confunda)
 

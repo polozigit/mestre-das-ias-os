@@ -72,7 +72,7 @@ export default async function UsuariosPage() {
       <div>
         <h1 className="font-display text-2xl font-bold text-fg-1">Usuários</h1>
         <p className="mt-1 text-sm text-fg-3">
-          Quem entra no sistema e o que cada pessoa pode ver e fazer. Convites chegam por e-mail.
+          Quem entra no sistema e o que cada pessoa pode ver e fazer. O cadastro e a troca de senha acontecem aqui dentro, sem e-mail.
         </p>
       </div>
 

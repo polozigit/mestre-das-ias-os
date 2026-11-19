@@ -4,7 +4,7 @@ credenciais/*.env
 # Lixo de sistema
 .DS_Store
 node_modules/
-# Log local dos hooks (guarda/autosave) - nao e historico do negocio
+# Log local dos hooks (guarda/registro) - nao e historico do negocio
 operacao/telemetria.jsonl
 # Backup do banco - dado real do cliente, NUNCA sobe
 operacao/backups/
@@ -12,7 +12,7 @@ operacao/backups/
 operacao/vigilancia/entrada.json
 # Copia de trabalho do PMO (tarefas lidas do banco, com nome de pessoa): refeita a cada leitura
 operacao/pmo/tarefas.json
-# Estado local do registro do trabalho (1 conversa = 1 arquivo): refeito a cada pedido
+# Fila local do registro do trabalho (estado dos objetivos, vinculos, pendentes, recibos, checkpoint): cache, nunca historico
 operacao/tasks/.sessoes/
 # o repo do kit ignora .codex/ e .agents/; aqui eles PRECISAM subir (Casa pronta no zip)
 !.codex/

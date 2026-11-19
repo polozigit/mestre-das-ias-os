@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
-import { autorizado, tocarBanco } from "./keep-alive.ts";
+import { autorizado, tocarBanco, tocarHomologacao } from "./keep-alive.ts";
 
 const raiz = new URL("../../", import.meta.url);
 
@@ -56,4 +56,68 @@ test("o proxy deixa o Cron passar sem login (o Cron não segue redirect para /lo
   const fonte = readFileSync(new URL("src/lib/supabase/proxy.ts", raiz), "utf8");
   const bloco = fonte.match(/const isPublic =([\s\S]*?);/)?.[1] ?? "";
   assert.ok(bloco.includes('pathname === "/api/keep-alive"'), "isPublic sem /api/keep-alive");
+});
+
+const URL_HML = "https://refhomolog.supabase.co";
+const CHAVE_HML = "anon-homolog-fake";
+
+test("tocarHomologacao: sem URL ou sem chave anon é ausente e nem chama a rede", async () => {
+  let chamadas = 0;
+  const busca = (async () => {
+    chamadas++;
+    return new Response("[]", { status: 200 });
+  }) as typeof fetch;
+  assert.equal(await tocarHomologacao(undefined, CHAVE_HML, busca), "ausente");
+  assert.equal(await tocarHomologacao(URL_HML, undefined, busca), "ausente");
+  assert.equal(await tocarHomologacao("", "", busca), "ausente");
+  assert.equal(chamadas, 0);
+});
+
+test("tocarHomologacao: leitura de empresa com a chave anon; lista vazia pela RLS é ok", async () => {
+  let pedido: { url: string; init?: RequestInit } | null = null;
+  const busca = (async (url: string, init?: RequestInit) => {
+    pedido = { url, init };
+    return new Response("[]", { status: 200 });
+  }) as unknown as typeof fetch;
+  assert.equal(await tocarHomologacao(`${URL_HML}/`, CHAVE_HML, busca), "ok");
+  assert.equal(pedido!.url, `${URL_HML}/rest/v1/empresa?select=id&limit=1`);
+  const cab = pedido!.init!.headers as Record<string, string>;
+  assert.equal(cab.apikey, CHAVE_HML);
+  assert.equal(cab.Authorization, `Bearer ${CHAVE_HML}`);
+  assert.ok(pedido!.init!.signal, "sem timeout a homologação pausada seguraria o Cron");
+});
+
+test("tocarHomologacao: erro do banco, rede caída ou timeout viram falhou (nunca lançam)", async () => {
+  const erro500 = (async () => new Response("x", { status: 540 })) as typeof fetch;
+  const erro404 = (async () => new Response("x", { status: 404 })) as typeof fetch;
+  const rede = (async () => {
+    throw new Error("fetch failed");
+  }) as typeof fetch;
+  const lenta = ((_u: string, init?: RequestInit) =>
+    new Promise((_ok, rejeitar) => {
+      init?.signal?.addEventListener("abort", () => rejeitar(new Error("timeout")));
+    })) as unknown as typeof fetch;
+  assert.equal(await tocarHomologacao(URL_HML, CHAVE_HML, erro500), "falhou");
+  assert.equal(await tocarHomologacao(URL_HML, CHAVE_HML, erro404), "falhou");
+  assert.equal(await tocarHomologacao(URL_HML, CHAVE_HML, rede), "falhou");
+  assert.equal(await tocarHomologacao(URL_HML, CHAVE_HML, lenta, 20), "falhou");
+});
+
+test("tocarHomologacao: URL sem https não sai da máquina", async () => {
+  let chamadas = 0;
+  const busca = (async () => {
+    chamadas++;
+    return new Response("[]");
+  }) as typeof fetch;
+  assert.equal(await tocarHomologacao("http://refhomolog.supabase.co", CHAVE_HML, busca), "falhou");
+  assert.equal(chamadas, 0);
+});
+
+test("a rota do Cron: homologação entra depois da produção e só no campo `homologacao`, sem mudar o status", () => {
+  const fonte = readFileSync(new URL("src/app/api/keep-alive/route.ts", raiz), "utf8");
+  assert.ok(fonte.indexOf("tocarBanco(") < fonte.indexOf("tocarHomologacao("), "a produção vem primeiro");
+  assert.ok(fonte.includes("NEXT_PUBLIC_SUPABASE_URL_HOMOLOG"));
+  assert.ok(fonte.includes("NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG"));
+  assert.ok(!fonte.includes("SUPABASE_SERVICE_ROLE_KEY_HOMOLOG"), "a homologação usa só a chave pública");
+  assert.match(fonte, /Response\.json\(\{ \.\.\.resultado\.corpo, homologacao \}, \{ status: resultado\.status \}\)/);
 });

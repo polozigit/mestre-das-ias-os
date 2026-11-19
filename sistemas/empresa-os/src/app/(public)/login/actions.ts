@@ -34,7 +34,7 @@ export async function entrar(formData: FormData) {
     if (error.code === "invalid_credentials" || error.status === 400) {
       return {
         error:
-          "E-mail ou senha incorretos. Se você ainda não tem conta, o acesso é por convite — peça ao dono da empresa.",
+          "E-mail ou senha incorretos. Se você ainda não tem acesso, peça pra quem cuida do sistema na sua empresa cadastrar você.",
       };
     }
     if (error.status === 429) {
@@ -48,9 +48,12 @@ export async function entrar(formData: FormData) {
 }
 
 /**
- * "Esqueci minha senha": e-mail de recuperação com link pra
- * /auth/definir-senha. Resposta neutra mesmo pra e-mail inexistente
- * (anti-enumeração) — o Supabase só envia se a conta existir.
+ * "Esqueci minha senha" por e-mail: ÚLTIMA opção, rebaixada na tela. O envio
+ * padrão do Supabase só entrega pra membros da conta do Supabase do projeto e
+ * limita a 2 e-mails por hora; o caminho que funciona é por dentro do sistema
+ * (Usuários, Redefinir senha) ou, pro dono, pedir pra IA dele zerar a senha.
+ * Link pra /auth/definir-senha. Resposta neutra mesmo pra e-mail inexistente
+ * (anti-enumeração): o Supabase só envia se a conta existir.
  */
 export async function enviarRecuperacaoSenha(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
@@ -80,7 +83,7 @@ export async function enviarRecuperacaoSenha(formData: FormData) {
     return { error: "Não foi possível enviar agora. Tente de novo em instantes." };
   return {
     success:
-      "Se esse e-mail tiver cadastro, o link de redefinição chega em instantes.",
+      "Se esse e-mail tiver cadastro, pedimos o envio do link. Se não chegar em alguns minutos, use um dos caminhos acima.",
   };
 }
 

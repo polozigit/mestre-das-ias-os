@@ -27,15 +27,16 @@ por migration, nunca clicando numa tela de administração.
 
 ## Do commit à produção
 
-Fluxo fixo: commit → testes automáticos verdes (CI) → link do preview → o DONO
+Fluxo fixo: commit → checagem local verde (`checar_local.py`, rodada pelo
+`$tecnologia-publicar`) → link do preview → o DONO
 abre o link, olha a tela que mudou e diz "aprovado" → produção. Quem libera a
 publicação de uma mudança de tela é o "aprovado" do dono, por escrito no chat.
-Mudança que não toca tela (documento, operação) não espera o dono. Os testes
-automáticos e os checks do GitHub continuam valendo.
+Mudança que não toca tela (documento, operação) não espera o dono. A checagem
+local e as travas do git continuam valendo.
 
 Conferência pela IA é opcional e nunca trava: se o dono pedir, o `polozi-sistema-qa`
 abre o preview com o token e confere SÓ a tela que a mudança alterou, só navegando
-(o preview usa o banco de produção: não salva, não exclui, não convida). Se essa
+(o preview usa o banco de homologação, ou o de produção numa Casa instalada antes dele: não salva, não exclui, não convida). Se essa
 conferência não rodar, siga com o link para o dono.
 
 Primeira resposta no preview: diga ao dono o único passo dele, abrir o link, olhar a tela que mudou e responder "aprovado". Nunca peça para criar usuário, convidar membro de teste ou guardar senha.

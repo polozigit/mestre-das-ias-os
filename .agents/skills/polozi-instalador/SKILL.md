@@ -1,13 +1,13 @@
 ---
 name: polozi-instalador
-description: "Começa ou retoma a instalação da Casa (clonada ou do zip), etapa por etapa. Chame com $polozi-instalador; não cria pasta nova."
+description: "Começa ou retoma a instalação da Casa (do zip ou clonada), etapa por etapa. Chame com $polozi-instalador; não cria pasta nova."
 ---
 
 # Polozi Instalador
 
-Configurar a Casa que já veio pronta (clonada do repositório-modelo
-`polozigit/mestre-das-ias-os`, o caminho da aula, ou descompactada do zip, o
-caminho antigo que continua valendo), nunca criá-la do zero, e
+Configurar a Casa que já veio pronta (descompactada do zip do curso, o
+caminho da aula; ou clonada do repositório-modelo `polozigit/mestre-das-ias-os`,
+caminho secundário que continua valendo), nunca criá-la do zero, e
 conduzir a jornada de instalação do começo ao fim, ou retomá-la de onde
 parou, delegando cada etapa pra skill certa e nunca inventando uma etapa
 como concluída.
@@ -22,12 +22,13 @@ como concluída.
 3. Resolver `<SKILL_DIR>` e `<SKILL_IRMA>` seguindo o bloco "Resolver
    `<SKILL_DIR>`" abaixo, ANTES de rodar qualquer comando `.py` desta skill.
 4. Saber de onde a Casa veio (o preflight conta no item `casa_git`):
-   - **Clonada do repositório-modelo**: tem `.git` e o `origin` termina em
-     `polozigit/mestre-das-ias-os`. Esse `origin` é do MODELO, não do aluno:
-     enquanto for, NUNCA `git push` e NUNCA `gh repo rename`. A etapa do GitHub
-     troca o `origin` pelo repositório do aluno antes de qualquer push.
-   - **Descompactada do zip**: sem `.git`. É o fluxo antigo; a etapa da Casa
-     inicia o git.
+   - **Descompactada do zip** (o caminho da aula): pasta sem `.git` e sem `origin`,
+     com o `AGENTS.md` logo na raiz. A etapa da Casa inicia o git; só commit
+     local até a etapa do GitHub, que cria o repositório do aluno e liga o `origin`.
+   - **Clonada do repositório-modelo** (caso secundário): tem `.git` e o `origin`
+     termina em `polozigit/mestre-das-ias-os`. Esse `origin` é do MODELO, não do
+     aluno: enquanto for, NUNCA `git push` e NUNCA `gh repo rename`. A etapa do
+     GitHub troca o `origin` pelo repositório do aluno antes de qualquer push.
 
 ### Resolver `<SKILL_DIR>`
 
@@ -72,9 +73,10 @@ vira `<SKILL_DIR>` — a pasta que contém `scripts/preflight.py` (sem o
 `scripts/preflight.py` no final).
 
 Nenhum caminho achou → **PARE**: esta skill está instalada incompleta
-(falta `scripts/preflight.py`). Mostre ao aluno e peça pra reinstalar o
-`polozi-fundacao.zip` e reiniciar o app. Não improvise caminho, não rode
-nada relativo, não copie script pra dentro da Casa.
+(falta `scripts/preflight.py`). Mostre ao aluno e peça pra baixar o zip do
+kit de novo, descompactar e abrir no aplicativo a pasta que tem o `AGENTS.md`
+dentro, não a de fora. Não improvise caminho, não rode nada relativo, não
+copie script pra dentro da Casa.
 
 Depois de achar `<SKILL_DIR>`, procurar `<SKILL_IRMA>` — a skill
 `polozi-criar-empresa-ia` — NO MESMO diretório de skills onde `<SKILL_DIR>`
@@ -170,10 +172,12 @@ Retomada numa Casa já instalada: rode uma vez
    são ignorados EM SILÊNCIO [24a:config/f2, hooks/f05]. Dizer, com todas as
    letras, que NÃO existe hoje comando publicado que prove que o config do
    projeto carregou. Por isso: perguntar ao aluno se ele confirma que
-   confiou na pasta e se o rodapé do Codex mostra o modelo `gpt-5.6-terra`.
-   No app, o seletor de modelo do chat e a permissão escolhida na tela podem
-   valer mais que o `.codex/config.toml` [24a:config/n65]: rodapé com outro
-   modelo? Peça pra escolher o GPT-5.6 Terra no seletor do chat.
+   confiou na pasta. A prova de que o config e os hooks da Casa carregaram
+   vem depois: numa conversa nova, depois da `3-casa`, o hook mostra o bloco
+   `VERIFICACAO DE ESTADO`. A Casa não fixa modelo nem esforço: o seletor de
+   modelo do chat e a permissão escolhida na tela podem valer mais que o
+   `.codex/config.toml` [24a:config/n65], e quem escolhe o modelo é o dono,
+   no seletor do app. Não confira nem peça um modelo específico.
    **Acesso total e Computer Use NÃO são ligados por este instalador:** são
    a configuração que o professor faz junto com o aluno, no telão, ANTES do
    instalador (atividade "Configurar o Codex" do plano), porque sem o
@@ -193,8 +197,8 @@ Retomada numa Casa já instalada: rode uma vez
    guardas da Casa continuam valendo em acesso total: o hook que recusa ação
    perigosa roda igual [24a:hooks/n66]. Só então peça o "sim".
    SÓ com o "sim" dele gravar `projeto_confiado: sim` no frontmatter — nunca
-   gravar `sim` por conta própria. Sem comando que prove, o que vale é o que
-   ele vê no rodapé. A confiança dos HOOKS é outra coisa e vem no FIM da
+   gravar `sim` por conta própria. Sem comando que prove, o que vale é o bloco
+   `VERIFICACAO DE ESTADO` na conversa nova. A confiança dos HOOKS é outra coisa e vem no FIM da
    `3-casa`, depois que o comando gera o `.codex/hooks.json`: nesta etapa a
    pasta só tem o `.codex/hooks.json.modelo` (o Codex não lê esse nome), com
    `{{CASA_ABS}}` nos comandos. NÃO peça pra confiar em hooks aqui: um
@@ -213,21 +217,7 @@ Retomada numa Casa já instalada: rode uma vez
    configurações do Chrome, "Navegador padrão", clica em tornar padrão (a
    confirmação do sistema é do aluno). Senha, código de SMS e 2FA são sempre
    do aluno: a IA nunca digita nem pede.
-6. **Acesso total também no outro agente de código.** A Casa também abre
-   noutro agente de código que lê o mesmo `AGENTS.md`; nele o acesso total só
-   vale se vier do arquivo de configuração do USUÁRIO, não do da Casa. O
-   script detecta se esse agente está na máquina e diz o nome. A IA liga
-   sozinha, avisando em 1 linha:
-   ```
-   <PY> <SKILL_DIR>/scripts/ligar_acesso_total.py --gravar
-   ```
-   `NAO_SE_APLICA` = o outro agente não está nesta máquina, siga. `FEITO` ou
-   `JA_ESTAVA`: repasse a linha `ACAO_DO_ALUNO` (o aviso do modo na primeira
-   conversa é do aluno). `TRAVA` = o próprio arquivo trava o modo: respeite e
-   siga. `PAREI` (saída 2) = o arquivo do aluno não é JSON válido: mostre e
-   corrija com ele, nunca sobrescreva. As regras `deny` da Casa continuam
-   valendo em acesso total.
-7. Fechar a ETAPA 0, com o mesmo caminho absoluto:
+6. Fechar a ETAPA 0, com o mesmo caminho absoluto:
    ```
    <PY> <SKILL_DIR>/scripts/preflight.py --pasta "<PASTA_ABERTA>" --gravar
    ```
@@ -261,7 +251,7 @@ antigo).
 
 ### 3-casa
 
-A Casa JÁ EXISTE (clonada ou do zip): não delegar criação a ninguém.
+A Casa JÁ EXISTE (do zip ou clonada): não delegar criação a ninguém.
 
 **Nome da pasta, ANTES de rodar o comando.** O nome do sistema também é o nome da
 pasta da Casa. A pasta aberta tem outro nome (por exemplo `mestre-das-ias-os`)?
@@ -348,6 +338,9 @@ Antes de marcar `3-casa` como `concluida`, mais 3 passos:
 
 Só então marcar `3-casa` como `concluida`.
 
+Logo depois, avise o aluno em 1 linha: abra uma conversa nova nesta pasta e chame `$polozi-instalador`
+de novo (o `AGENTS.md` e os hooks da Casa só valem numa conversa nova).
+
 ### Próxima etapa pendente
 
 Ordem fixa, sem pular, a da aula:
@@ -363,8 +356,8 @@ da tabela.
 | `3-casa` | Seção "3-casa" acima. |
 | `4-github` | Delegar em `polozi-criar-github`: login do `gh` JÁ com `--scopes workflow`, autor dos commits da Casa = e-mail da conta GitHub do aluno (`identidade_git.py`, A39) e cria o repositório PRIVADO com o nome do sistema (`slug_os:` de `operacao/INSTALACAO.md`). Casa clonada: troca o `origin` do modelo pelo repositório do aluno ANTES do primeiro push (push no modelo nunca). Aluno que já tem um repositório dele com outro nome: `gh repo rename` no repositório DELE, nunca no modelo. |
 | `7-banco` | Delegar em `polozi-registrar-conexao` (Supabase do sistema, projeto `<slug_os>`) e fechar o banco como na seção "7-banco" abaixo: Secrets do GitHub gravados e migrations aplicadas pela Action `deploy-db.yml`, disparada à mão, nunca por `supabase db push`. Sem o time Tecnologia na Casa ou sem o repositório do aluno no `origin`: **PARAR**. |
-| `8-sistema` | Delegar na skill `tecnologia-publicar` (publica o sistema; o projeto na Vercel se chama como o sistema, `<slug_os>`) e seguir o roteiro `sistemas/empresa-os/LEIA-ME.md` pelos passos abaixo. Exige a `7-banco` `concluida` (banco no ar, migrations aplicadas pela Action, schemas expostos); senão volte à `7-banco`. O sistema já está em `sistemas/empresa-os/`: o passo 1 do roteiro sobre descompactar não vale, o passo 5 (migrations) foi a `7-banco` e o passo 2 (mockup) e o tema e a logo do passo 3 são da `6-marca`. Na ordem: (a) só o pacote do setup dentro de `sistemas/empresa-os` (passo 1): `npm install --prefix scripts --no-save "@supabase/supabase-js@2"`, nunca o `npm install` completo (a Vercel instala tudo na nuvem; ~500 MB por aluno na rede da sala); (b) preencher a identidade em `sistemas/empresa-os/config/empresa.ts` (a parte do passo 3 que o setup exige) com as respostas da `3-casa`, sem perguntar de novo: `nome` é o nome da empresa, `nomeMaster` e `emailMaster` são o nome e o e-mail do dono, `slug` é o `slug_os:` de `operacao/INSTALACAO.md` e `descricao` é uma frase curta que você escreve com o nome da empresa; (c) passo 4 (preview local), só se o dono quiser ver antes: aí sim o `npm install` completo; (d) passo 6: o `scripts/setup-inicial.mjs` do sistema cria a empresa e o dono, carrega o plano e manda o e-mail de convite (as chaves vêm de `credenciais/.env` sem aparecer no chat; na 1ª vez com `SITE_URL=http://localhost:3000`) e para sem o pacote do setup instalado e sem o `config/empresa.ts` preenchido; (e) passo 7 (Vercel), com a `tecnologia-publicar` e a `tecnologia-conectar`, nesta ordem: (e0) antes de criar: o conector da Vercel é da conta do ChatGPT, então a IA mostra o time dele (`list_teams`) e PARA se não for o do aluno (religar o plugin só vale em CONVERSA NOVA); o app "Vercel" instalado no GitHub do aluno com acesso a TODOS os repositórios (`tecnologia-conectar`, passo e1); (e1) a IA cria o projeto `<slug_os>` pelo conector da Vercel (`create_git_project`, pasta raiz `sistemas/empresa-os`, `deploy=false`; sem o conector, o roteiro "Projeto na Vercel a mão" da `tecnologia-conectar`); (e2) `<PY> "<PASTA_ABERTA>/.agents/skills/tecnologia-publicar/scripts/instalar_guardas.py" --casa "<PASTA_ABERTA>"` (link com `--project <slug_os>`, git, QA, bypass de automação da prévia, guardas, Secrets e Dependabot; a CLI da Vercel a IA instala e loga pelo Chrome antes); (e3) `$tecnologia-conectar` `projeto` (prova o link) e `vercel-env` (as variáveis do banco na Vercel, antes da primeira publicação); (e4) a primeira publicação, pela `tecnologia-publicar`, SEM QA de tela: na instalação não há usuário "Teste de QA", não se pede um 2º e-mail e o `polozi-sistema-qa` não roda (é o sistema do modelo, sem mudança de tela; o QA por preview é das mudanças de tela depois, pela `tecnologia-construir-tela` e a `tecnologia-publicar`); (e5) `$tecnologia-conectar` `auth-urls`, `provar` (só segue com `TUDO LIGADO`) e `vault`; e então o `setup-inicial.mjs` de novo com o `SITE_URL` definitivo: é ele que marca "sistema no ar" no plano (e6); (f) passo 8 (primeiro login): o dono abre o e-mail de convite, define a senha e entra, de preferência pelo celular; (g) passo 9 (guardas): as guardas já ligaram no (e2), então só confira o bloco `DEPLOY` de `operacao/INSTALACAO.md` (o `usuario_qa` em `NAO-MEDIDO` é o esperado). Prova da `8-sistema`, e só ela: `/login` do endereço de produção responde 200, as variáveis do banco estão na Vercel (`vercel-env`), as Auth URLs gravadas (`auth-urls`), o convite enviado e o 1º login do dono feito. Se `.agents/skills/tecnologia-publicar/` ou `.agents/skills/tecnologia-conectar/` não existir (Casa clonada antes da skill nova: atualizar o time Tecnologia): instruir a instalar o time Tecnologia e **PARAR**. |
-| `5-dossie` | Delegar em `polozi-registrar-dossie` (só quando o usuário tiver a transcrição pronta). Vem depois do sistema no ar: o dossiê é gravado no banco e aparece na aba Dossiê da tela Marca. |
+| `8-sistema` | Delegar na skill `tecnologia-publicar` (publica o sistema; o projeto na Vercel se chama como o sistema, `<slug_os>`) e seguir o roteiro `sistemas/empresa-os/LEIA-ME.md` pelos passos abaixo. Exige a `7-banco` `concluida` (banco no ar, migrations aplicadas pela Action, schemas expostos); senão volte à `7-banco`. O sistema já está em `sistemas/empresa-os/`: o passo 1 do roteiro sobre descompactar não vale, o passo 5 (migrations) foi a `7-banco` e o passo 2 (mockup) e o tema e a logo do passo 3 são da `6-marca`. Na ordem: (a) só o pacote do setup dentro de `sistemas/empresa-os` (passo 1): `npm install --prefix scripts --no-save "@supabase/supabase-js@2"`, nunca o `npm install` completo (a Vercel instala tudo na nuvem; ~500 MB por aluno na rede da sala); (b) preencher a identidade em `sistemas/empresa-os/config/empresa.ts` (a parte do passo 3 que o setup exige) com as respostas da `3-casa`, sem perguntar de novo: `nome` é o nome da empresa, `nomeMaster` e `emailMaster` são o nome e o e-mail do dono, `slug` é o `slug_os:` de `operacao/INSTALACAO.md` e `descricao` é uma frase curta que você escreve com o nome da empresa; (c) passo 4 (preview local), só se o dono quiser ver antes: aí sim o `npm install` completo; (d) passo 6: o `scripts/setup-inicial.mjs` do sistema cria a empresa e o dono, carrega o plano e cria o login do dono com a senha provisória `mudar@123` e o e-mail já confirmado, sem e-mail nenhum (as chaves vêm de `credenciais/.env` sem aparecer no chat; na 1ª vez com `SITE_URL=http://localhost:3000`; o jeito que vale igual em Mac e Windows é o próprio Node carregar o arquivo, de dentro de `sistemas/empresa-os`: `node --env-file=../../credenciais/.env scripts/setup-inicial.mjs`, com o `SITE_URL` definido antes, no PowerShell `$env:SITE_URL='http://localhost:3000'`; nunca `cat`, `type` nem `Get-Content` no `.env`) e para sem o pacote do setup instalado e sem o `config/empresa.ts` preenchido; (d2) o mesmo `setup-inicial.mjs` contra o banco de homologação (comando no passo 5 da `7-banco`; homologação `pendente` = pule); (e) passo 7 (Vercel), com a `tecnologia-publicar` e a `tecnologia-conectar`, nesta ordem: (e0) antes de criar: o conector da Vercel é da conta do ChatGPT, então a IA mostra o time dele (`list_teams`) e PARA se não for o do aluno (religar o plugin só vale em CONVERSA NOVA); o app "Vercel" instalado no GitHub do aluno com acesso a TODOS os repositórios (`tecnologia-conectar`, passo e1); (e1) a IA cria o projeto `<slug_os>` pelo conector da Vercel (`create_git_project`, pasta raiz `sistemas/empresa-os`, `deploy=false`; sem o conector, o roteiro "Projeto na Vercel a mão" da `tecnologia-conectar`); (e2) `<PY> "<PASTA_ABERTA>/.agents/skills/tecnologia-publicar/scripts/instalar_guardas.py" --casa "<PASTA_ABERTA>"` (link com `--project <slug_os>`, git, QA, bypass de automação da prévia, guardas, Secrets e Dependabot; a CLI da Vercel a IA instala e loga pelo Chrome antes); (e3) `$tecnologia-conectar` `projeto` (prova o link) e `vercel-env` (as variáveis do banco na Vercel, antes da primeira publicação); (e4) a primeira publicação, pela `tecnologia-publicar`, SEM QA de tela: na instalação não há usuário "Teste de QA", não se pede um 2º e-mail e o `polozi-sistema-qa` não roda (é o sistema do modelo, sem mudança de tela; o QA por preview é das mudanças de tela depois, pela `tecnologia-construir-tela` e a `tecnologia-publicar`); (e5) `$tecnologia-conectar` `auth-urls` e `provar` (só segue com `TUDO LIGADO`); e então o `setup-inicial.mjs` de novo com o `SITE_URL` definitivo: é ele que marca "sistema no ar" no plano (e6); (f) passo 8 (primeiro login): o dono entra no endereço de produção com o e-mail dele e a senha provisória `mudar@123`, de preferência pelo celular; diga a ele, numa frase, que o sistema avisa para trocar a senha e que é só usar Trocar senha no menu do usuário (nada de e-mail: o envio padrão do Supabase só entrega para membro da organização, 2 por hora e em inglês); (g) passo 9 (guardas): as guardas já ligaram no (e2), então só confira o bloco `DEPLOY` de `operacao/INSTALACAO.md` (o `usuario_qa` em `NAO-MEDIDO` é o esperado). Prova da `8-sistema`, e só ela: `/login` do endereço de produção responde 200, as variáveis do banco estão na Vercel (`vercel-env`), as Auth URLs gravadas (`auth-urls`), a linha `[setup] login do dono` do setup e o 1º login do dono feito. O `vault` (segredos no cofre do banco) NÃO faz parte da instalação: é opcional, fica para depois dela, quando o dono pedir (`$tecnologia-conectar` `vault`; nada no fluxo depende dele). Se `.agents/skills/tecnologia-publicar/` ou `.agents/skills/tecnologia-conectar/` não existir (Casa clonada antes da skill nova: atualizar o time Tecnologia): instruir a instalar o time Tecnologia e **PARAR**. |
+| `5-dossie` | Delegar em `polozi-registrar-dossie` (só quando o dono tiver o arquivo do dossiê baixado do app do aluno, o `dossie-completo.md`; quem ainda só tem a transcrição do áudio segue o caminho antigo da mesma skill). Vem depois do sistema no ar: o dossiê é gravado no banco e aparece na aba Dossiê da tela Marca. |
 | `6-marca` | Exige a `5-dossie` concluída e o time Marketing na Casa (`.agents/skills/marketing-persona/` existe). Presente: delegar, uma por vez e nesta ordem, em `marketing-persona` (cliente ideal e persona a partir do dossiê), `marketing-identidade` (cores, letra e tom de voz) e, só se o dono tem o arquivo do logo, `marketing-logo` (opcional; usa o Pillow, que a skill instala sem perguntar); cada uma pede o "sim" do dono antes de publicar na tela Marca. Conclui quando `empresa/publico/persona.md`, `empresa/marca/identidade-visual.md` e `empresa/marca/tom-de-voz.md` estão `aprovado` no `MAPA-DA-EMPRESA-IA.md`. Publicar na tela Marca NÃO é condição (o banco e o sistema já estão no ar, etapas 7 e 8, e cada skill publica ao ser aprovada): a skill que terminar com `FALTA` deixa o documento aprovado na pasta e a publicação sai depois, quando o dono pedir "publica a persona e a marca" (a `marketing-persona` publica o que ficou pendente) ou pela atividade `dossie-persona-marca` do plano. Dossiê ausente (`contexto/dossie/dossie-completo.md` não existe, ou a `5-dossie` está `pulada`): instruir a `5-dossie` e **PARAR**; se o dono prefere deixar a marca para depois, vale "Pular uma etapa" (a `6-marca` fica `pulada`, com o motivo em `operacao/DECISOES.md`). Time ausente (`.agents/skills/marketing-persona/` ou `.agents/skills/marketing-identidade/` não existe): o time Marketing não está nesta Casa, instruir a instalá-lo com a skill `polozi-instalar-time` (ou clonar de novo o repositório-modelo, que já vem com ele) e **PARAR**: não marcar como `pulada`, não improvisar persona nem identidade visual sozinho. Ao concluir, NÃO aplique a marca no sistema aqui: aponte a atividade seguinte do plano, `sistema-com-marca`, para o dono rodar em conversa nova (skill `tecnologia-aplicar-marca`: mostra primeiro um mockup das telas principais em claro e escuro, ele aprova, e só então aplica, manda o link de teste e publica com o sim dele). |
 
 #### 7-banco
@@ -396,32 +389,51 @@ Antes de começar, confirme (qualquer falha = **PARAR**, sem improvisar):
 
 Nesta seção, `<SKILL_PUBLICAR>` é `<PASTA_ABERTA>/.agents/skills/tecnologia-publicar`.
 
-1. **Conexão e valores.** O projeto `<slug_os>` ainda não existe no Supabase?
-   A IA o cria no painel, com esse nome, pelo Chrome do dono (Computer Use);
-   a senha do banco é a única parte do dono: ele digita na tela e guarda (ela
-   vai para o `.env` pelo mesmo caminho, nunca pelo chat).
-   Depois de gerar uma chave, a IA NÃO lê a página (nem captura de tela, nem
-   árvore de acessibilidade: no teste de 08/10 o token vazou assim); clica em
-   Copiar e usa o comando de chave de uma linha.
-   Delegar em `polozi-registrar-conexao`: registre o
-   Supabase (conector do app, com a prova do script dela) e traga para o
-   `credenciais/.env` os valores do projeto `<slug_os>`, um por vez, pelo
-   comando de chave de uma linha da própria skill: a IA copia o valor no
-   painel do Supabase, pelo Chrome do dono (botão de copiar do painel), e o
-   comando o cola direto no arquivo. O valor nunca
-   passa pelo chat e a IA nunca abre o arquivo (o hook recusa). Nomes:
-   - para a Action: `SUPABASE_PROJECT_ID` (o ref: o trecho antes de
-     `.supabase.co` na URL do projeto), `SUPABASE_ACCESS_TOKEN` (Account,
-     Access Tokens; token de ACESSO TOTAL, o clássico, sem escolher organização nem
-     permissão, validade "Never"; a IA cria sozinha, sem perguntar; depois de gerar
-     NUNCA lê a página, só clica em Copiar) e `SUPABASE_DB_PASSWORD`
-     (a senha do banco; esqueceu, o dono troca em Database, Reset database
-     password);
-   - para o sistema: `NEXT_PUBLIC_SUPABASE_URL`,
-     `NEXT_PUBLIC_SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY`. São os
-     nomes que os scripts da Casa leem do `.env` (`setup-inicial.mjs`,
-     `sincronizar_catalogo.py`, o WhatsApp local); a Vercel recebe os dela
-     pela `tecnologia-conectar` na `8-sistema` e o sistema aceita os dois (`sistemas/empresa-os/conexao.md`).
+1. **Conexão e valores.** O aluno não digita senha de banco: o Chrome só cria o
+   token e o script cria o banco. Nesta seção, `<SKILL_CONECTAR>` é
+   `<PASTA_ABERTA>/.agents/skills/tecnologia-conectar`.
+
+   (a) **Token (a única coisa pelo Chrome).**
+   Delegar em `polozi-registrar-conexao`: registre o Supabase (conector do app, com a prova
+   do script dela) e traga para o `credenciais/.env` o `SUPABASE_ACCESS_TOKEN`
+   pelo comando de chave de uma linha da própria skill. A IA cria o token no
+   painel do Supabase pelo Chrome do dono (Account, Access Tokens; token de
+   ACESSO TOTAL, o clássico, sem escolher organização nem permissão, validade
+   "Never"; a IA cria sozinha, sem perguntar), clica em Copiar e o comando o cola
+   direto no arquivo. Depois de gerar, a IA NÃO lê a página (nem captura de
+   tela, nem árvore de acessibilidade: no teste de 08/10 o token vazou assim). O
+   valor nunca passa pelo chat e a IA nunca abre o arquivo (o hook recusa).
+
+   (b) **Banco de produção pelo script.** Cria (ou reaproveita) o projeto
+   `<slug_os>`, gera a senha do banco, espera ficar no ar, expõe os schemas
+   `tarefas` e `organograma` e grava no `.env` os 5 nomes (`SUPABASE_PROJECT_ID`,
+   `SUPABASE_DB_PASSWORD`, `NEXT_PUBLIC_SUPABASE_URL`,
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`; os scripts da
+   Casa leem esses nomes e a Vercel recebe os dela pela `tecnologia-conectar` na
+   `8-sistema`, `sistemas/empresa-os/conexao.md`):
+
+   ```
+   <PY> "<SKILL_CONECTAR>/scripts/conectar.py" banco --casa "<PASTA_ABERTA>"
+   ```
+
+   Saída 0 e as linhas `[ok] banco` (ou `[pulado] banco`, já existia) = pronto;
+   nada aparece na tela. O token abre mais de uma organização: o script lista e
+   para; pergunte ao dono qual é a da empresa e rode de novo com `--org <slug>`.
+   Limite do plano gratuito (2 projetos ativos): a mensagem diz o que fazer;
+   o dono pausa ou apaga um projeto gratuito que não usa e o comando roda de novo.
+   Linha `[pendente] banco` sobre a senha (projeto que já existia antes do
+   script): a senha vem pelo caminho de reserva abaixo, só ela.
+
+   (c) **Reserva, só se o (b) falhar por outro motivo** (API fora do ar, erro
+   que a mensagem não resolve): a IA cria o projeto `<slug_os>` no painel pelo
+   Chrome do dono; a senha do banco o dono digita na tela e guarda; os valores
+   vão para o `.env` um por vez pelo comando de chave de uma linha da
+   `polozi-registrar-conexao` (a IA copia no painel pelo botão de copiar, nunca
+   lê a página): `SUPABASE_PROJECT_ID` (o trecho antes de `.supabase.co` na URL
+   do projeto), `SUPABASE_DB_PASSWORD` (esqueceu: Database, Reset database
+   password), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` e
+   `SUPABASE_SERVICE_ROLE_KEY`. Depois rode o (b) de novo: ele reaproveita o
+   projeto e só expõe os schemas.
 
    Já estão no `.env`? Confira só os nomes (`--listar-nomes` da skill) e não
    peça de novo.
@@ -471,22 +483,77 @@ Nesta seção, `<SKILL_PUBLICAR>` é `<PASTA_ABERTA>/.agents/skills/tecnologia-p
    workflow, o repositório do aluno não tem `.github/workflows/deploy-db.yml`
    na `main` (Casa mais antiga que o modelo atual): **PARAR**, sem copiar o
    arquivo na mão.
-4. **Expor os schemas.** A IA, no painel do Supabase do projeto `<slug_os>`, pelo
-   Chrome do dono:
-   Project Settings, Data API, Exposed schemas; acrescentar `tarefas` e
-   `organograma` à lista (manter os que já estão) e salvar. Sem isso o
-   `setup-inicial.mjs` da `8-sistema` para com `PGRST106` (e repete esta
-   instrução).
+4. **Expor os schemas.** Já feito pelo `conectar.py banco` do passo 1 (linha
+   `schemas expostos` ou `schemas já expostos`). Só no caminho de reserva sem o
+   (b) rodado: a IA, no painel do projeto `<slug_os>` pelo Chrome do dono,
+   Project Settings, Data API, Exposed schemas, acrescenta `tarefas` e
+   `organograma` (mantém os que já estão) e salva. Sem isso o
+   `setup-inicial.mjs` da `8-sistema` para com `PGRST106`.
 
-**Fica para depois (não bloqueia o D1).** O projeto de homologação
-(`<slug_os>-homolog`) e o `deploy-db-homologacao.yml`, que ensaia migration
-com dado de exemplo antes da produção. Ele lê mais dois Secrets,
-`SUPABASE_PROJECT_ID_HOMOLOG` e `SUPABASE_DB_PASSWORD_HOMOLOG`, que o
-`instalar_guardas.py` não grava. Anote uma linha em `operacao/PENDENCIAS.md`
-(origem `descoberta-ia`) e siga: a `tecnologia-mudar-banco` conduz o ensaio
-quando o dono quiser.
+5. **Homologação (automática, nenhuma ação do aluno).** O projeto Supabase
+   `<slug_os>-homolog` é o banco de teste que o preview da Vercel usa no lugar
+   do banco real. Nasce com o mesmo `SUPABASE_ACCESS_TOKEN` do passo 1: sem
+   token novo, sem senha nova, sem clique. Na ordem:
 
-Passo 3 verde e passo 4 feito = `7-banco` entregue (siga "Depois de cada
+   (a) Criar o projeto, esperar ficar no ar, expor os schemas e gravar as 5
+   variáveis `_HOMOLOG` em `credenciais/.env` (a senha do banco é gerada pelo
+   script e gravada na hora; nada aparece na tela):
+
+   ```
+   <PY> "<SKILL_CONECTAR>/scripts/conectar.py" homologacao --casa "<PASTA_ABERTA>"
+   ```
+
+   Saída 0 e as linhas `[ok] homologacao` = pronto. Rodar de novo é seguro (acha
+   o projeto por nome, despausa se preciso, não cria outro). O Supabase gratuito
+   aceita 2 projetos ativos: com os 2 já em uso o script para com uma mensagem em
+   português e NÃO grava nada. Nesse caso diga ao aluno, numa frase, que o plano
+   gratuito do Supabase só deixa 2 projetos ativos e que a homologação fica para
+   quando ele pausar ou apagar um projeto gratuito que não usa; marque o passo
+   como `pendente` em `operacao/PENDENCIAS.md` (origem `descoberta-ia`) e siga:
+   isso NUNCA bloqueia o D1 (na `8-sistema`, o `vercel-env` e o `provar` rodam
+   com `--sem-preview`).
+
+   (b) Secrets do GitHub da homologação: rode de novo o comando do passo 2. Com
+   as variáveis do (a) no `.env` ele grava também `SUPABASE_PROJECT_ID_HOMOLOG` e
+   `SUPABASE_DB_PASSWORD_HOMOLOG`, que o `deploy-db-homologacao.yml` lê.
+
+   (c) Aplicar as migrations e o dado de exemplo na homologação: dispare e
+   espere o workflow `deploy-db-homologacao.yml` exatamente como no passo 3
+   (anotar o número da última execução, disparar com
+   `gh workflow run deploy-db-homologacao.yml --ref main`, pegar a nova e
+   esperar com o mesmo `gh run watch` do passo 3). Vermelho: mesmas regras do
+   passo 3, nunca na mão.
+
+   (d) O dono no banco de teste: o login do preview entra como o dono (exige
+   `usuarios.e_dono` ativo), então a homologação também roda o
+   `scripts/setup-inicial.mjs`, que cria o dono com a mesma senha provisória `mudar@123`, sem e-mail. Ele precisa do pacote do
+   setup e do `config/empresa.ts` preenchido, que são do `8-sistema` (passos (a)
+   e (b)): rode logo depois do (d) do `8-sistema`, no mesmo terminal da Casa
+   (`sistemas/empresa-os`), carregando o `credenciais/.env` como o `8-sistema`
+   faz e trocando a URL e a chave de serviço pelas de homologação (os valores
+   nunca aparecem no chat):
+
+   ```
+   source ../../credenciais/.env && NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL_HOMOLOG" SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY_HOMOLOG" SITE_URL=http://localhost:3000 node scripts/setup-inicial.mjs
+   ```
+
+   No PowerShell, carregue o `.env` como o `8-sistema` e atribua
+   `$env:NEXT_PUBLIC_SUPABASE_URL = $env:NEXT_PUBLIC_SUPABASE_URL_HOMOLOG`,
+   `$env:SUPABASE_SERVICE_ROLE_KEY = $env:SUPABASE_SERVICE_ROLE_KEY_HOMOLOG`,
+   e `$env:SITE_URL = "http://localhost:3000"` antes do
+   `node scripts/setup-inicial.mjs`. Prova: a linha
+   `[setup] login do dono criado com a senha provisória (sem e-mail).` (ou, rodando de novo, `[setup] login do dono já existe`)
+
+   Depois da instalação, a `tecnologia-mudar-banco` conduz o ensaio de cada
+   migration nova na homologação antes da produção.
+
+   **Casa já instalada antes da homologação.** Os mesmos comandos servem (todos
+   idempotentes): (a), (b), (c) e (d) acima e, depois, o `vercel-env` da
+   `tecnologia-conectar`, que TROCA o preview do banco real para o de teste (para o
+   Supabase gratuito não pausar o banco de teste, o keep-alive diário da produção
+   também o consulta).
+
+Passo 3 verde e passo 4 feito = `7-banco` entregue (o passo 5, homologação, nunca entra nessa conta; siga "Depois de cada
 etapa"). Só então a `8-sistema` roda o `scripts/setup-inicial.mjs` e publica
 na Vercel.
 
@@ -525,10 +592,18 @@ publicação sai quando o sistema estiver no ar.
 2. Seguir direto pra próxima etapa, avisando em 1 linha o que terminou e o
    que vem; parar só se o dono pedir, ou numa etapa que espera algo que só
    ele faz (senha, código, 2FA, janela do sistema, a transcrição do dossiê).
-3. Se todas as etapas estiverem `concluida`/`pulada`, informar que a
-   instalação terminou. Os times do kit já vêm instalados na Casa (conferir
-   com `polozi-instalar-time`) e time novo é com o time Native AI: ficam fora
-   deste fluxo.
+3. Se todas as etapas estiverem `concluida`/`pulada`, fechar o bloco de
+   primeiro acesso do `AGENTS.md` (ele só existe pra retomar a instalação) e
+   informar que ela terminou:
+   ```
+   <PY> "<caminho de aplicar_regra.py>" --casa "<PASTA_ABERTA>" --fechar-primeiro-acesso
+   ```
+   O caminho de `aplicar_regra.py` se acha pela busca da skill
+   `polozi-aplicar-regra` (`.agents/skills/polozi-aplicar-regra/scripts/`).
+   Saída `0` = bloco apagado ou já fechado; recusa ou erro, mostre a mensagem
+   e não edite o `AGENTS.md` à mão. Salvar é com a `tecnologia-publicar`. Os times do kit já vêm instalados na Casa (conferir
+   com `polozi-instalar-time`) e time novo o aluno pede à IA principal, que cria as skills em
+   `.agents/skills/<area>-<nome>/`: ficam fora deste fluxo.
 
 ### Pular uma etapa (só a pedido explícito do usuário)
 
@@ -568,7 +643,7 @@ volta a pedir aprovação [24a:config/n07].
 - Nunca gravar `projeto_confiado: sim` sem o aluno confirmar.
 - Nunca marcar `0-preflight` concluída com item em bloqueio.
 - `instalar_requisitos.py` roda sem perguntar, avisando em 1 linha; nunca com senha digitada pela IA.
-- Acesso total e Computer Use conferidos ligados antes do preflight (faltou = a ETAPA 0 parou com o passo exato); `ligar_acesso_total.py --gravar` rodou (qualquer saída menos `PAREI`).
+- Acesso total e Computer Use conferidos ligados antes do preflight (faltou = a ETAPA 0 parou com o passo exato).
 
 ## Limites
 

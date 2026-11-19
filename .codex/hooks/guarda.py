@@ -32,10 +32,10 @@ Escolha de forma: NÃO usamos "exit 2 + stderr" (a doc permite, mas o JSON é
 explícito e testável — decisão registrada aqui em comentário, não reabrir
 sem motivo novo).
 
-MAIN E BRANCH (07/10/2026): a Casa vive na `main` — o guardião commita e
-envia a cada checkpoint, o autosave do fim de turno envia, e
+MAIN E BRANCH (07/10/2026): a Casa vive na `main` — a IA commita e
+envia a cada marco pelo `salvar.py` (o Stop não salva mais), e
 `polozi-criar-github` faz o primeiro `git push -u origin main`. Por isso a
-regra 2 NÃO nega push da main em geral (negava, e travava esses três
+regra 2 NÃO nega push da main em geral (negava, e travava esses
 caminhos oficiais). Ela nega só quando a Casa tem sistema publicado em
 produção (mesmo marcador da regra 11, `sistemas/empresa-os/.vercel/
 project.json`): aí a main publica, e o trabalho vai por branch + PR. Push
@@ -93,60 +93,73 @@ _RE_GIT_PUSH = re.compile(
 MOTIVOS = {
     "r01_push_forcado": (
         "Push que reescreve o historico remoto bloqueado. Resolva o "
-        "conflito normalmente, ou peca ajuda antes de sobrescrever."
+        "conflito normalmente, ou peca ajuda antes de sobrescrever. "
+        "Como corrigir: rode `git pull --rebase` e salve de novo com `salvar.py`; se houver conflito, mostre os dois lados ao dono."
     ),
     "r02_push_main": (
         "Push da main bloqueado: esta Casa ja tem sistema publicado em "
         "producao e a main publica. Crie uma branch (git switch -c ...) "
-        "e abra uma PR."
+        "e abra uma PR. "
+        "Como corrigir: crie a branch com `git switch -c <nome-da-branch>` e siga o fluxo completo da `tecnologia-publicar` (PR, link de teste, aprovado do dono)."
     ),
     "r03_supabase_db_push": (
         "Migration linked direto no banco bloqueada. Isso passa pela peca "
-        "de veredito da migration antes de tocar o banco de verdade."
+        "de veredito da migration antes de tocar o banco de verdade. "
+        "Como corrigir: escreva a migration na pasta de migrations do sistema e rode `$tecnologia-mudar-banco`: ele grava o veredito e a Action aplica."
     ),
     "r04_vercel_producao": (
         "Publicar em producao por comando solto bloqueado. Siga o fluxo "
-        "de publicacao com revisao humana, nunca direto por este caminho."
+        "de publicacao com revisao humana, nunca direto por este caminho. "
+        "Como corrigir: publique pela `$tecnologia-publicar` (PR, link de teste, aprovado do dono); o merge na main e que coloca no ar."
     ),
     "r05_rm_recursivo": (
         "Remocao recursiva forcada bloqueada. Confirme o alvo com o dono "
-        "antes de apagar uma pasta inteira."
+        "antes de apagar uma pasta inteira. "
+        "Como corrigir: apague so os arquivos que voce criou, um por um, depois de confirmar o alvo com o dono."
     ),
     "r06_drop_truncate": (
         "Instrucao destrutiva de banco (DROP/TRUNCATE) bloqueada sem "
         "veredito aprovado da migration. Rode a auditoria de migration "
-        "antes."
+        "antes. "
+        "Como corrigir: escreva a migration em `sistemas/empresa-os/supabase/migrations/` e rode `$tecnologia-mudar-banco`."
     ),
     "r07_leitura_de_credenciais": (
         "Leitura de arquivo de acesso/segredo bloqueada. Esse conteudo "
-        "nao deve entrar no contexto da conversa."
+        "nao deve entrar no contexto da conversa. "
+        "Como corrigir: para conectar um servico use `$tecnologia-acessos`; para saber se ja esta conectado, pergunte ao dono."
     ),
     "r08_mcp_compra": (
         "Chamada de compra/pagamento por MCP bloqueada. Essa acao exige "
-        "confirmacao humana fora deste fluxo."
+        "confirmacao humana fora deste fluxo. "
+        "Como corrigir: diga ao dono o que seria comprado e o valor, e deixe que ele faca a compra no site do servico."
     ),
     "r09_vault_segredo": (
         "Consulta a segredo do cofre bloqueada. Valor de credencial nunca "
-        "entra no contexto da conversa."
+        "entra no contexto da conversa. "
+        "Como corrigir: use `$tecnologia-acessos` para ligar o servico; o valor da chave nunca vem para a conversa."
     ),
     "r10_mcp_schema": (
         "Alteracao de schema por MCP bloqueada sem veredito aprovado da "
-        "migration. Rode a auditoria de migration antes."
+        "migration. Rode a auditoria de migration antes. "
+        "Como corrigir: escreva a migration em `sistemas/empresa-os/supabase/migrations/` e rode `$tecnologia-mudar-banco`."
     ),
     "r11_sistemas_na_main": (
         "Edicao de sistemas/ na branch principal, com producao ja "
         "publicada, bloqueada. Trabalhe numa branch e publique com o "
-        "fluxo revisado."
+        "fluxo revisado. "
+        "Como corrigir: crie a branch com `git switch -c <nome-da-branch>`, edite nela e publique pela `$tecnologia-publicar`."
     ),
     "r12_pular_trava_do_git": (
         "Pular ou desligar a trava de segredo bloqueado. Corrija o que a "
         "trava apontou e salve de novo pelo tecnologia-publicar; se ela "
-        "estiver desligada, o salvar explica como religar."
+        "estiver desligada, o salvar explica como religar. "
+        "Como corrigir: tire o segredo que a trava apontou e salve de novo com `salvar.py -m '<mensagem>' <caminhos>`."
     ),
     "r13_push_no_modelo": (
         "Esta pasta ainda aponta pro repositório-modelo do curso; a etapa 4 "
         "do instalador cria o seu repositório e troca o origin. Até lá, "
-        "salve só neste computador (commit local), sem enviar."
+        "salve só neste computador (commit local), sem enviar. "
+        "Como corrigir: salve com `salvar.py -m '<mensagem>' <caminhos>`; ele faz o commit local e nao envia."
     ),
 }
 

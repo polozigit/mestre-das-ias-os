@@ -36,7 +36,7 @@ export function CardAgente({
       href={`/agentes/${encodeURIComponent(agente.name)}`}
       className="group flex rounded-lg"
     >
-      <Card className="flex w-full flex-col transition-colors group-hover:bg-bg-sutil">
+      <Card className="luz flex w-full flex-col">
         <CardBody className="flex flex-1 flex-col gap-3">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">

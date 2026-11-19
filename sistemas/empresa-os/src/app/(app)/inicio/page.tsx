@@ -146,7 +146,7 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
       </div>
 
       {(veTarefas || veAgentes) && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="entrada grid grid-cols-1 gap-4 sm:grid-cols-3">
           {veTarefas && <KpiCard label="Tarefas abertas" value={abertas.count ?? 0} variant="feature" />}
           {veTarefas && <KpiCard label="Concluídas na semana" value={concluidasNaSemana.count ?? 0} />}
           {veAgentes && <KpiCard label="Agentes instalados" value={agentesInstalados.count ?? 0} />}
@@ -166,7 +166,7 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
               {proximoPasso ? (
                 <Link
                   href={hrefTarefa(proximoPasso.item.tarefa_id, proximoPasso.item.trilha)}
-                  className="flex min-h-11 flex-col gap-0.5 rounded-md border border-acento bg-acento-suave p-3 hover:bg-bg-sutil"
+                  className="luz flex min-h-11 flex-col gap-0.5 rounded-md border border-acento bg-acento-suave p-3 [--luz-borda:var(--acento)]"
                 >
                   <span className="text-[10px] font-bold uppercase tracking-wider text-acento-texto">
                     Próximo passo · {proximoPasso.rotuloTrilha} · {proximoPasso.numero} de {proximoPasso.total}
@@ -205,7 +205,7 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Pro
                     <li key={i.tarefa_id}>
                       <Link
                         href={hrefTarefa(i.tarefa_id, i.trilha)}
-                        className="flex min-h-11 items-center justify-between gap-3 rounded-md px-2 text-sm text-fg-1 hover:bg-bg-sutil"
+                        className="flex min-h-11 items-center justify-between gap-3 rounded-md px-2 text-sm text-fg-1 transition-colors duration-200 hover:bg-bg-sutil"
                       >
                         <span className="min-w-0 truncate">{i.titulo}</span>
                         <span className="flex shrink-0 items-center gap-2 text-xs text-fg-3">

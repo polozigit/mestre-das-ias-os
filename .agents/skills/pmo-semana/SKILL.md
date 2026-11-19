@@ -20,7 +20,7 @@ Monta a proposta da semana e, com o "sim" do dono, marca cada tarefa escolhida n
 ## Ler as tarefas
 
 1. **Com banco** (o time Tecnologia já ligou o banco; `<CASA>` e o que fazer com "não está ligado" estão em "Ler as tarefas" da `pmo-quadro`): rode `<PY> .agents/skills/pmo-quadro/scripts/quadro.py consulta --gravar-em operacao/pmo/tarefas.json --sistema "<CASA>/sistemas/empresa-os"` e passe `--tarefas operacao/pmo/tarefas.json`. Enquanto o banco não estiver ligado, vale a leitura pelo MCP do Supabase (só leitura) descrita na `pmo-quadro`; nunca grave por ele.
-2. **Sem banco:** use `--pasta-tasks operacao/tasks`. É só leitura: mostre a proposta, diga que sem o banco não dá para marcar a semana nas tarefas, e pare aí. A task da sessão continua sendo do `polozi-gerente-de-trabalho`.
+2. **Sem banco:** use `--pasta-tasks operacao/tasks`. É só leitura: mostre a proposta, diga que sem o banco não dá para marcar a semana nas tarefas, e pare aí. A task da sessão continua sendo do hook de registro.
 
 ## Passos
 

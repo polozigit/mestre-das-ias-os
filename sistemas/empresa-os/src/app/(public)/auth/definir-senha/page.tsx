@@ -94,8 +94,8 @@ export default function DefinirSenhaPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-bg p-6">
-      <div className="w-full max-w-sm rounded-lg border border-borda bg-bg-elevada p-8 shadow-[var(--sombra-md)]">
+    <main className="palco-luz flex min-h-screen items-center justify-center bg-bg p-6">
+      <div className="entrada-pagina w-full max-w-sm rounded-lg border border-borda bg-bg-elevada p-8 shadow-[var(--sombra-md)]">
         <LogoMarca alt={nomeSistema} width={140} height={36} priority className="mb-6 h-9 w-auto" />
 
         {estado === "carregando" && (
@@ -108,8 +108,9 @@ export default function DefinirSenhaPage() {
               Link inválido ou expirado
             </h1>
             <p className="mb-6 text-sm text-fg-3">
-              Peça um link novo em &quot;Esqueci minha senha&quot; na tela de
-              login, ou um novo convite ao dono da empresa.
+              Peça pra quem cuida do sistema na sua empresa redefinir a sua
+              senha em Usuários. Na tela de login, &quot;Esqueci minha senha&quot;
+              explica o passo a passo.
             </p>
             <button
               type="button"
@@ -146,7 +147,7 @@ export default function DefinirSenhaPage() {
                   required
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  className="w-full rounded-md border border-borda bg-bg px-3 py-2.5 text-sm text-fg-1"
+                  className="campo w-full rounded-md border border-borda bg-bg px-3 py-2.5 text-sm text-fg-1"
                 />
               </div>
               <div>
@@ -163,7 +164,7 @@ export default function DefinirSenhaPage() {
                   required
                   value={confirma}
                   onChange={(e) => setConfirma(e.target.value)}
-                  className="w-full rounded-md border border-borda bg-bg px-3 py-2.5 text-sm text-fg-1"
+                  className="campo w-full rounded-md border border-borda bg-bg px-3 py-2.5 text-sm text-fg-1"
                 />
               </div>
               {erro && (

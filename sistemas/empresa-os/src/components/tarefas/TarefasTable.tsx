@@ -14,6 +14,7 @@ import type { TarefaOrigem, TarefaStatus } from "@/types/database";
 export type TarefaLinha = {
   id: string;
   titulo: string;
+  area?: string;
   status: TarefaStatus;
   origem: TarefaOrigem;
   /** Trilha do banco (curso, plano90 ou trabalho): o link do detalhe leva o grupo pro menu lateral. */
@@ -27,6 +28,7 @@ export type TarefaLinha = {
 /* Client component porque ResponsiveTable recebe funções de render por coluna —
    e função não atravessa a fronteira server→client como prop. */
 const COLUNAS: ResponsiveColumn<TarefaLinha>[] = [
+  { key: "area", header: "Área", render: (t) => t.area === "geral" || !t.area ? "Geral" : t.area },
   {
     key: "titulo",
     header: "Título",

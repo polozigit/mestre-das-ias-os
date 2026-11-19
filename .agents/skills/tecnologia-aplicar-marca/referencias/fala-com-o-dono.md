@@ -30,7 +30,7 @@ Antes dela, as 5 linhas: "Os botões ficam nesta cor." / "Os links ficam nesta c
 
 ## Link de teste
 
-"Está no ar para teste neste link. Responda sim para publicar." Antes, você mesmo abriu o link: login e uma tela interna, claro e escuro, celular e computador.
+"Este é o link de TESTE (homologação): o que você fizer nele não vale e os dados são de teste. Olhe a sua marca e responda sim para publicar: <link>" Antes, você mesmo abriu o link: login e uma tela interna, claro e escuro, celular e computador.
 
 Depois do sim e do merge: "Seu sistema está no ar com a sua marca."
 

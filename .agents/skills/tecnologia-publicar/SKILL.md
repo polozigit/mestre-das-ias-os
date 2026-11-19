@@ -21,25 +21,24 @@ Detalhes e `arquivo:linha` em `.agents/skills/tecnologia-sistema/referencias/reg
 
 ## Salvar (Casa sem sistema no ar)
 
-Quando o dono diz "salva", pede um checkpoint, ou a sessão abre com árvore suja, e a Casa NÃO tem produção publicada: um comando só, sem subagente e sem revisor. O script faz commit, push e a prova.
+Quando o dono diz "salva" ou há um marco útil (objetivo concluído, pausa) e a Casa NÃO tem produção publicada: um comando só, com os caminhos exatos do trabalho, sem subagente e sem revisor. O script faz commit, push e a prova. Abrir a sessão ou terminar um turno não salva nada: árvore suja de antes não é salva por esta seção, e resposta sem arquivo novo não gera commit.
 
 ```bash
 python3 .agents/skills/tecnologia-publicar/scripts/salvar.py -m "<o que mudou, em português>" <caminho> [<caminho> ...]
-python3 .agents/skills/tecnologia-publicar/scripts/salvar.py -m "<mensagem>" --tudo   # só para salvar a árvore suja inteira (começo de sessão)
-python3 .agents/skills/tecnologia-publicar/scripts/salvar.py --provar                 # só confere, não salva
+python3 .agents/skills/tecnologia-publicar/scripts/salvar.py --provar <caminho> [<caminho> ...]   # só confere o escopo, não salva
 ```
 
-Rode na raiz da Casa, com o Python de `operacao/INSTALACAO.md` (campo `comando_python`; no Windows costuma ser `py -3`) no lugar de `python3`. Prefira os caminhos exatos do que você mudou; `--tudo` é a única exceção à regra de nunca usar `git add -A`.
+Rode na raiz da Casa, com o Python de `operacao/INSTALACAO.md` (campo `comando_python`; no Windows costuma ser `py -3`) no lugar de `python3`. Os caminhos exatos do trabalho são obrigatórios: `--tudo` foi retirado (o script recusa, saída 5) e nunca se usa `git add -A`. O commit leva só esses caminhos; arquivo staged ou sujo de outro trabalho fica de fora (índice com staged alheio: o script recusa, saída 5, e preserva o que já estava preparado). O recibo do envio vai para `operacao/tasks/.sessoes/git-recibo.json` (cache ignorado pelo git): nunca vira arquivo versionado que exija outro commit. Dois salvamentos ao mesmo tempo: o segundo sai 2 ("outro checkpoint está salvando").
 
 | Saída | Significa | O que fazer |
 |---|---|---|
 | 0 com `SINCRONIZADO <hash>` | commit e push feitos, nada sobrando | Diga ao dono: "Sincronizado no GitHub, commit <hash curto>." |
 | 0 com `SALVO_LOCAL <hash>` | a Casa não tem GitHub ligado: sem `origin`, ou o `origin` ainda é o repositório-modelo do curso (o script commita e não empurra; a etapa 4 do instalador troca o `origin`) | Diga: "Salvo neste computador." Não diga "no GitHub". `SALVO_LOCAL` com saída 1: o commit foi feito, mas sobrou arquivo fora dele (veja a saída 1). |
 | 1 | sobrou arquivo fora do commit, ou commit que não subiu (com o `origin` no repositório-modelo o `--provar` sempre dá 1: não há GitHub do dono para provar) | Leia a lista, salve o que faltou ou explique por que ficou. Não diga "salvo". |
-| 2 | a trava de segredo barrou, ou o push foi recusado | Tire o segredo ou o arquivo e tente de novo. Nunca contorne a trava. Se uma chave vazou, chame `tecnologia-acessos` (Girar chave). |
+| 2 | a trava de segredo barrou, o push foi recusado, ou outro salvamento está rodando | Tire o segredo ou o arquivo e tente de novo. Nunca contorne a trava. Se uma chave vazou, chame `tecnologia-acessos` (Girar chave). |
 | 3 | sistema em produção e a branch é a `main` | Siga o fluxo completo (`## Passos` abaixo). Nada foi commitado. |
 | 4 | travas de segredo desligadas | Se `.githooks/pre-commit` e `.githooks/pre-push` existem, religue com `git config core.hooksPath .githooks` e rode de novo; se sumiram, avise o dono e não salve. Nada foi commitado. |
-| 5 | uso errado (fora da raiz, sem mensagem, caminho fora do repositório, HEAD solto) | Corrija o comando. |
+| 5 | uso errado (fora da raiz, sem mensagem, sem caminhos, `--tudo`, caminho fora do repositório, índice com staged de outro trabalho, HEAD solto) | Corrija o comando; com staged alheio, deixe-o como está e salve só os seus caminhos depois que o outro trabalho commitar. |
 | 6 | o GitHub tem mudança que conflita com a local; o merge foi desfeito | Mostre os dois lados ao dono, em palavras simples, e deixe ele escolher. Não resolva sozinho. |
 
 Só diga "Sincronizado no GitHub" com exit 0 e a linha `SINCRONIZADO`. Esta seção não troca de branch, não abre PR e não coloca nada no ar: se o dono quer link de teste ou a mudança é de `sistemas/` com produção publicada, vá aos `## Passos`.
@@ -52,7 +51,7 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
 
 1. **Conferir o estado.** Rode `git fetch origin`, `git status --porcelain` e `git branch --show-current`. Se estiver na `main`, ou numa branch cuja PR já foi mesclada (`gh pr list --head <branch> --state merged --json number --jq length` maior que 0), crie a branch nova a partir da `main` do GitHub: `git switch -c <tipo>/<assunto-curto> origin/main` (por exemplo `feat/tela-clientes`); as edições soltas vão junto. Anote o nome: é o `<branch>` dos passos seguintes. O hook da Casa recusa push na `main` quando há produção publicada.
 
-2. **Commit local.** Commit com os caminhos exatos dos arquivos (nunca `git add -A`), mensagem em português dizendo o que mudou. Se a mudança tem migration (`sistemas/*/supabase/migrations/*.sql`), o veredito dela, `operacao/vereditos/<nome-sem-.sql>.json`, entra no MESMO commit: o `pre-commit` da Casa confere o veredito da migration que vai no commit, e o revisor do passo 5 lê esse arquivo. Termine a mensagem com a linha de coautoria do modelo que está rodando, se o repositório usar esse costume. Ainda não faça push. Depois liste o que vai subir: `git diff --name-only --no-renames origin/main...HEAD`. O `--no-renames` é obrigatório em toda lista de arquivos: sem ele, arquivo movido ou renomeado aparece só com o nome novo, e mover `AGENTS.md` para `NOTAS.md` ou `.github/workflows/x.yml` para `docs/` sumiria da conferência do 3a. As checagens 3, 4 e 5 usam essa lista; se ela vier vazia mas havia trabalho, pare e descubra por quê.
+2. **Commit local.** Commit com os caminhos exatos dos arquivos (nunca `git add -A`, nunca alteração de outro trabalho), mensagem em português dizendo o que mudou. Se a mudança tem migration (`sistemas/*/supabase/migrations/*.sql`), o veredito dela, `operacao/vereditos/<nome-sem-.sql>.json`, entra no MESMO commit: o `pre-commit` da Casa confere o veredito da migration que vai no commit, e o revisor do passo 5 lê esse arquivo. Termine a mensagem com a linha de coautoria do modelo que está rodando, se o repositório usar esse costume. Ainda não faça push. Depois liste o que vai subir: `git diff --name-only --no-renames origin/main...HEAD`. O `--no-renames` é obrigatório em toda lista de arquivos: sem ele, arquivo movido ou renomeado aparece só com o nome novo, e mover `AGENTS.md` para `NOTAS.md` ou `.github/workflows/x.yml` para `docs/` sumiria da conferência do 3a. As checagens 3, 4 e 5 usam essa lista; se ela vier vazia mas havia trabalho, pare e descubra por quê.
 
 3. **Arquivos protegidos e migrations.**
 
@@ -63,13 +62,19 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
 
    **3b. Migrations.** Se a lista toca `sistemas/*/supabase/migrations/*.sql`, para cada arquivo rode os dois, e guarde a saída e o código de saída de cada um para o passo 5: `python3 .agents/skills/tecnologia-mudar-banco/scripts/classificar_migration.py <sql>` (0 = acrescenta, 1 = destrutiva; o 1 só informa a classe, não é erro) e `python3 .agents/skills/tecnologia-mudar-banco/scripts/veredito.py conferir <sql>`. Qualquer problema (sem veredito, sha diferente, BLOCKED, destrutiva sem o "sim" do dono) = pare e chame a skill `tecnologia-mudar-banco`. Não siga.
 
-4. **Checagem local** (o que o GitHub Actions fazia antes, agora no computador). Na raiz da Casa: `git fetch --no-tags origin main` e depois `python3 .agents/skills/tecnologia-publicar/scripts/checar_local.py`. Ele confere só o que a branch mudou: segredo nas linhas novas e arquivo proibido, veredito de cada migration, `npm run lint` + `npx tsc --noEmit` + `npm test` (se mexe em `sistemas/empresa-os/`; instala as dependências sozinho na primeira vez), guardas de arquitetura e, com Docker ligado, as migrations num Postgres local com dado. Cada item sai `OK`, `FALHOU` ou `PULADO`.
+4. **Checagem local** (o que o GitHub Actions fazia antes, agora no computador). É a ÚNICA rodada de lint, tsc e testes do fluxo: `tecnologia-construir-tela` não repete. Na raiz da Casa: `git fetch --no-tags origin main` e depois `python3 .agents/skills/tecnologia-publicar/scripts/checar_local.py`. Ele confere só o que a branch mudou: segredo nas linhas novas e arquivo proibido, veredito de cada migration, `npm run lint` + `npx tsc --noEmit` + `npm test` (se mexe em `sistemas/empresa-os/`; instala as dependências sozinho na primeira vez), guardas de arquitetura e, com Docker ligado, as migrations num Postgres local com dado. Cada item sai `OK`, `FALHOU` ou `PULADO`.
    - Saída 0 = siga. Guarde as linhas da saída: vão no texto da PR (passo 6).
    - Saída 1 = pare, corrija o item `FALHOU`, commite de novo (passo 2) e repita desde o passo 3. Nunca siga com `FALHOU`.
    - Saída 2 = a mensagem `PARE:` diz o que falta (em geral o `git fetch`).
    - `PULADO banco` por falta de Docker é normal: quem prova a migration com dado é a homologação, no passo 6.
 
-5. **Revisão independente.** Só se a lista do passo 2 toca `sistemas/` ou o 3a deu saída 1 (arquivo protegido); senão pule este passo (o subagente começa sem contexto e custa tokens; documento e operação não passam por ele). Chame o subagente `tecnologia-revisor-seguranca` passando `chamado_por: tecnologia-publicar`, a lista do passo 2, o texto do diff (`git diff --no-renames origin/main...HEAD`), a saída do `arquivos_protegidos.py` (passo 3a, campo `arquivos_protegidos`), o `ok_do_dono` do 3a quando houver, e, para cada migration da lista, o caminho, a classificação (`classificar_migration.py`) e a saída, com o código de saída, do `veredito.py conferir` do passo 3b. O revisor só lê e não roda comando: sem esses dados ele devolve BLOCKED. BLOCKED = UMA correção: corrija, commite de novo, repita os passos 3 e 4 (a correção pode mudar o sha da migration e quebrar o veredito) e chame o mesmo revisor UMA vez só para conferir os achados corrigidos. BLOCKED de novo = PARE, não faça merge, registre o motivo em `operacao/PENDENCIAS.md` e conte ao dono em 1 linha. Nunca faça uma 3ª chamada ao revisor (teto do kit: 1 revisão + 1 correção por etapa, nunca em loop). Nunca siga com BLOCKED.
+5. **Revisão independente, só por risco.** Chame o `tecnologia-revisor-seguranca` apenas se o diff toca ao menos um destes gatilhos; senão pule (o subagente começa sem contexto e custa tokens; tela comum passa pelo `checar_local.py` do passo 4 e pelo "aprovado" do dono, e documento e operação nunca passam por ele):
+   - migration: arquivo em `sistemas/*/supabase/migrations/` (o 3b já rodou);
+   - login ou autorização: `sistemas/empresa-os/src/proxy.ts`, `sistemas/empresa-os/src/lib/auth/` ou `sistemas/empresa-os/src/lib/supabase/`;
+   - arquivo protegido: o 3a deu saída 1;
+   - padrão de segredo: o diff acrescenta linha com `service_role`, `secret`, `token`, `password`, `api_key` ou `private_key`. Confira com `git diff --no-renames -U0 origin/main...HEAD | grep -E '^\+' | grep -Eiq 'service_role|secret|token|password|api[_-]?key|private[_-]?key' && echo GATILHO`.
+
+   Com gatilho, passe `chamado_por: tecnologia-publicar`, a lista do passo 2, o texto do diff (`git diff --no-renames origin/main...HEAD`), a saída do `arquivos_protegidos.py` (passo 3a, campo `arquivos_protegidos`), o `ok_do_dono` do 3a quando houver, e, para cada migration da lista, o caminho, a classificação (`classificar_migration.py`) e a saída, com o código de saída, do `veredito.py conferir` do passo 3b. O revisor só lê e não roda comando: sem esses dados ele devolve BLOCKED. BLOCKED = UMA correção: corrija, commite de novo, repita os passos 3 e 4 (a correção pode mudar o sha da migration e quebrar o veredito) e chame o mesmo revisor UMA vez só para conferir os achados corrigidos. BLOCKED de novo = PARE, não faça merge, registre o motivo em `operacao/PENDENCIAS.md` e conte ao dono em 1 linha. Nunca faça uma 3ª chamada ao revisor (teto do kit: 1 revisão + 1 correção por etapa, nunca em loop). Nunca siga com BLOCKED.
 
 6. **Push, PR e checks.**
    - `git push -u origin HEAD`.
@@ -87,10 +92,10 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
    - Vermelho: pegue o id da execução que falhou com `gh run list --branch <branch> --status failure --limit 1 --json databaseId --jq '.[0].databaseId'` e leia com `gh run view <id> --log-failed`. Corrija, commite (passo 2) e volte ao passo 3. Só avance com verde.
 
 7. **Link do preview e "aprovado" do dono.** Pegue o link do preview da Vercel (comentário do bot na PR: `gh pr view <branch> --json comments`).
-   - **Mudança que mexe em tela:** o dono vê o resultado antes de ir ao ar. Primeira resposta, em linguagem simples: "Abra este link, olhe a tela que mudou e responda aprovado se estiver certo: <link>". Espere o "aprovado" escrito no chat e só então siga ao passo 8. Se o dono pedir ajuste, volte ao passo 2 na mesma PR (o link se atualiza). Nunca peça para criar usuário, convidar membro de teste ou guardar senha: o preview entra como o dono, sem senha.
+   - **Mudança que mexe em tela:** o dono vê o resultado antes de ir ao ar. Primeira resposta, em linguagem simples e sempre com o aviso de que o link é de TESTE: "Este é o link de TESTE (homologação): o que você fizer nele não vale, os dados são de teste e nada chega ao sistema de verdade. Abra, olhe a tela que mudou e responda aprovado se estiver certo: <link>". Sem print: só o link e o aviso. Espere o "aprovado" escrito no chat e só então siga ao passo 8. Se o dono pedir ajuste, volte ao passo 2 na mesma PR (o link se atualiza). Nunca peça para criar usuário, convidar membro de teste ou guardar senha: o preview entra como o dono, sem senha.
    - **Abrir o link (a prévia da Vercel é protegida e pede login da Vercel):** você mesma a abre no Chrome do dono, já logado na Vercel, por comando (Mac `open -a "Google Chrome" "<link>"`, Windows `start chrome "<link>"`), nunca no navegador do app. Conferir por script: `(cd sistemas/empresa-os && vercel curl /login --deployment "<link>")` (a CLI passa pela proteção com o bypass de automação criado na primeira vez, passo `bypass_automacao`). Nunca desligue a proteção da prévia para conseguir abrir.
    - **Mudança que não mexe em tela** (documento, operação, automação): não espere o dono. Diga em 1 frase "Estou colocando no ar." e siga ao passo 8.
-   - **Conferência pela IA (opcional).** Se ajudar, a IA pode abrir o link de teste e olhar só a tela que a mudança alterou, nunca o sistema inteiro. Ela só navega e olha: o preview usa o banco de PRODUÇÃO, então não salva, não exclui e não convida; teste que precisa gravar usa um registro "[TESTE]" e apaga depois. Se a conferência não rodar (login do preview falhou ou o agente está fora), nada trava: entregue o link ao dono do mesmo jeito.
+   - **Conferência pela IA (opcional).** Se ajudar, a IA pode abrir o link de teste e olhar só a tela que a mudança alterou, nunca o sistema inteiro. Ela só navega e olha: o preview usa o banco de HOMOLOGAÇÃO (ou o de PRODUÇÃO, numa Casa instalada antes dele: `conectar.py homologacao` e `vercel-env` resolvem), então não salva, não exclui e não convida; teste que precisa gravar usa um registro "[TESTE]" e apaga depois. Se a conferência não rodar (login do preview falhou ou o agente está fora), nada trava: entregue o link ao dono do mesmo jeito.
 
    Exceção: se a mudança veio de `tecnologia-construir-tela`, a chamada dela informa o `TASK-N`. Então pare aqui e devolva o controle a ela: ela pede o "aprovado" do dono para a tela e, com ele, devolve a você para seguir do passo 8.
 
@@ -167,8 +172,10 @@ Variável de shell não passa de um comando para outro. Por isso cada bloco abai
     - "Salvo" depois do merge: o `state` do 8b deu `MERGED`, `git merge-base --is-ancestor <SHA do 9.1> origin/main && echo "está na main"` imprime a frase e `git status --porcelain` sai vazio (nada ficou fora do commit). Não troque a pasta para a `main`: num worktree ela pode estar aberta em outra pasta. O próximo trabalho começa no passo 1, com branch nova a partir de `origin/main`.
     - "Salvo" com a branch ainda sem merge: `git status --porcelain` vazio e `git log origin/<branch>..HEAD` vazio (diga "salvei, falta colocar no ar").
     - "No ar": o deploy desse commit com `state` `success` (passo 9.3) e `checar_producao.py` com saída 0 depois disso.
+    - A mensagem de "no ar" leva só o endereço de PRODUÇÃO (o `SITE_URL` do 8a). O link de teste da prévia nunca aparece nela: ele foi só para o "aprovado".
     - Sem a prova, diga o que falta em palavras simples: "Ainda estou esperando o site atualizar".
-    - Com a prova ("no ar" ou "salvo" depois do merge): rode `python3 .codex/hooks/registro_trabalho.py reconciliar` (no Windows, `py -3`): conclui no quadro a atividade que isto provou.
+    - Com a prova de "no ar" (deploy `success` e `checar_producao.py` com saída 0), grave o recibo que o registro exige para concluir trabalho do tipo `publicacao`, com o endereço `https://` do site e o SHA do 9.1 (cache ignorado pelo git, nunca commitado): `printf '{"publicado": true, "url": "%s", "commit": "%s"}' "<SITE_URL>" "<SHA>" > operacao/tasks/.sessoes/publicacao-recibo.json`. Sem essa prova, não grave o arquivo.
+    - Com a prova ("no ar" ou "salvo" depois do merge), e só se a tarefa for do plano de 90 dias ou do curso, rode `python3 .codex/hooks/registro_trabalho.py reconciliar` (no Windows, `py -3`): conclui no quadro a atividade que isto provou. Trabalho comum fecha por `registro_trabalho.py concluir` (skill `polozi-concluir-trabalho`).
 
 ## Primeira vez neste sistema
 
@@ -229,7 +236,7 @@ Não faz: mexer em ruleset ou proteção de branch (a checagem é a do passo 4 d
 - Desligar a proteção da prévia (Deployment Protection, Vercel Authentication) ou mandar o dono desligar.
 - `supabase db push` (só a Action aplica migration).
 - Seguir com o revisor em BLOCKED.
-- `git add -A` ou `git add .`. Única exceção: `salvar.py --tudo`.
+- `git add -A`, `git add .` ou `salvar.py --tudo`.
 - `gh pr merge --auto`.
 - Ler `credenciais/` para achar o endereço do site.
 - Dizer "salvo" ou "no ar" sem a prova do passo 11.

@@ -29,7 +29,7 @@ export function LinhaDoTempo({
   return (
     <section className="flex flex-col gap-4">
       <KpiCard label={trilha.rotulo} value={`${trilha.pct}%`} progress={trilha.pct} delta={{ value: `${feitas} de ${total}`, trend: "flat" }} />
-      <div className="grid grid-cols-1 gap-3 lg:grid-flow-col lg:auto-cols-fr">
+      <div className="entrada grid grid-cols-1 gap-3 lg:grid-flow-col lg:auto-cols-fr">
         {fases.map((f) => (
           <div
             key={f.fase}
@@ -55,7 +55,7 @@ export function LinhaDoTempo({
                         href={hrefTarefa(i.tarefa_id, i.trilha)}
                         aria-current={eProximo ? "step" : undefined}
                         className={cn(
-                          "flex min-h-11 items-center justify-between gap-2 rounded-md border px-2 py-1 text-sm hover:bg-bg-sutil",
+                          "flex min-h-11 items-center justify-between gap-2 rounded-md border px-2 py-1 text-sm transition-colors duration-200 hover:bg-bg-sutil",
                           eProximo ? "border-acento bg-acento-suave font-semibold" : "border-transparent",
                           i.status === "CONCLUIDA" || i.status === "CANCELADA" ? "text-fg-3" : "text-fg-1",
                         )}

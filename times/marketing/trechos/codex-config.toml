@@ -8,6 +8,10 @@ description = "Confere persona e marca contra o dossiê. Use antes de publicar p
 
 [agents.marketing-pesquisador]
 config_file = "agents/marketing-pesquisador.toml"
-description = "Pesquisa pública do cliente para a persona. Use só quando a skill marketing-persona pedir pesquisa pública; devolve fichas com link, data e trecho literal"
+description = "Pesquisa pública do cliente para a persona. Use só na etapa 2 da skill marketing-persona (pesquisa de mercado em três frentes: alternativas, voz do cliente, dúvidas e reclamações); devolve até 50 trechos de até 10 páginas, cada um com link, data, trecho literal, frente e tema"
+
+[agents.marketing-analista]
+config_file = "agents/marketing-analista.toml"
+description = "Análise e descobertas do estudo da persona. Use só nas etapas 3 e 4 da skill marketing-persona, uma chamada por estudo e no máximo uma volta de correção; lê dossiê, escopo, hipótese do dono e pesquisa e devolve um JSON com a análise e as descobertas"
 
 # AGENTES:FIM (marketing)

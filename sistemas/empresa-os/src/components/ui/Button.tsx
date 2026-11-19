@@ -36,7 +36,7 @@ export function Button({
       className={cn(
         // Press: scale sutil transform-only, atrás de motion-safe (reduced-motion
         // não deve nem pular o estado — some por completo).
-        "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-[background-color,border-color,color,box-shadow,scale] duration-150 ease-out motion-safe:active:scale-[0.98] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-[background-color,border-color,color,box-shadow,scale] duration-150 ease-saida motion-safe:active:scale-[0.97] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
         variantStyles[variant],
         sizeStyles[size],
         className,

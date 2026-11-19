@@ -5,5 +5,5 @@ export const marca: Marca = {
   aplicada: false,
   logo: { fundoClaro: "/marca/logo.svg", fundoEscuro: "/marca/logo.svg" },
   fontesGoogle: null,
-  corDoNavegador: { claro: "#FCFCFD", escuro: "#111114" },
+  corDoNavegador: { claro: "#FFFFFF", escuro: "#0A0A0A" },
 };

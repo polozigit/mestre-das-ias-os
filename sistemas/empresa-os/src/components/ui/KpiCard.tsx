@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { numeroContado } from "@/lib/numero-contado";
 import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 
 // trend: direção da seta. tone (opcional): cor semântica desacoplada da seta —
@@ -26,6 +27,8 @@ export function KpiCard({
   className?: string;
 }) {
   const isFeature = variant === "feature";
+  // Inteiro simples (ou "41%") conta de 0 até o valor; o resto fica parado (ver numero-contado.ts).
+  const contado = numeroContado(value);
 
   return (
     <div
@@ -60,7 +63,20 @@ export function KpiCard({
             isFeature ? "text-fg-sobre-acento" : "text-fg-1",
           )}
         >
-          {value}
+          {contado ? (
+            <>
+              {/* O valor de verdade fica no texto (leitor de tela, busca); o contador é só o desenho. */}
+              <span className="sr-only">{value}</span>
+              <span
+                aria-hidden="true"
+                className="conta-num"
+                style={{ "--conta-ate": contado.ate } as React.CSSProperties}
+              />
+              {contado.sufixo && <span aria-hidden="true">{contado.sufixo}</span>}
+            </>
+          ) : (
+            value
+          )}
         </span>
         {delta && (() => {
           const tone =
@@ -101,7 +117,7 @@ export function KpiCard({
         >
           <div
             className={cn(
-              "h-full rounded-full",
+              "barra-enche h-full rounded-full",
               isFeature ? "bg-fg-sobre-acento" : "bg-acento",
             )}
             style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}

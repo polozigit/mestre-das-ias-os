@@ -5,6 +5,7 @@ Esta pasta ensina a pessoa a usar o sistema. Ela não deve ser carregada inteira
 ## Capítulos
 
 - `como-trabalhar.md`: começar uma tarefa e usar as Skills.
+- `fluxo-operacional.md`: como a IA registra o pedido e salva o trabalho (por marco, só os arquivos certos).
 - `conexoes-e-seguranca.md`: usar conectores, APIs e credenciais com segurança.
 - `modelos-e-esforco.md`: escolher modelo e nível de esforço.
 - `sessoes-e-contexto.md`: continuar, encerrar ou abrir outra conversa.

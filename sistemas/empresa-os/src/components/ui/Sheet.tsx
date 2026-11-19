@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
  */
 export function sheetPanelClasses(open: boolean, mdWidth = "md:w-[420px]") {
   return cn(
-    "fixed z-50 flex flex-col overflow-y-auto bg-bg-elevada shadow-[var(--sombra-md)] transition-transform duration-300 ease-out motion-reduce:transition-none",
+    "fixed z-50 flex flex-col overflow-y-auto bg-bg-elevada shadow-[var(--sombra-md)] transition-transform duration-[420ms] ease-saida motion-reduce:transition-none",
     // mobile = bottom-sheet
     "inset-x-0 bottom-0 max-h-[90vh] rounded-t-2xl border-t border-borda pb-[env(safe-area-inset-bottom)]",
     // desktop = painel lateral direito full-height
@@ -48,7 +48,7 @@ export function sheetBackdropClasses(open: boolean) {
 export function sheetPopoverClasses(open: boolean, mdWidth = "md:w-80") {
   return cn(
     "z-50 flex flex-col overflow-hidden bg-bg-elevada shadow-[var(--sombra-md)]",
-    "transition-transform duration-300 ease-out motion-reduce:transition-none",
+    "transition-transform duration-[420ms] ease-saida motion-reduce:transition-none",
     // <md: bottom-sheet
     "fixed inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl border-t border-borda pb-[env(safe-area-inset-bottom)]",
     open ? "translate-y-0" : "translate-y-full",

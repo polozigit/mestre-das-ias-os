@@ -6,6 +6,8 @@ import { assertAcesso } from "@/lib/auth/guards";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { actionError as err, type ActionResult } from "@/lib/action-result";
+import { SENHA_PROVISORIA } from "@/lib/senha-provisoria";
+import { mensagemDeAcesso, metadataComSenhaProvisoria, podeRedefinirSenha } from "@/lib/senha-equipe";
 import {
   agruparPermissoes,
   diffPermissoes,
@@ -36,7 +38,7 @@ async function registrarAtividade(
   return error ? error.message : null;
 }
 
-/** Origem do site a partir dos headers do proxy (o redirectTo do convite funciona também em preview). */
+/** Origem do site a partir dos headers do proxy (o endereço da mensagem de acesso funciona também em preview). */
 async function siteOrigin() {
   const h = await headers();
   const proto = h.get("x-forwarded-proto") ?? "https";
@@ -45,18 +47,29 @@ async function siteOrigin() {
 }
 
 /**
- * Convida alguém: e-mail de convite via Supabase Auth (Admin API, service key)
- * + linha em `usuarios` (sem permissão nenhuma: o dono concede depois, no painel
- * da pessoa). `usuarios` não dá INSERT a authenticated (convite é server-side).
+ * Resultado das ações de acesso: `acesso` é o texto pronto (endereço, e-mail e
+ * senha provisória) pra quem cadastrou mandar pra pessoa. Só volta pra quem
+ * passou na checagem de permissão; a senha nunca é gravada nem logada.
+ */
+export type ResultadoAcesso = ActionResult & { acesso?: string };
+
+/**
+ * Cadastra alguém SEM e-mail: cria o login no Supabase Auth (Admin API, service
+ * key) já com a senha provisória e a marca `senha_provisoria`, + linha em
+ * `usuarios` (sem permissão nenhuma: o dono concede depois, no painel da
+ * pessoa). `usuarios` não dá INSERT a authenticated (cadastro é server-side).
+ * O e-mail padrão do Supabase não serve aqui: só entrega pra membro da conta
+ * do Supabase e limita a 2 por hora.
  *
  * Ordem importa: (1) pre-check de duplicidade ANTES do Auth, senão um auth user
- * órfão trava o e-mail; (2) inviteUserByEmail; (3) INSERT do perfil; (4) se o
- * INSERT falhar, deleteUser desfaz o convite pra não queimar o e-mail.
+ * órfão trava o e-mail; (2) createUser; (3) INSERT do perfil; (4) se o
+ * INSERT falhar, deleteUser desfaz o login pra não queimar o e-mail.
+ * E-mail que já existe no Auth: createUser falha e nada é regravado.
  */
 export async function convidarMembro(
-  _prev: ActionResult | null,
+  _prev: ResultadoAcesso | null,
   formData: FormData,
-): Promise<ActionResult> {
+): Promise<ResultadoAcesso> {
   try {
     const sessao = await assertAcesso("usuarios");
     const nome = String(formData.get("nome") ?? "").trim();
@@ -75,10 +88,21 @@ export async function convidarMembro(
     if (jaExiste) return err("Já existe uma pessoa com esse e-mail.");
 
     const service = createServiceClient();
-    const { data: convite, error: conviteErr } = await service.auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${await siteOrigin()}/auth/definir-senha`,
+    const { data: convite, error: conviteErr } = await service.auth.admin.createUser({
+      email,
+      password: SENHA_PROVISORIA,
+      email_confirm: true,
+      user_metadata: { senha_provisoria: true },
     });
-    if (conviteErr) return err(`Convite falhou: ${conviteErr.message}`);
+    if (conviteErr) {
+      // Mesmo caso do convite antigo (e-mail já no Auth): para aqui, sem tocar na senha de ninguém.
+      if (conviteErr.code === "email_exists" || conviteErr.code === "user_already_exists") {
+        return err(
+          "Esse e-mail já tem login no sistema, mas não aparece na lista. Peça pra IA da empresa conferir o usuário no painel do Supabase.",
+        );
+      }
+      return err(`O cadastro falhou: ${conviteErr.message}`);
+    }
 
     const { error: perfilErr } = await service.from("usuarios").insert({
       nome,
@@ -99,22 +123,93 @@ export async function convidarMembro(
             `o e-mail ${email} pode ter ficado preso no Auth. Peça pra IA da empresa remover o usuário órfão no painel do Supabase antes de convidar de novo.`,
         );
       }
-      return err(`Convite desfeito, o cadastro falhou: ${perfilErr.message}`);
+      return err(`Login desfeito, o cadastro falhou: ${perfilErr.message}`);
     }
 
     const atvErr = await registrarAtividade(operador, {
       usuarioId: sessao.usuarioId,
       tipo: "membro_convidado",
-      descricao: `${sessao.nome} convidou ${nome} (${email}).`,
+      descricao: `${sessao.nome} cadastrou ${nome} (${email}) com a senha provisória.`,
     });
 
     revalidatePath("/usuarios");
+    const acesso = mensagemDeAcesso({ nome, endereco: await siteOrigin(), email, senha: SENHA_PROVISORIA });
     if (atvErr) {
-      return { ok: true, info: `Convite enviado pra ${email}, mas o registro na atividade falhou: ${atvErr}` };
+      return { ok: true, acesso, info: `Cadastro feito, mas o registro na atividade falhou: ${atvErr}` };
     }
-    return { ok: true, info: `Convite enviado pra ${email}. Abra a pessoa na lista pra dar as permissões.` };
+    return { ok: true, acesso, info: "Cadastro feito. Depois abra a pessoa na lista pra dar as permissões." };
   } catch (e) {
-    return err(e instanceof Error ? e.message : "Falha ao convidar.");
+    return err(e instanceof Error ? e.message : "Falha ao cadastrar.");
+  }
+}
+
+/**
+ * Volta a senha de alguém da equipe pra provisória (sem e-mail). Mesma checagem
+ * das outras actions do módulo: `assertAcesso("usuarios")` (sessão + permissão)
+ * e o alvo lido pelo client da SESSÃO (RLS: só acha quem é desta empresa). Do
+ * formulário só vem o id; o resto sai do banco. A service key só entra depois
+ * de tudo isso, e só pra trocar a senha no Auth.
+ */
+export async function redefinirSenha(usuarioId: string): Promise<ResultadoAcesso> {
+  try {
+    const sessao = await assertAcesso("usuarios");
+    if (typeof usuarioId !== "string" || !usuarioId) return err("Pessoa não encontrada.");
+    const operador = await createClient();
+
+    const { data: alvo, error: alvoErr } = await operador
+      .from("usuarios")
+      .select("id, nome, email, e_dono, ativo, auth_user_id")
+      .eq("id", usuarioId)
+      .maybeSingle();
+    if (alvoErr) return err(alvoErr.message);
+    if (alvo && !podeEditarUsuario(alvo, sessao)) return err("O dono não é editado por outra pessoa.");
+
+    const decisao = podeRedefinirSenha(sessao, alvo);
+    if (!decisao.pode) return err(decisao.motivo);
+    // podeRedefinirSenha já barrou alvo nulo e sem login; o TS não enxerga através da função.
+    if (!alvo || !alvo.auth_user_id) return err("Pessoa não encontrada.");
+
+    const service = createServiceClient();
+    const { data: conta, error: contaErr } = await service.auth.admin.getUserById(alvo.auth_user_id);
+    // Defesa extra: o login apontado tem que ser o da mesma pessoa (mesmo e-mail).
+    if (contaErr || !conta.user || (conta.user.email ?? "").toLowerCase() !== alvo.email) {
+      return err("Não deu pra achar o login desta pessoa. Peça pra IA da empresa conferir no painel do Supabase.");
+    }
+
+    const { error: updErr } = await service.auth.admin.updateUserById(alvo.auth_user_id, {
+      password: SENHA_PROVISORIA,
+      user_metadata: metadataComSenhaProvisoria(conta.user.user_metadata),
+    });
+    if (updErr) return err("Não deu pra redefinir a senha agora. Tente de novo em instantes.");
+
+    // Coerência com `usuarios.senha_trocada_em` (NULL = precisa trocar a senha inicial):
+    // voltou pra provisória, volta a NULL. Falha aqui não desfaz a senha.
+    const { error: carimboErr } = await service
+      .from("usuarios")
+      .update({ senha_trocada_em: null })
+      .eq("id", alvo.id);
+
+    const atvErr = await registrarAtividade(operador, {
+      usuarioId: sessao.usuarioId,
+      tipo: "senha_redefinida",
+      descricao: `${sessao.nome} voltou a senha de ${alvo.nome} para a provisória.`,
+    });
+
+    revalidatePath("/usuarios");
+    const acesso = mensagemDeAcesso({
+      nome: alvo.nome,
+      endereco: await siteOrigin(),
+      email: alvo.email,
+      senha: SENHA_PROVISORIA,
+    });
+    const avisos = [
+      carimboErr ? `a marca de troca na lista falhou (${carimboErr.message})` : null,
+      atvErr ? `o registro na atividade falhou (${atvErr})` : null,
+    ].filter(Boolean);
+    if (avisos.length) return { ok: true, acesso, info: `Senha redefinida, mas ${avisos.join(" e ")}.` };
+    return { ok: true, acesso, info: `A senha de ${alvo.nome} voltou a ser a provisória.` };
+  } catch (e) {
+    return err(e instanceof Error ? e.message : "Falha ao redefinir a senha.");
   }
 }
 

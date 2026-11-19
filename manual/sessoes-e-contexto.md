@@ -18,35 +18,19 @@ Por que isso pesa no seu limite: a cada mensagem o Codex reenvia o histórico da
 
 ## Antes de encerrar
 
-Atualize `operacao/STATUS-ATUAL.md`, registre mudanças em `operacao/CHANGELOG.md`, guarde decisões em `operacao/DECISOES.md` e prepare `operacao/PROXIMA-SESSAO.md` quando houver continuação.
+Salve o que já é entregável (`salvar.py` com os caminhos do trabalho, veja `fluxo-operacional.md`). Atualize `operacao/STATUS-ATUAL.md`, registre mudanças em `operacao/CHANGELOG.md`, guarde decisões em `operacao/DECISOES.md` e prepare `operacao/PROXIMA-SESSAO.md` quando houver continuação.
 
 A próxima conversa deve receber um objetivo claro e consultar o Mapa. Não copie toda a conversa anterior para o novo chat. Registre nos arquivos somente o que precisa persistir.
 
-## Agendar a retrospectiva semanal
+## Compactar em marco
 
-A retrospectiva (`$polozi-retrospectiva`) é melhor como tarefa agendada do
-app, pra rodar sozinha sem alguém abrir o chat. Passo a passo:
+Chegou a um marco (entregável pronto, decisão tomada) e a conversa continua sobre o mesmo trabalho? Compacte
+a conversa nesse ponto, para a IA carregar o resumo em vez do histórico inteiro. Mudou de assunto? Abra conversa nova.
 
-1. No app desktop (a interface de agendamento existe lá e na web, não no CLI).
-2. Projeto: a pasta desta Casa.
-3. Modo de execução: **Local** — a outra opção cria uma cópia separada da pasta, e o que ela escrever lá não aparece na sua Casa.
-4. Repetição: toda segunda, 07:00.
-5. Prompt: exatamente `$polozi-retrospectiva`.
-6. Permissão: gravação na pasta do projeto. A rotina roda sem ninguém olhando e só
-   escreve na Casa; o acesso total fica pras conversas com o dono.
-7. O computador precisa estar ligado, com o app aberto e a pasta no disco
-   na hora marcada.
-8. Depois que ela rodar, a próxima sessão vai achar a Casa com um arquivo
-   novo ainda não salvo — é normal: a verificação de início de sessão vê, e
-   a `tecnologia-publicar` salva.
+## Retrospectiva e vigília: só quando você pede
 
-## Agendar a vigília diária
-
-A vigília (`tecnologia-vigiar`) também é melhor como tarefa agendada,
-1×/dia, criada do mesmo jeito acima, com o prompt `$tecnologia-vigiar` — no
-app desktop, Modo de execução
-**Local** (a outra opção cria uma cópia separada da pasta, que não enxerga
-o histórico já salvo nem o que a vigília gravou antes). O limite é o
-mesmo, dito na cara: com o app fechado, ela não roda
-[24a:cli_automacoes/f9, n23 (d), n23 (e)]. Sem número de frequência/cota —
-`nao medido` (gate T-agendada).
+A retrospectiva (`$polozi-retrospectiva`) e a vigília (`tecnologia-vigiar`) rodam quando você pede, na conversa.
+O kit não agenda nenhuma das duas. Quer agendar mesmo assim? Peça: no app desktop, modo de execução **Local**
+(a outra opção cria uma cópia separada da pasta, e o que ela escrever lá não aparece na sua Casa), com o app
+aberto e o computador ligado na hora marcada [24a:cli_automacoes/f9, n23 (d), n23 (e)]. Depois que a rotina
+rodar, a conversa seguinte acha um arquivo novo ainda não salvo; é normal, e a `tecnologia-publicar` salva.

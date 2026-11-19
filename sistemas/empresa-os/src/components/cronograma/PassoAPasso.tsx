@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { KpiCard } from "@/components/ui/KpiCard";
 import { Pill } from "@/components/ui/Pill";
 import { StatusPill } from "@/components/tarefas/pills";
@@ -8,6 +8,34 @@ import { FECHADA, itensVisiveis, numerarPassos, type TrilhaResumo } from "@/lib/
 import { hrefTarefa } from "@/lib/tarefas/grupos";
 import type { TarefaStatus } from "@/types/database";
 import { ComoFazerRecolhivel } from "./ComoFazer";
+
+/** Passos concluídos que entram na cascata do visto; do 13º em diante acendem juntos. */
+const LIMITE_DA_CASCATA = 12;
+
+/**
+ * Visto do passo concluído, desenhado aqui (e não o ícone pronto) porque o traço se desenha:
+ * `pathLength={1}` deixa o CSS animar o contorno (`.traco-acende` em globals.css).
+ */
+function Visto({ posicao }: { posicao: number }) {
+  return (
+    <svg
+      role="img"
+      aria-label="Concluído"
+      viewBox="0 0 24 24"
+      width={14}
+      height={14}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="traco-acende"
+      style={{ "--i": Math.min(posicao, LIMITE_DA_CASCATA) } as React.CSSProperties}
+    >
+      <path d="M20 6 9 17l-5-5" pathLength={1} />
+    </svg>
+  );
+}
 
 /**
  * Passo a passo do curso: uma lista só, numerada, na ordem do plano (Dia 1 > Dia 2 > Dia 3), com o
@@ -32,6 +60,9 @@ export function PassoAPasso({
   const total = trilha.fases.reduce((s, f) => s + f.total, 0);
   const proximo = trilha.proximo;
   const fases = trilha.fases.map((f) => ({ ...f, visiveis: itensVisiveis(f.itens, mostrarCanceladas) }));
+  // Posição de cada passo concluído na lista inteira: o caminho feito acende em ordem, do 1º ao último.
+  const ordemDosFeitos = new Map<string, number>();
+  for (const f of fases) for (const i of f.visiveis) if (i.status === "CONCLUIDA") ordemDosFeitos.set(i.tarefa_id, ordemDosFeitos.size);
   return (
     <section className="flex flex-col gap-4">
       <KpiCard label={`${trilha.rotulo}: passo a passo`} value={`${trilha.pct}%`} progress={trilha.pct} delta={{ value: `${feitas} de ${total}`, trend: "flat" }} />
@@ -39,7 +70,7 @@ export function PassoAPasso({
       {proximo && (
         <Link
           href={hrefTarefa(proximo.tarefa_id, proximo.trilha)}
-          className="flex min-h-11 flex-wrap items-center justify-between gap-3 rounded-md border border-acento bg-acento-suave p-4 hover:bg-bg-sutil"
+          className="luz flex min-h-11 flex-wrap items-center justify-between gap-3 rounded-md border border-acento bg-acento-suave p-4 [--luz-borda:var(--acento)]"
         >
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-wider text-acento-texto">
@@ -49,7 +80,7 @@ export function PassoAPasso({
           </div>
           <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-acento-texto">
             Ver como fazer
-            <ArrowRight size={16} aria-hidden />
+            <ArrowRight size={16} aria-hidden className="seta-avanca" />
           </span>
         </Link>
       )}
@@ -78,17 +109,18 @@ export function PassoAPasso({
                         href={hrefTarefa(i.tarefa_id, i.trilha)}
                         aria-current={eProximo ? "step" : undefined}
                         className={cn(
-                          "flex min-h-11 items-center gap-3 rounded-md border px-2 py-1 text-sm hover:bg-bg-sutil",
+                          "flex min-h-11 items-center gap-3 rounded-md border px-2 py-1 text-sm transition-colors duration-200 hover:bg-bg-sutil",
                           eProximo ? "border-acento bg-acento-suave" : "border-transparent",
                         )}
                       >
                         <span
                           className={cn(
                             "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                            feito ? "bg-ok-suave text-ok" : eProximo ? "bg-acento text-fg-sobre-acento" : "bg-bg-sutil text-fg-3",
+                            // "Você está aqui": só o próximo passo pulsa (`.ponto-vivo`).
+                            feito ? "bg-ok-suave text-ok" : eProximo ? "ponto-vivo bg-acento text-fg-sobre-acento" : "bg-bg-sutil text-fg-3",
                           )}
                         >
-                          {feito ? <Check size={14} aria-label="Concluído" /> : (numero ?? "–")}
+                          {feito ? <Visto posicao={ordemDosFeitos.get(i.tarefa_id) ?? 0} /> : (numero ?? "–")}
                         </span>
                         <span
                           className={cn(

@@ -1,27 +1,24 @@
 ---
 name: polozi-chamar-time
-description: "Aciona um time já instalado pelo nome, um por vez, com objetivo e formato. Use em \"chama o time de vendas\"; não instala time."
+description: "Confere o time instalado e segue a skill dele na conversa. Use em \"chama o time de vendas\"; não instala time."
 ---
 
 # Polozi Chamar Time
 
-Porteiro, não fluxo: garante que o time de área pedido está instalado antes
-de delegar, e delega pelo NOME do agente — nunca por caminho de arquivo.
-Cada time já traz as próprias skills (ex.: o time `marketing` traz
-`marketing-persona`, `marketing-identidade` e `marketing-logo`); esta skill NÃO
-reimplementa esse fluxo — só barra a chamada de time não instalado, impõe
-um por vez e exige objetivo + formato de saída.
+Porteiro, não fluxo: confere que o time pedido está instalado e manda a
+CONVERSA PRINCIPAL seguir a skill dele. Esta skill não chama subagente. Cada
+time traz as próprias skills (ex.: o time `marketing` traz `marketing-persona`,
+`marketing-identidade` e `marketing-logo`); aqui não se reimplementa esse fluxo.
 
 ## Preparar
 
 Resolver `<SKILL_IRMA>` = `polozi-instalar-time` NO MESMO diretório de
-skills onde esta skill foi achada — achou esta skill em
-`~/.agents/skills/polozi-chamar-time`? procure a irmã em
-`~/.agents/skills/polozi-instalar-time`; achou no cache numa versão `X`?
-procure a irmã em `.../polozi-fundacao/X/skills/polozi-instalar-time`, a
-MESMA `X`, nunca fixa. As duas skills compartilham um único script — assim
-não duplica código. Não achou a irmã → **PARE**, peça pra reinstalar o
-`polozi-fundacao.zip`.
+skills onde esta skill foi achada (ex.: achou esta em
+`<PASTA_ABERTA>/.agents/skills/polozi-chamar-time`? a irmã está em
+`<PASTA_ABERTA>/.agents/skills/polozi-instalar-time`). As duas compartilham
+um único script. Não achou a irmã → **PARE**: faltam skills da fundação na
+pasta. Peça pra baixar o zip do kit de novo, descompactar e abrir no
+aplicativo a pasta que tem o `AGENTS.md` dentro, não a de fora.
 
 ## Comando do Python (faça isto antes de qualquer comando)
 
@@ -36,65 +33,51 @@ python --version
 O PRIMEIRO que imprimir `Python 3.` vira `<PY>`. Nenhum comando desta skill
 pode conter `python3` literal fora desta checagem.
 
-## Pré-checagem OBRIGATÓRIA (antes de qualquer delegação)
+## Pré-checagem OBRIGATÓRIA (antes de seguir qualquer skill do time)
 
 ```
 <PY> "<SKILL_IRMA>/scripts/instalar_time.py" --verificar "<TIME>"
 ```
 
-- Exit 0: o time está instalado — siga pra "Delegar" abaixo.
-- Exit 2: **PARE**. Não delega. Responda ao dono que o time não está
+- Exit 0: o time está instalado — siga pra "Seguir a skill do time" abaixo.
+- Exit 2: **PARE**. Responda ao dono que o time não está
   instalado e que o caminho é `$polozi-instalar-time`.
 
 Nunca pule esta checagem, mesmo se o dono disser "tenho certeza que já
 instalei" — o disco decide, não a memória da conversa.
 
-## Delegar
+## Seguir a skill do time
 
-1. Acionar o agente PELO NOME (o diretor do time) — a doc só reconhece
-   acionamento por nome de papel, via pedido direto ou via instrução de
-   AGENTS.md/skill que peça delegação [24a:agentes/n02]. Nunca por caminho
-   de arquivo.
-2. UM time por vez: o diretor de um time decide o trabalho daquela área, e
-   dois diretores na mesma mensagem disputam a mesma conversa. Paralelo é
-   para partes independentes DENTRO de um trabalho (até
-   `max_concurrent_threads_per_session = 3` no `.codex/config.toml` da Casa
-   [24a:agentes/f5]), com `[agents] enabled = true` [24a:agentes/f8].
-3. A mensagem de delegação tem os 2 campos que o "Ciclo de trabalho" do
-   AGENTS.md v3 exige: objetivo e formato de saída (o AGENTS.md não fala
-   em "insumos" — não são 3 campos). Na prática, o que o agente precisa
-   ler entra dentro do objetivo, não como um campo à parte.
+1. A conversa principal faz o trabalho, lendo e seguindo a skill do time.
+   Nenhum subagente é chamado por esta skill.
+2. Escolher a skill: abra `times/<TIME>/time.json` e olhe a lista `skills`.
+   Use a que tem `"entrada": true` quando o pedido é o começo do trabalho da
+   área; senão a que o campo `quando` (ou a `description` do `SKILL.md` dela,
+   em `.agents/skills/<nome>/`) diz que atende o pedido. Nenhuma serve? Diga
+   ao dono o que o time oferece, não improvise.
+3. Revisor ou conferente do time (lista `agents` do `time.json`) só entra
+   quando a própria skill do time manda, no gatilho dela. Nunca como chefe do
+   time e nunca por iniciativa desta skill.
+4. Um time por vez: pediu dois, termine um e siga pro outro.
 
 ## Onde estão os nomes
 
-A tabela "Times da empresa" de `capacidades/PLUGINS.md`, coluna Agentes —
-leia esse arquivo quando precisar; é por isso que o `AGENTS.md` não carrega
-a lista de times (custo de catálogo de agentes não é quantificado por
-nenhuma página oficial [24a:agentes/n04], então o kit mantém o `AGENTS.md`
-enxuto).
+A tabela "Times da empresa" de `capacidades/PLUGINS.md` e o `time.json` de
+cada time. Não invente nome de skill nem de agente que não esteja lá.
 
 ## Depois da entrega
 
-Se a peça sai da empresa (publicação, entrega externa), a própria skill
-orquestradora do time já manda passar pelo auditor daquele time — esta
-skill não reimplementa isso, só lembra em 1 linha.
+Se a peça sai da empresa (publicação, entrega externa), a skill do time já
+manda passar pelo revisor daquele time: esta skill só lembra em 1 linha.
 
-## Avisos honestos
+## Aviso honesto
 
-- Fluxo com subagente consome MAIS token que fazer sozinho — a própria doc
-  oficial repete esse aviso mais de uma vez [24a:agentes/f10].
-- Nenhum número de cota ou de mensagens do Plus é prometido: a doc não
-  publica isso [24a:agentes/f17].
-- O subagente herda o sandbox e o modo de permissão da sessão pai quando o
-  toml do agente não define o próprio [24a:agentes/f13] — delegar não
-  "reduz" risco de escrita.
+Subagente consome MAIS token que fazer sozinho, e a doc oficial repete isso
+[24a:agentes/f10]: por isso aqui a conversa principal trabalha.
 
 ## Limites
 
 - Não instala nada, não copia arquivo.
-- Não chama 2 times na mesma mensagem.
-- Não inventa nome de agente que não esteja em `capacidades/PLUGINS.md`.
-- Não liga, desliga nem desinstala plugin — "não quero mais esse time" cai
-  em `$polozi-instalar-time --remover`; desligar/desinstalar o PLUGIN são
-  gestos do CLI plugin browser / plugin browser suportado, descritos lá
-  [24a:plugins/n18, plugins/n19].
+- Não chama subagente nem 2 times na mesma mensagem.
+- Não liga, desliga nem desinstala plugin: "não quero mais esse time" cai em
+  `$polozi-instalar-time --remover`.

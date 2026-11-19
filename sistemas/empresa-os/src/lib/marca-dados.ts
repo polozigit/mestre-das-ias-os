@@ -285,6 +285,16 @@ export function normalizarTitulo(titulo: string): string {
     .replace(/\s+/g, " ");
 }
 
+/** Título de uma linha `## ...`, ou null. Sem regex com retrocesso: texto de IA não pode travar a tela. */
+function tituloDaLinha(linha: string): string | null {
+  const m = /^##\s+(\S.*)$/.exec(linha.trimEnd());
+  if (!m) return null;
+  const bruto = m[1];
+  let fim = bruto.length;
+  while (fim > 1 && (bruto[fim - 1] === "#" || /\s/.test(bruto[fim - 1]))) fim--;
+  return bruto.slice(0, fim);
+}
+
 /** Divide por `## ` (fora de blocos de código). O que vem antes do primeiro `## ` fica de fora. */
 export function dividirSecoes(texto: string): Secao[] {
   const secoes: Secao[] = [];
@@ -300,10 +310,10 @@ export function dividirSecoes(texto: string): Secao[] {
       if (cerca === null) cerca = abre[1][0];
       else if (abre[1][0] === cerca) cerca = null;
     }
-    const titulo = cerca === null ? /^##\s+(.+?)\s*#*\s*$/.exec(linha) : null;
-    if (titulo) {
+    const titulo = cerca === null ? tituloDaLinha(linha) : null;
+    if (titulo !== null) {
       fechar();
-      atual = { titulo: titulo[1], linhas: [] };
+      atual = { titulo, linhas: [] };
     } else if (atual) {
       atual.linhas.push(linha);
     }

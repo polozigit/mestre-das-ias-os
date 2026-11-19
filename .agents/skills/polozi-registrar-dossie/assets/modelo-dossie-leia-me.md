@@ -6,7 +6,7 @@ Guardar a transcrição original e o dossiê estruturado da entrevista empresari
 
 ## Estrutura
 
-- `fontes/`: cópias imutáveis das transcrições recebidas e, quando necessário, o texto extraído.
+- `fontes/`: cópias imutáveis das transcrições recebidas ou do arquivo baixado do app e, quando necessário, o texto extraído.
 - `relatorios/`: resultado técnico da separação por códigos.
 - `historico/`: versões anteriores do dossiê canônico.
 - `dossie-completo.md`: versão atual, organizada pelas perguntas do questionário.

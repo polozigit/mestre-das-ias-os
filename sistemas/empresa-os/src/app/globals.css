@@ -56,6 +56,11 @@
   --font-display: var(--fonte-titulo);
 }
 
+/* Curva de movimento da casa (utilitário `ease-saida`): chega rápido e assenta devagar. */
+@theme {
+  --ease-saida: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* =============================================================
    Shell: sidebar recolhível (só desktop) — mecânica fixa, sem marca.
    Dirigido por <html data-sidebar="collapsed|expanded">. No celular a
@@ -75,9 +80,9 @@
   [data-sidebar="collapsed"] .sidebar-header { justify-content: center; padding-left: 0; padding-right: 0; }
   [data-sidebar="collapsed"] .sidebar-link { justify-content: center; }
   [data-sidebar="collapsed"] .sidebar-footer { justify-content: center; }
-  [data-sidebar="collapsed"] .sidebar-tooltip { display: block; }
+  /* Recolhido: a logo encolhe para caber na faixa estreita, sem cortar. */
+  [data-sidebar="collapsed"] .sidebar-logo { max-width: 48px; object-position: center; }
 }
-.sidebar-tooltip { display: none; }
 
 /* Utilitários tipográficos (só tokens). */
 .eyebrow {
@@ -159,4 +164,305 @@ body {
     & td[data-primary]::before { display: none; }
     & td[data-mobile-hidden] { display: none; }
   }
+}
+
+/* =============================================================
+   Movimento e luz: mecânica fixa do template, sem marca.
+
+   A ideia: a cor da marca (`--acento`) é a LUZ do sistema. Ela segue
+   o cursor no que dá pra abrir (`.luz`), acende o caminho já feito
+   (`.barra-enche`, `.traco-acende`), marca onde a pessoa está
+   (`.ponto-vivo`, indicador do menu) e ilumina a porta de entrada
+   (`.palco-luz`). Trocou o `theme.css`, a luz troca junto.
+
+   Fica em `@layer components` para o utilitário do Tailwind na mesma
+   tag continuar mandando. Nenhuma animação usa preenchimento
+   `forwards`: animação de `transform` que fica aplicada vira bloco de
+   referência de `position: fixed` e tira do lugar os painéis laterais.
+   ============================================================= */
+:root {
+  --dur-rapida: 120ms;
+  --dur-media: 220ms;
+  --dur-longa: 420ms;
+  --luz-forte: color-mix(in srgb, var(--acento) 14%, transparent);
+  --luz-fraca: color-mix(in srgb, var(--acento) 6%, transparent);
+}
+
+/* O que o navegador desenha sozinho também é do sistema. */
+html {
+  caret-color: var(--acento);
+  scrollbar-color: var(--borda) transparent;
+  scrollbar-width: thin;
+}
+::selection {
+  background: color-mix(in srgb, var(--acento) 20%, transparent);
+  color: var(--fg-1);
+}
+h1, h2, h3 { text-wrap: balance; }
+a { text-underline-offset: 0.2em; }
+
+/* Número que conta até o valor (KpiCard): CSS puro, começa na primeira pintura, sem piscar. */
+@property --conta {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+@keyframes entrar-pagina { from { opacity: 0; transform: translateY(6px); } }
+@keyframes entrar-item   { from { opacity: 0; transform: translateY(10px) scale(0.985); } }
+@keyframes surgir        { from { opacity: 0; transform: translateY(-4px) scale(0.97); } }
+@keyframes trocar-icone  { from { opacity: 0; transform: rotate(-70deg) scale(0.6); } }
+@keyframes encher        { from { transform: scaleX(0); } }
+@keyframes passar-luz    { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes tracar        { from { stroke-dashoffset: 1; } }
+@keyframes acender       { from { opacity: 0; transform: scale(0.5); } }
+@keyframes contar        { from { --conta: 0; } }
+@keyframes pulso-vivo {
+  0%        { transform: scale(1);   opacity: 0.5; }
+  70%, 100% { transform: scale(2.4); opacity: 0; }
+}
+@keyframes brilho   { to { background-position: -200% 0; } }
+@keyframes respirar { from { opacity: 0.6; } to { opacity: 1; } }
+@keyframes girar    { to { transform: rotate(360deg); } }
+@keyframes revelar-tema {
+  from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0%)); }
+  to   { clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 0%)); }
+}
+
+@layer components {
+  /* Página nova chega de leve (src/app/(app)/template.tsx). */
+  .entrada-pagina { animation: entrar-pagina var(--dur-longa) var(--ease-saida) backwards; }
+
+  /* Lista que aparece como lista: os filhos entram em cascata, com o atraso total limitado. */
+  .entrada > * { animation: entrar-item var(--dur-longa) var(--ease-saida) backwards; }
+  .entrada > :nth-child(2) { animation-delay: 40ms; }
+  .entrada > :nth-child(3) { animation-delay: 80ms; }
+  .entrada > :nth-child(4) { animation-delay: 120ms; }
+  .entrada > :nth-child(5) { animation-delay: 160ms; }
+  .entrada > :nth-child(6) { animation-delay: 200ms; }
+  .entrada > :nth-child(7) { animation-delay: 240ms; }
+  .entrada > :nth-child(n + 8) { animation-delay: 280ms; }
+
+  /* Menu, balão e aviso que abrem a partir de um ponto (`--origem`). */
+  .surgir {
+    transform-origin: var(--origem, top right);
+    animation: surgir var(--dur-media) var(--ease-saida) backwards;
+  }
+  .icone-troca { animation: trocar-icone 320ms var(--ease-saida) backwards; }
+
+  /* Luz do cursor: o que dá pra abrir acende na cor da marca, no ponto onde o cursor está.
+     `--mx`/`--my` vêm de components/ui/LuzDoCursor.tsx; sem JavaScript a luz nasce do topo. */
+  .luz {
+    position: relative;
+    isolation: isolate;
+    transition:
+      border-color var(--dur-media) var(--ease-saida),
+      box-shadow var(--dur-media) var(--ease-saida),
+      background-color var(--dur-media) var(--ease-saida),
+      transform var(--dur-media) var(--ease-saida);
+  }
+  .luz::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(16rem circle at var(--mx, 50%) var(--my, 0%), var(--luz-forte), transparent 72%);
+    opacity: 0;
+    transition: opacity var(--dur-media) var(--ease-saida);
+  }
+  @media (hover: hover) {
+    .luz:hover::before { opacity: 1; }
+  }
+  .luz:focus-visible::before { opacity: 1; }
+  /* Seta que avança quando o cartão acende. */
+  .luz .seta-avanca { transition: transform var(--dur-media) var(--ease-saida); }
+  .luz:hover .seta-avanca { transform: translateX(3px); }
+
+  /* Progresso: a barra enche até o valor e uma luz passa por ela uma vez. */
+  .barra-enche {
+    position: relative;
+    overflow: hidden;
+    transform-origin: left;
+    animation: encher 900ms var(--ease-saida) 120ms backwards;
+  }
+  .barra-enche::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--bg-elevada) 65%, transparent), transparent);
+    transform: translateX(-100%);
+    animation: passar-luz 900ms var(--ease-saida) 900ms backwards;
+  }
+
+  /* Passo concluído: o visto se desenha, um passo depois do outro (`--i` = posição, limitada). */
+  .traco-acende {
+    animation: acender 360ms var(--ease-saida) backwards;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+  .traco-acende path {
+    stroke-dasharray: 1;
+    animation: tracar 420ms var(--ease-saida) backwards;
+    animation-delay: calc(var(--i, 0) * 45ms + 120ms);
+  }
+
+  /* "Você está aqui" e "ao vivo": um anel que sai do ponto, na cor do próprio ponto. */
+  .ponto-vivo { position: relative; }
+  .ponto-vivo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    pointer-events: none;
+    animation: pulso-vivo 2.2s var(--ease-saida) infinite;
+  }
+
+  /* Número do KpiCard contando até o valor (`--conta-ate`). */
+  .conta-num {
+    --conta: var(--conta-ate);
+    counter-reset: conta var(--conta);
+    animation: contar 900ms var(--ease-saida) backwards;
+  }
+  .conta-num::after { content: counter(conta); }
+
+  /* Carregando: faixa de luz atravessando o bloco. */
+  .brilho {
+    background: linear-gradient(100deg, var(--bg-sutil) 40%, color-mix(in srgb, var(--fg-1) 7%, var(--bg-sutil)) 50%, var(--bg-sutil) 60%) 0 0 / 200% 100%;
+    animation: brilho 1.6s linear infinite;
+  }
+  .gira { animation: girar 700ms linear infinite; }
+
+  /* Menu lateral: uma só marca desliza até o item da página (components/shell/Sidebar.tsx).
+     Sem JavaScript a marca não existe e o item aceso mantém o próprio fundo. */
+  .sidebar-marca {
+    position: absolute;
+    top: 0;
+    left: 0.75rem;
+    right: 0.75rem;
+    border-radius: var(--raio-md);
+    background: var(--acento-suave);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      transform 360ms var(--ease-saida),
+      height 360ms var(--ease-saida),
+      opacity var(--dur-media) var(--ease-saida);
+  }
+  .sidebar-link { position: relative; }
+  .sidebar-link svg { transition: transform var(--dur-media) var(--ease-saida); }
+  @media (hover: hover) {
+    .sidebar-link:hover svg { transform: scale(1.12); }
+  }
+
+  /* Abas (SegmentedControl): o fundo da aba ativa desliza até a escolhida. */
+  .aba-marca {
+    position: absolute;
+    top: 0.25rem;
+    bottom: 0.25rem;
+    left: 0;
+    border-radius: var(--raio-sm);
+    background: var(--bg-elevada);
+    box-shadow: var(--sombra-sm);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      transform 320ms var(--ease-saida),
+      width 320ms var(--ease-saida),
+      opacity var(--dur-media) var(--ease-saida);
+  }
+
+  /* Navegação em andamento: fio de luz no topo (components/shell/NavegacaoProgresso.tsx). */
+  .fio-nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 70;
+    height: 2px;
+    background: var(--acento);
+    pointer-events: none;
+    transform-origin: left;
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  .fio-nav[data-estado="indo"] {
+    transform: scaleX(0.9);
+    opacity: 1;
+    transition: transform 9s cubic-bezier(0.05, 0.8, 0.1, 1), opacity 160ms linear 140ms;
+  }
+  .fio-nav[data-estado="chegou"] {
+    transform: scaleX(1);
+    opacity: 0;
+    transition: transform 220ms var(--ease-saida), opacity 260ms linear 180ms;
+  }
+
+  /* Porta de entrada (login e telas públicas): a luz da marca desce do topo, respira devagar
+     e acompanha o cursor. */
+  .palco-luz { position: relative; isolation: isolate; overflow: hidden; }
+  .palco-luz::before,
+  .palco-luz::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .palco-luz::before {
+    background:
+      radial-gradient(60rem 30rem at 50% -6rem, color-mix(in srgb, var(--acento) 22%, transparent), transparent 70%),
+      radial-gradient(28rem circle at var(--mx, 50%) var(--my, 35%), var(--luz-fraca), transparent 70%);
+    animation: respirar 8s ease-in-out infinite alternate;
+  }
+  .palco-luz::after {
+    background: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--fg-1) 10%, transparent) 1px, transparent 0) 0 0 / 22px 22px;
+    mask-image: radial-gradient(70% 60% at 50% 35%, #000, transparent);
+  }
+  .campo {
+    transition: border-color var(--dur-media) var(--ease-saida), box-shadow var(--dur-media) var(--ease-saida);
+  }
+}
+
+/* Estados que precisam vencer o utilitário de borda e sombra da própria tag: fora da camada. */
+@media (hover: hover) {
+  .luz:hover {
+    /* `--luz-borda`: quem já nasce com a borda na cor da marca não desbota ao acender. */
+    border-color: color-mix(in srgb, var(--acento) 38%, var(--luz-borda, var(--borda)));
+    box-shadow: var(--sombra-md);
+    transform: translateY(-2px);
+  }
+}
+.luz:active { transform: translateY(0) scale(0.995); transition-duration: var(--dur-rapida); }
+.campo:hover { border-color: color-mix(in srgb, var(--acento) 30%, var(--borda)); }
+.campo:focus-visible { border-color: var(--acento); }
+
+/* Com a marca deslizante ligada, o item ativo solta o próprio fundo (a marca é o fundo). Fora da
+   camada de propósito: precisa vencer o utilitário de cor do item. */
+[data-marca="on"] .sidebar-link[aria-current="page"],
+[data-marca="on"] > [role="tab"][aria-selected="true"] {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* Troca de tema: o tema novo abre em círculo a partir do botão (components/shell/ThemeToggle.tsx). */
+html[data-vt="tema"]::view-transition-old(root) { animation: none; }
+html[data-vt="tema"]::view-transition-new(root) { animation: revelar-tema 560ms var(--ease-saida); }
+
+/* Movimento reduzido: some o deslocamento e o que fica em laço; cor, opacidade e estado continuam. */
+@media (prefers-reduced-motion: reduce) {
+  .entrada-pagina,
+  .entrada > *,
+  .surgir,
+  .icone-troca,
+  .barra-enche,
+  .barra-enche::after,
+  .traco-acende,
+  .traco-acende path,
+  .conta-num,
+  .ponto-vivo::after,
+  .palco-luz::before { animation: none; }
+  .brilho { animation: none; background: var(--bg-sutil); }
+  .luz, .luz:hover, .luz:active, .luz .seta-avanca, .luz:hover .seta-avanca,
+  .sidebar-link:hover svg { transform: none; }
+  .sidebar-marca, .aba-marca { transition-property: opacity; }
+  .fio-nav[data-estado="indo"] { transform: scaleX(1); transition: opacity 160ms linear 140ms; }
 }

@@ -159,8 +159,7 @@ def rodar_startup(casa: Path) -> list[str]:
 
 def rodar_compact() -> list[str]:
     return [
-        "Houve compactação. Avalie fechar com $polozi-concluir-trabalho ou "
-        "passar adiante com $polozi-transferir-trabalho."
+        "Houve compactação. Continue do checkpoint da tarefa, sem concluir, instalar nem publicar por rotina."
     ]
 
 

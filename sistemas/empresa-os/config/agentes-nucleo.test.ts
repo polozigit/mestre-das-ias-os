@@ -33,7 +33,7 @@ const temPlugin = existsSync(new URL(caminhoPlugin, import.meta.url));
 test("agentes-nucleo: os agentes do núcleo existem, sem repetição", () => {
   assert.deepEqual(
     nucleo.map((a) => a.name).sort(),
-    ["polozi-gerente-de-trabalho", "polozi-sistema-qa"],
+    ["polozi-sistema-qa"],
   );
   assert.equal(new Set(nucleo.map((a) => a.name)).size, nucleo.length, "name repetido");
 });

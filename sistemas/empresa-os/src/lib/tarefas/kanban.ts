@@ -46,6 +46,7 @@ export function agruparPorStatus<T extends { status: TarefaStatus }>(
 }
 
 export type FiltroTarefas = {
+  area?: string;
   origem?: TarefaOrigem;
   donoId?: string;
   status?: TarefaStatus;
@@ -56,12 +57,20 @@ export type FiltroTarefas = {
  * restringe. donoId nunca casa tarefa sem dono (dono_id null).
  */
 export function filtrar<
-  T extends { origem: TarefaOrigem; dono_id: string | null; status: TarefaStatus },
+  T extends { origem: TarefaOrigem; dono_id: string | null; status: TarefaStatus; metadata?: unknown },
 >(tarefas: T[], filtro: FiltroTarefas): T[] {
   return tarefas.filter(
     (t) =>
       (!filtro.origem || t.origem === filtro.origem) &&
       (!filtro.donoId || t.dono_id === filtro.donoId) &&
-      (!filtro.status || t.status === filtro.status),
+      (!filtro.status || t.status === filtro.status) &&
+      (!filtro.area || areaDaTarefa(t.metadata) === filtro.area),
   );
+}
+
+/** Contrato único: área vive nos metadados, sem tabela ou schema novos. */
+export function areaDaTarefa(metadata: unknown): string {
+  if (!metadata || typeof metadata !== "object" || !("area" in metadata)) return "geral";
+  const area = metadata.area;
+  return typeof area === "string" && area.trim() ? area.trim().toLowerCase() : "geral";
 }

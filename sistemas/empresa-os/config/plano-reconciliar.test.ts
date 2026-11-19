@@ -141,7 +141,7 @@ test("o plano real: a ordem que o setup vai impor põe a instalação inteira an
   const m = JSON.parse(readFileSync(new URL("./planos/mestre.json", import.meta.url), "utf8"));
   const chaves = atividadesEmOrdem(m).filter((a) => a.trilha === "curso").map((a) => a.chave);
   assert.equal(chaves.indexOf("curso.d1.contas"), 0);
-  assert.ok(chaves.indexOf("curso.d1.times") < chaves.indexOf("curso.d1.primeiro-time"));
+  assert.ok(chaves.indexOf("curso.d1.sistema-com-marca") >= 0 && chaves.indexOf("curso.d1.sistema-com-marca") < chaves.indexOf("curso.d2.whatsapp"));
 });
 
 test("o plano real: sistema no ar existe e NÃO é feita_na_instalacao (só a prova do /login conclui)", () => {

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Polozi Planejar Trabalho"
+  short_description: "Pergunta o que falta e planeja por marcos antes de construir trabalho grande."
+  default_prompt: "Use $polozi-planejar-trabalho para planejar antes de construir este trabalho."
+policy:
+  allow_implicit_invocation: false

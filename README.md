@@ -4,7 +4,7 @@ Esta pasta é a sua empresa organizada para trabalhar com IA: as regras de traba
 
 ## Como começar
 
-1. Abra esta pasta no Codex (ou no Claude Code) e confie nela quando ele perguntar.
+1. Abra esta pasta no Codex (a pasta que tem o `AGENTS.md` dentro) e confie nela quando ele perguntar.
 2. Escreva: **"$polozi-instalador começa a instalação"** (ou só "começa a instalação"). A IA conduz as etapas e pergunta o nome da empresa, o seu nome e o seu e-mail; a partir daí tudo passa a se chamar `<primeiro-nome>-os`.
 3. Nunca digite senha, chave ou código dentro do chat. Senha se digita no site, no seu navegador.
 

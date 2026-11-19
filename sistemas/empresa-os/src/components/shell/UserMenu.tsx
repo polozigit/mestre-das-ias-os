@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { KeyRound, LogOut } from "lucide-react";
 import { usePermissions } from "@/lib/auth/PermissionsProvider";
 import { sair } from "@/app/(public)/login/actions";
 
@@ -37,13 +38,13 @@ export function UserMenu() {
         onClick={() => setAberto((v) => !v)}
         aria-expanded={aberto}
         aria-label="Menu do usuário"
-        className="flex size-11 items-center justify-center rounded-full bg-acento-suave text-sm font-semibold text-acento-texto"
+        className="flex size-11 items-center justify-center rounded-full bg-acento-suave text-sm font-semibold text-acento-texto transition-[box-shadow,scale] duration-200 ease-saida hover:shadow-[0_0_0_3px_var(--bg-elevada),0_0_0_4px_var(--borda)] motion-safe:active:scale-95"
       >
         {iniciais || "?"}
       </button>
 
       {aberto && (
-        <div className="absolute right-0 top-12 z-50 w-64 rounded-lg border border-borda bg-bg-elevada p-2 shadow-[var(--sombra-md)]">
+        <div className="surgir absolute right-0 top-12 z-50 w-64 rounded-lg border border-borda bg-bg-elevada p-2 shadow-[var(--sombra-md)]">
           <div className="border-b border-borda-suave px-3 py-2">
             <p className="truncate text-sm font-semibold text-fg-1">{sessao.nome}</p>
             <p className="truncate text-xs text-fg-3">{sessao.email}</p>
@@ -52,10 +53,19 @@ export function UserMenu() {
             )}
           </div>
 
+          <Link
+            href="/conta/senha"
+            onClick={() => setAberto(false)}
+            className="mt-1 flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm text-fg-2 hover:bg-bg-sutil"
+          >
+            <KeyRound className="size-4" aria-hidden />
+            Trocar senha
+          </Link>
+
           <form action={sair} className="pt-1">
             <button
               type="submit"
-              className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm text-erro hover:bg-erro-suave"
+              className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm text-erro transition-colors hover:bg-erro-suave"
             >
               <LogOut className="size-4" aria-hidden />
               Sair

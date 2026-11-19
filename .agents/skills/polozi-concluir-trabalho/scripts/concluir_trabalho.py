@@ -20,16 +20,15 @@ import re
 import subprocess
 import sys
 import tempfile
-import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 
 # Rótulos do TASK.md — única fonte de verdade dos bullets que
-# `polozi-gerente-de-trabalho` escreve e `operacao/tasks/TEMPLATE-TASK.md`
+# `registro_trabalho.py` escreve e `operacao/tasks/TEMPLATE-TASK.md`
 # publica (guarda cruzada em tests/test_contrato_task.py). Divergiu um dos
-# três, a suite cai.
+# dois, a suite cai.
 ROTULO_STATUS = "Status:"
 ROTULO_CONCLUIDA = "Concluída em:"
 ROTULO_COMMIT = "Commit:"
@@ -459,57 +458,6 @@ def atualizar_plugins(texto_atual: str, plugins: list[dict[str, str]], data: str
     return "\n".join(linhas).rstrip() + "\n"
 
 
-def _normalizar_celula(valor: str) -> str:
-    """Minúsculas, sem acento/cedilha, sem espaço nas bordas — pra casar
-    'Serviço' com 'servico' e 'Supabase' com 'supabase' sem depender de
-    grafia exata."""
-    sem_acento = "".join(
-        caractere
-        for caractere in unicodedata.normalize("NFD", valor)
-        if not unicodedata.combining(caractere)
-    )
-    return sem_acento.strip().casefold()
-
-
-def _e_linha_separadora(celulas: list[str]) -> bool:
-    preenchidas = [celula for celula in celulas if celula.strip()]
-    if not preenchidas:
-        return False
-    return all(set(celula) <= {"-", ":"} for celula in preenchidas)
-
-
-def banco_conectado(texto_conexoes: str) -> bool:
-    """O banco (Supabase) vira a fonte oficial de tasks quando REGISTRADO NA
-    COLUNA "Serviço" da tabela de CONEXOES.md — coluna achada pelo NOME do
-    cabeçalho (nunca por posição fixa: outras skills podem inserir colunas
-    no meio). Linha de tabela que só MENCIONA Supabase noutra coluna, ou
-    prosa fora da tabela, não conta — falha pro lado seguro (carimba o
-    TASK.md local, visível e versionado)."""
-    linhas = texto_conexoes.splitlines()
-    indices = linhas_de_tabela(texto_conexoes)
-    indice_cabecalho = None
-    indice_servico = None
-    for indice in indices:
-        celulas_normalizadas = [
-            _normalizar_celula(celula) for celula in analisar_celulas(linhas[indice])
-        ]
-        if "servico" in celulas_normalizadas:
-            indice_cabecalho = indice
-            indice_servico = celulas_normalizadas.index("servico")
-            break
-    if indice_cabecalho is None:
-        return False
-    for indice in indices:
-        if indice <= indice_cabecalho:
-            continue
-        celulas = analisar_celulas(linhas[indice])
-        if _e_linha_separadora(celulas):
-            continue
-        if indice_servico < len(celulas) and _normalizar_celula(celulas[indice_servico]) == "supabase":
-            return True
-    return False
-
-
 def exigir_formato_da_task(conteudo: str, caminho: Path) -> str:
     """`--provar --tarefa N` nunca inventa o bullet: recusa com ERRO
     acionável (decisão D-E). Diz o que falta, onde está a forma certa e o
@@ -648,23 +596,12 @@ def modo_provar(destino: Path, tarefa: str | None, registro_em: str) -> int:
             # commitar. Aspereza apontada pelo codex.auditor 06/09 rodada 2.
             print("Já carimbada; rode --provar (sem --tarefa) pra prova final.")
         else:
-            conexoes_caminho = destino / "credenciais" / "CONEXOES.md"
-            conexoes_texto = (
-                conexoes_caminho.read_text(encoding="utf-8") if conexoes_caminho.is_file() else ""
+            caminho_tarefa, conteudo_tarefa = fechar_tarefa(destino, tarefa, data, hash_curto)
+            escrever_atomico(caminho_tarefa, conteudo_tarefa)
+            print(
+                f"TASK-{tarefa} carimbada: {ROTULO_STATUS} {VALOR_CONCLUIDA}, "
+                f"{ROTULO_CONCLUIDA} {data}, {ROTULO_COMMIT} {hash_curto}."
             )
-            if banco_conectado(conexoes_texto):
-                print(
-                    f"Banco conectado (credenciais/CONEXOES.md): peça ao "
-                    f"polozi-gerente-de-trabalho para fechar a TASK-{tarefa} (tabela tarefas) "
-                    f"com o commit {hash_curto}. Arquivo local não foi alterado."
-                )
-            else:
-                caminho_tarefa, conteudo_tarefa = fechar_tarefa(destino, tarefa, data, hash_curto)
-                escrever_atomico(caminho_tarefa, conteudo_tarefa)
-                print(
-                    f"TASK-{tarefa} carimbada: {ROTULO_STATUS} {VALOR_CONCLUIDA}, "
-                    f"{ROTULO_CONCLUIDA} {data}, {ROTULO_COMMIT} {hash_curto}."
-                )
             print(
                 "FALTA A PROVA FINAL: use a skill tecnologia-publicar pra commitar e empurrar o "
                 "carimbo e rode --provar (sem --tarefa)."

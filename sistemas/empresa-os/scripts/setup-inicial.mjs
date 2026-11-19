@@ -4,7 +4,7 @@
  * (RPC seed_empresa), carrega o organograma e o plano do curso (e marca como concluídos os passos que a
  * própria instalação prova: contas até banco; "sistema no ar" só com prova real do /login), registra os agentes do núcleo na tela
  * Time de Agentes (RPC sincronizar_agentes), coloca os agentes instalados nas posições
- * do Time de IA e manda o e-mail de convite pro dono definir a senha.
+ * do Time de IA e cria o login do dono com a senha provisória (config/senha-dono.mjs), sem e-mail.
  * Roda em produção E em homologação (a homologação nasce com a "Empresa
  * Exemplo" do seed de exemplo; o dono real vem daqui).
  *
@@ -12,10 +12,12 @@
  * Env:  URL do Supabase (NEXT_PUBLIC_SUPABASE_URL ou SUPABASE_URL), chave de serviço
  *       (SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_SECRET_KEY), SITE_URL
  *       CURSO_INICIO (opcional, AAAA-MM-DD, data do D1; padrão = hoje)
+ *       ZERAR_SENHA=1 (opcional): volta a senha do dono para a provisória (o dono pediu).
+ *       Produção e homologação seguem o mesmo caminho: nenhum e-mail sai do Supabase.
  *       (a IA carrega de credenciais/.env da Casa; valor nunca aparece no chat)
  *
- * Idempotente: rodar de novo (mesmo em outro dia, sem CURSO_INICIO) não duplica nada; se o convite já foi enviado,
- * só refaz o vínculo auth_user_id se estiver faltando.
+ * Idempotente: rodar de novo (mesmo em outro dia, sem CURSO_INICIO) não duplica nada e não
+ * troca a senha de quem já trocou; só refaz o vínculo auth_user_id se estiver faltando.
  */
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -37,6 +39,7 @@ import {
   urlDoLogin,
   urlPublicaHttps,
 } from "../config/plano-reconciliar.mjs";
+import { SENHA_PROVISORIA, decidirSenhaDono } from "../config/senha-dono.mjs";
 import { urlSupabase } from "../config/supabase-env.mjs";
 import { chaveSecretaSupabase, mensagemFaltaConfigServico } from "../config/supabase-env-servidor.mjs";
 
@@ -434,50 +437,47 @@ console.log(
     `${reordenadas} reordenadas, ${concluidas} passos marcados como concluídos pela instalação (sistema no ar: ${noAr ? "provado" : "aberto"}).`,
 );
 
-// --- 4. Convite do dono por e-mail (link pra definir a senha) ---
-// Rodar de novo não reenvia: se o dono já está vinculado a um login, o convite já saiu
-// (reenviar estoura o limite de e-mail do Supabase). REENVIAR_CONVITE=1 força o reenvio.
+// --- 4. Login do dono: senha provisória, sem e-mail (config/senha-dono.mjs) ---
+// Igual em produção e em homologação. Rodar de novo não troca a senha de quem já trocou
+// nem de quem já entrou; ZERAR_SENHA=1 volta para a provisória quando o dono pedir.
 let authUserId = null;
-const { data: donoVinculado, error: erroDono } = await supabase
-  .from("usuarios")
-  .select("auth_user_id")
-  .eq("email", emailMaster)
-  .eq("e_dono", true)
-  .not("auth_user_id", "is", null)
-  .maybeSingle();
-if (erroDono) falhar(`não consegui ler o dono: ${erroDono.message}`);
-const pularConvite = Boolean(donoVinculado) && process.env.REENVIAR_CONVITE !== "1";
-
-const { data: convite, error: erroConvite } = pularConvite
-  ? { data: null, error: null }
-  : await supabase.auth.admin.inviteUserByEmail(emailMaster, {
-      redirectTo: `${siteUrl.replace(/\/$/, "")}/auth/definir-senha`,
-    });
-
-if (pularConvite) {
-  authUserId = donoVinculado.auth_user_id;
-  console.log(
-    "[setup] convite já enviado antes — não reenvio (use REENVIAR_CONVITE=1 pra mandar de novo).",
-  );
-} else if (erroConvite) {
-  const jaExiste =
-    erroConvite.code === "email_exists" ||
-    /already.*(registered|exists)/i.test(erroConvite.message);
-  if (!jaExiste) falhar(`convite falhou: ${erroConvite.message}`);
-  console.log("[setup] e-mail já tem conta no Auth — pulando convite.");
-  const { data: lista, error: erroLista } = await supabase.auth.admin.listUsers({
-    page: 1,
-    perPage: 1000,
+const zerarSenha = process.env.ZERAR_SENHA === "1";
+const { data: listaAuth, error: erroLista } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+if (erroLista) falhar(`não consegui listar usuários do Auth: ${erroLista.message}`);
+let usuarioAuth =
+  listaAuth.users.find((u) => (u.email ?? "").toLowerCase() === emailMaster.toLowerCase()) ?? null;
+const acaoSenha = decidirSenhaDono(usuarioAuth, { zerar: zerarSenha });
+const motivoSenha = (erro) =>
+  /password|senha/i.test(erro.message)
+    ? `${erro.message} (a regra de senha do Supabase recusou a senha provisória: em Authentication, Policies, ` +
+      "o mínimo tem de aceitar 9 caracteres e não pode exigir letra maiúscula)"
+    : erro.message;
+if (acaoSenha === "criar") {
+  const { data: criado, error: erroCriar } = await supabase.auth.admin.createUser({
+    email: emailMaster,
+    password: SENHA_PROVISORIA,
+    email_confirm: true,
+    user_metadata: { senha_provisoria: true },
   });
-  if (erroLista) falhar(`não consegui listar usuários do Auth: ${erroLista.message}`);
-  authUserId =
-    lista.users.find(
-      (u) => (u.email ?? "").toLowerCase() === emailMaster.toLowerCase(),
-    )?.id ?? null;
+  if (erroCriar) falhar(`criação do login do dono falhou: ${motivoSenha(erroCriar)}`);
+  usuarioAuth = criado.user;
+  console.log("[setup] login do dono criado com a senha provisória (sem e-mail).");
+} else if (acaoSenha === "provisoria") {
+  const { error: erroSenha } = await supabase.auth.admin.updateUserById(usuarioAuth.id, {
+    password: SENHA_PROVISORIA,
+    email_confirm: true,
+    user_metadata: { ...(usuarioAuth.user_metadata ?? {}), senha_provisoria: true },
+  });
+  if (erroSenha) falhar(`não consegui gravar a senha provisória do dono: ${motivoSenha(erroSenha)}`);
+  console.log(
+    zerarSenha
+      ? "[setup] senha do dono zerada para a provisória (ZERAR_SENHA=1)."
+      : "[setup] o dono ainda não tinha entrado: o login ganhou a senha provisória.",
+  );
 } else {
-  authUserId = convite.user?.id ?? null;
-  console.log(`[setup] convite enviado pra ${emailMaster}.`);
+  console.log("[setup] login do dono já existe: a senha não muda (use ZERAR_SENHA=1 para voltar à provisória).");
 }
+authUserId = usuarioAuth?.id ?? null;
 
 // --- 5. Vincula auth.users -> usuarios (se ainda não vinculado) ---
 if (authUserId) {
@@ -510,11 +510,10 @@ if (authUserId) {
     }
   }
 } else {
-  console.warn(
-    "[setup] AVISO: não achei o usuário no Auth pra vincular — rode de novo depois do convite.",
-  );
+  console.warn("[setup] AVISO: não achei o login do dono no Auth pra vincular — rode o setup de novo.");
 }
 
 console.log(
-  `\n[setup] pronto. Próximo passo: ${emailMaster} abre o e-mail de convite e define a senha.`,
+  `\n[setup] pronto. Próximo passo: entrar em ${siteUrl.replace(/\/$/, "")}/login com ${emailMaster} e a senha ` +
+    `provisória ${SENHA_PROVISORIA}; o sistema avisa para trocar a senha.`,
 );

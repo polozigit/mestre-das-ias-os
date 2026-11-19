@@ -67,7 +67,11 @@ Depois as variáveis, ANTES da primeira publicação (o build precisa delas):
 <PY> .agents/skills/tecnologia-conectar/scripts/conectar.py vercel-env --casa "<CASA>"
 ```
 
-Prova: `prova production: 3/3 nomes` e `prova preview: 3/3 nomes` (a prova é só por NOME, o valor nunca aparece). Variável que já existia com valor errado fica `[pulado]`: trocar o valor é no painel da Vercel ou com `vercel env rm`, fora desta skill.
+Antes, o banco de teste do preview precisa existir: rode a seção "Homologação" abaixo (o instalador faz isso na etapa `7-banco`). Sem os valores `_HOMOLOG` no `credenciais/.env`, o `vercel-env` PARA e manda rodar o `homologacao`: nunca cai para o banco de produção.
+
+A produção lê o banco real; o preview lê o banco de homologação. Na produção ainda vão duas variáveis públicas de homologação (`NEXT_PUBLIC_SUPABASE_URL_HOMOLOG` e `NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG`), que o keep-alive usa para manter o banco de teste acordado. No preview o script remove a variável antes de gravar, então rodar de novo numa Casa instalada antes da homologação TROCA o preview do banco real para o de teste.
+
+Prova: `prova production: 5/5 nomes` e `prova preview: 3/3 nomes` (a prova é só por NOME, o valor nunca aparece). Variável de produção que já existia fica `[pulado]`.
 
 ### (e4) Primeira publicação
 
@@ -97,6 +101,26 @@ Guarda cada segredo do `credenciais/.env` no cofre do banco (Vault) e registra o
 
 Quem faz é o instalador, não esta skill: ele roda o `setup-inicial.mjs` de novo com `SITE_URL=https://<DOMINIO>`, e o convite do dono sai apontando para o endereço publicado, não para localhost.
 
+## Banco de produção (antes da homologação)
+
+```
+<PY> .agents/skills/tecnologia-conectar/scripts/conectar.py banco --casa "<CASA>"
+```
+
+Cria o projeto Supabase de produção `<slug_os>` só com o `SUPABASE_ACCESS_TOKEN` que o aluno pôs no `credenciais/.env`: o aluno não digita senha de banco e o Chrome só cria o token. Gera a senha do banco, grava no `.env` na hora, espera o projeto ficar no ar (até 10 minutos), expõe os schemas `tarefas` e `organograma` e grava as 5 variáveis (`SUPABASE_PROJECT_ID`, `SUPABASE_DB_PASSWORD`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`). Região padrão `sa-east-1` (São Paulo; outra com `--regiao`). O token abre mais de uma organização? O script para e lista as organizações; rode de novo com `--org <slug>` da organização da empresa. Projeto já anotado no `.env` (`SUPABASE_PROJECT_ID`) é reaproveitado e nunca ganha um segundo por cima; se o token não abrir esse projeto, o script para sem criar nada. Recusa se a produção for igual à homologação.
+
+Prova: linhas `[ok] banco` com o projeto no ar e as variáveis gravadas (só nomes). Limite do plano gratuito (2 projetos ativos): para com uma mensagem em português e não grava nada. Se a API falhar por outro motivo, o instalador cai no caminho de reserva pelo Chrome (etapa `7-banco`, passo 1).
+
+## Homologação (banco de teste do preview)
+
+```
+<PY> .agents/skills/tecnologia-conectar/scripts/conectar.py homologacao --casa "<CASA>"
+```
+
+Cria o projeto Supabase `<slug_os>-homolog` na mesma organização e região da produção, com o `SUPABASE_ACCESS_TOKEN` que o aluno já pôs no `credenciais/.env` (zero clique, zero chave nova). Gera a senha do banco sozinho, grava no `.env` na hora, espera o projeto ficar no ar (até 10 minutos), expõe os schemas `tarefas` e `organograma` e grava as 5 variáveis `_HOMOLOG` (`SUPABASE_PROJECT_ID_HOMOLOG`, `SUPABASE_DB_PASSWORD_HOMOLOG`, `NEXT_PUBLIC_SUPABASE_URL_HOMOLOG`, `NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG`, `SUPABASE_SERVICE_ROLE_KEY_HOMOLOG`). Rodar de novo é seguro: acha o projeto por nome e organização, despausa se estiver pausado e não cria outro. Recusa se o código de homologação for igual ao de produção.
+
+Prova: linhas `[ok] homologacao` com o projeto no ar e as variáveis gravadas (só nomes). Limite do plano gratuito do Supabase (2 projetos ativos): o script para com uma mensagem em português e não grava nada; o aluno pausa ou apaga um projeto gratuito que não usa no painel do Supabase e o passo é rodado de novo. Esse passo nunca trava a instalação do sistema: com a homologação pendente, rode `vercel-env` e `provar` com `--sem-preview` (só a produção; o script avisa `[pendente]` e o preview fica sem banco até a homologação existir) e, quando houver vaga, repita o `homologacao` e o `vercel-env` sem a opção.
+
 ## Regras de segredo
 
 - Nunca chame `buy_pro`, `buy_domain`, `buy_credits` nem `buy_addon`: são compras na hora, sem reembolso.
@@ -105,7 +129,7 @@ Quem faz é o instalador, não esta skill: ele roda o `setup-inicial.mjs` de nov
 - Nunca chame `filter_project_envs` com `decrypt`, nem rode `vercel env pull` ou `vercel env run`: os três trazem o valor da chave.
 - O valor de uma chave nunca aparece no chat. Ele anda do `credenciais/.env` para o script, e do script para a Vercel por um arquivo temporário apagado logo depois. A IA não abre o `credenciais/.env`.
 - Você não lê o cofre do banco. Isso é disciplina, não tranca.
-- O script nunca escreve no `credenciais/.env`.
+- Só os subcomandos `banco` e `homologacao` escrevem no `credenciais/.env`, e só os 5 nomes do seu banco (`banco`: os de produção; `homologacao`: os terminados em `_HOMOLOG`). Os outros subcomandos nunca tocam nele.
 
 ## Se falhar
 
@@ -119,7 +143,7 @@ Hoje esta skill roda no Codex. Chame pelo nome: `$tecnologia-conectar`. Ela não
 
 - Conector da Vercel, passo (e1): a ferramenta `create_git_project` cria o projeto (nome `slug_os`, pasta raiz `sistemas/empresa-os`, com `deploy=false`); `get_project` devolve o `id` e o endereço de produção; `list_teams` devolve o apelido do time. Se o conector não tiver essas ferramentas, ou o nome delas mudou, siga o roteiro "Projeto na Vercel a mão". O conector não recebe valor de chave: as variáveis vão pela CLI.
 - Rede: o script fala com a CLI da Vercel, com `api.supabase.com` e com o endereço do site. No modo `workspace-write` a rede de saída precisa estar ligada (a Casa liga `network_access = true`).
-- Risco aceito (preview): o preview usa o MESMO banco da produção até existir homologação. Um teste no preview mexe em dado real. A pendência está registrada na etapa `7-banco` do instalador ("Fica para depois").
+- Preview: usa o banco de homologação (`<slug_os>-homolog`, criado pelo subcomando `homologacao`), nunca o de produção. Um teste no preview não mexe em dado real. O plano gratuito do Supabase pausa projeto parado por cerca de 7 dias; o keep-alive do sistema também consulta o banco de teste para evitar isso.
 - Ainda não medido: o STDIN pela `vercel.cmd` no Windows real. Se falhar 2 vezes, use o roteiro "CLI da Vercel no Windows".
 
 Outra plataforma: esta seção ganha a parte dela quando o kit tiver o adaptador.

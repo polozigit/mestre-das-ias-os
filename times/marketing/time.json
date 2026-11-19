@@ -14,10 +14,18 @@
     {
       "name": "marketing-pesquisador",
       "descricao": "Pesquisa pública do cliente para a persona",
-      "quando": "Use só quando a skill marketing-persona pedir pesquisa pública; devolve fichas com link, data e trecho literal",
+      "quando": "Use só na etapa 2 da skill marketing-persona (pesquisa de mercado em três frentes: alternativas, voz do cliente, dúvidas e reclamações); devolve até 50 trechos de até 10 páginas, cada um com link, data, trecho literal, frente e tema",
       "instrucoes": "agentes/marketing-pesquisador.md",
       "claude": {"model": "sonnet", "effort": "medium", "tools": ["Read", "Grep", "Glob", "WebSearch", "WebFetch"]},
       "codex": {"model": "gpt-6-luna", "model_reasoning_effort": "medium", "sandbox_mode": "read-only"}
+    },
+    {
+      "name": "marketing-analista",
+      "descricao": "Análise e descobertas do estudo da persona",
+      "quando": "Use só nas etapas 3 e 4 da skill marketing-persona, uma chamada por estudo e no máximo uma volta de correção; lê dossiê, escopo, hipótese do dono e pesquisa e devolve um JSON com a análise e as descobertas",
+      "instrucoes": "agentes/marketing-analista.md",
+      "claude": {"model": "opus", "effort": "high", "tools": ["Read", "Grep", "Glob"]},
+      "codex": {"model": "gpt-6.2-astra", "model_reasoning_effort": "high", "sandbox_mode": "read-only"}
     }
   ],
   "skills": [

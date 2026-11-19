@@ -14,6 +14,28 @@ export type DocumentoDaLista = {
   publicado_em: string;
 };
 
+/** Troca de documento quando a aba tem mais de um: o aberto fica marcado. */
+export function ListaDeDocumentos({ aba, docs, abertoId }: { aba: Aba; docs: DocumentoDaLista[]; abertoId: string }) {
+  return (
+    <ul className="flex flex-wrap gap-2 text-xs">
+      {docs.map((d) => (
+        <li key={d.id}>
+          <Link
+            href={hrefMarca(aba, d.id)}
+            className={
+              d.id === abertoId
+                ? "rounded-sm bg-bg-sutil px-2 py-1 font-semibold text-fg-1"
+                : "rounded-sm px-2 py-1 text-fg-3 hover:text-fg-1"
+            }
+          >
+            {d.titulo}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /**
  * O conteúdo de UMA aba da tela Marca: o documento aberto (título, quando foi publicado, de onde veio, a
  * imagem e o texto) ou, sem documento, o estado vazio que diz o que pedir à IA. Roda no servidor; a
@@ -53,24 +75,7 @@ export function PainelDocumento({
         </p>
         <p className="break-all font-mono text-[11px] text-fg-4">{aberto.caminho_origem}</p>
       </div>
-      {docs.length > 1 && (
-        <ul className="flex flex-wrap gap-2 text-xs">
-          {docs.map((d) => (
-            <li key={d.id}>
-              <Link
-                href={hrefMarca(aba, d.id)}
-                className={
-                  d.id === aberto.id
-                    ? "rounded-sm bg-bg-sutil px-2 py-1 font-semibold text-fg-1"
-                    : "rounded-sm px-2 py-1 text-fg-3 hover:text-fg-1"
-                }
-              >
-                {d.titulo}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      {docs.length > 1 && <ListaDeDocumentos aba={aba} docs={docs} abertoId={aberto.id} />}
       {imagemUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={imagemUrl} alt={aberto.titulo} className="max-h-96 w-auto max-w-full rounded-md border border-borda-suave object-contain" />
@@ -94,11 +99,17 @@ export function montarPaineis<T extends DocumentoDaLista>(
   painelMarca: ReactNode = null,
   /** Com `painelMarca` disponível mas o texto integral pedido por ?doc=, o caminho de volta. */
   voltarMarcaHref: string | null = null,
+  /** Painel pronto da aba Persona (PersonaMarca); sem ele, o documento aberto em texto. */
+  painelPersona: ReactNode = null,
 ): Record<Aba, ReactNode> {
   const paineis = {} as Record<Aba, ReactNode>;
   for (const aba of ABAS) {
     if (aba === "marca" && painelMarca) {
       paineis[aba] = painelMarca;
+      continue;
+    }
+    if (aba === "persona" && painelPersona) {
+      paineis[aba] = painelPersona;
       continue;
     }
     const aberto = abertos[aba];

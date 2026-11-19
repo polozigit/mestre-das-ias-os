@@ -66,8 +66,8 @@ vira `<SKILL_IRMA>` — a pasta que contém `scripts/provar_conexao.py` (sem o
 `scripts/provar_conexao.py` no final).
 
 Nenhum caminho achou → **PARE**: `polozi-registrar-conexao` está ausente ou
-instalada incompleta. Mostre ao aluno e peça pra reinstalar o
-`polozi-fundacao.zip` e reiniciar o app. Não improvise caminho, não rode
+instalada incompleta. Mostre ao aluno e peça pra
+baixar o zip do kit de novo, descompactar e abrir no aplicativo a pasta que tem o `AGENTS.md` dentro, não a de fora. Não improvise caminho, não rode
 nada relativo, não copie script pra dentro da Casa.
 
 ## Preparar
@@ -84,7 +84,8 @@ nada relativo, não copie script pra dentro da Casa.
    confirmar) e `gh --version` (Mac: `brew install gh`; Windows:
    `winget install Git.Git GitHub.CLI`), reabrindo o terminal depois. Sem
    conseguir instalar → fallback no fim.
-4. Conta GitHub: perguntar se o dono já tem uma. Não tem → abrir
+4. Conta GitHub: o dono traz a conta criada e logada de casa (pré-requisito do curso);
+   perguntar só se ele consegue entrar nela. Não tem → abrir
    `github.com/signup` no Chrome dele e guiar campo a campo — quem digita
    usuário, senha e e-mail é sempre o dono, você só aponta o próximo campo.
    Assim que a conta nascer, oriente a ativar 2FA por app autenticador (não
@@ -93,21 +94,28 @@ nada relativo, não copie script pra dentro da Casa.
    sem esse escopo, o GitHub recusa o primeiro push (teste real de 08/10/2026,
    que precisou de um 2º código). `gh auth status`. Não logado:
    ```
-   gh auth login --hostname github.com --git-protocol https --web --scopes workflow
+   gh auth login --hostname github.com --git-protocol https --web --clipboard --scopes workflow
    ```
    Logado, mas sem `workflow` na linha "Token scopes":
    ```
-   gh auth refresh --hostname github.com --scopes workflow
+   gh auth refresh --hostname github.com --clipboard --scopes workflow
    ```
-   O comando espera o dono autorizar: rode numa sessão de terminal que fica
-   aberta até ele terminar, sem rodar outro comando nem deixar o código
-   expirar. Abra a página do código no Chrome do dono
+   O `--clipboard` copia o código de 8 letras pra área de transferência do
+   dono, então ele não precisa ler nem digitar nada. O comando espera o dono
+   autorizar: rode numa sessão de terminal que fica aberta até ele terminar,
+   sem rodar outro comando nem deixar o código expirar. Abra a página do
+   código no Chrome do dono por comando
    (`open -a "Google Chrome" "https://github.com/login/device"`; Windows
-   `start chrome "https://github.com/login/device"`); o código de 8 letras
-   quem digita é o dono, lendo da tela, e ele clica em Authorize — **você
-   nunca vê nem pede senha ou token**. ANTES do primeiro push, `gh auth status`
-   tem que mostrar `workflow` em "Token scopes"; sem ele, refaça o `refresh`
-   e não suba nada.
+   `start chrome "https://github.com/login/device"`) e diga, em português
+   simples: "Abri uma página do GitHub no Chrome. O código já está copiado.
+   1) Clique no campo do código. 2) Cole (no Windows Ctrl+V, no Mac Cmd+V).
+   3) Clique em Continue. 4) Clique em Authorize." Quem cola e autoriza é
+   sempre o dono — **você nunca vê nem pede senha ou token**.
+   Reserva: se o dono colar e o campo ficar vazio (área de transferência
+   sem o código), leia o código de 8 letras na saída do próprio `gh` e
+   mostre pra ele digitar na página; nunca peça que ele mande o código no
+   chat. ANTES do primeiro push, `gh auth status` tem que mostrar `workflow`
+   em "Token scopes"; sem ele, refaça o `refresh` e não suba nada.
 6. **Autor dos commits = o dono no GitHub (A39).** A Casa nasce com o autor
    `empresa-ia@local`, e a Vercel Hobby só faz deploy de commit cujo e-mail é o
    da conta GitHub dona do projeto (teste de 08/10/2026: a prévia ficou
@@ -127,10 +135,12 @@ nada relativo, não copie script pra dentro da Casa.
    `pendente` → parar e mandar rodar a etapa da Casa no `polozi-instalador`;
    nunca inventar o nome aqui.
 8. De onde a Casa veio: `git remote get-url origin`. Sem `origin` (o comando
-   responde `No such remote 'origin'`) é a Casa do zip: siga. Termina em
-   `polozigit/mestre-das-ias-os`? Então a Casa foi CLONADA do repositório-modelo, e
-   esse `origin` é do modelo, não do dono: **NUNCA `git push` nem `gh repo rename`
-   nele** (o dono não tem permissão, e o histórico do modelo não é dele).
+   responde `No such remote 'origin'`) é a Casa vinda do zip, o caminho principal
+   (o `git init` e o commit inicial já foram feitos pela etapa da Casa; só commit
+   local até esta etapa): siga. Termina em `polozigit/mestre-das-ias-os`? Caso
+   secundário: a Casa foi CLONADA do repositório-modelo, e esse `origin` é do
+   modelo, não do dono: **NUNCA `git push` nem `gh repo rename` nele** (o dono não
+   tem permissão, e o histórico do modelo não é dele).
 
 ## Executar
 
@@ -140,17 +150,16 @@ nada relativo, não copie script pra dentro da Casa.
    "passou mesmo assim" não existe.
 2. Criar o repositório PRIVADO com o nome do sistema (`<slug_os>`, lido no passo 7
    de Preparar: minúsculo, sem espaço, sem acento, sem dado sensível). Três casos:
-   - **Casa clonada do repositório-modelo** (`origin` do modelo): troca o `origin`
-     pelo repositório do dono ANTES do primeiro push. `git remote remove origin` só
-     desfaz a ligação local com o modelo (não apaga nem empurra nada); o repositório
-     novo nasce já com o histórico da Casa, e o hook `.githooks/pre-push` varre esse
-     histórico inteiro no primeiro push, então ele demora um pouco mais:
+   - **Casa do zip, sem `origin` (caminho principal)**: cria o repositório privado do
+     dono e liga o `origin` a ele, num comando só (`--source=.` liga, `--push` envia):
+     `gh repo create <slug_os> --private --source=. --push`.
+   - **Casa clonada do repositório-modelo** (caso secundário, `origin` do modelo): troca o
+     `origin` pelo repositório do dono ANTES do primeiro push. `git remote remove origin`
+     só desfaz a ligação local com o modelo (não apaga nem empurra nada):
      ```
      git remote remove origin
      gh repo create <slug_os> --private --source=. --push
      ```
-   - **Casa do zip, sem `origin`**: só o segundo comando:
-     `gh repo create <slug_os> --private --source=. --push`.
    - **O dono já tem um repositório DELE (o `origin` não é o modelo) com outro nome**:
      não criar um segundo. `gh repo rename <slug_os>` renomeia o repositório dele; depois
      confira com `git remote get-url origin` que o `origin` aponta pro nome novo (se não,
@@ -207,7 +216,9 @@ antes desse push: o hook `.githooks/pre-push` da Casa roda em todo push.
 
 - NUNCA repositório público.
 - NUNCA pedir ou colar senha, token ou código de autorização no chat — nem da
-  conta GitHub, nem do `gh auth login`.
+  conta GitHub, nem do `gh auth login`. (Ler o código na saída do `gh` e
+  mostrar ao dono, só na reserva do passo 5, não é pedir: o dono digita na
+  página do GitHub, nunca no chat.)
 - Nome do repositório sem dado sensível (CNPJ, telefone, endereço).
 - NUNCA `git push` nem `gh repo rename` com o `origin` apontando pro repositório-modelo
   `polozigit/mestre-das-ias-os`: o `origin` do modelo não é do dono. Primeiro troca o

@@ -35,7 +35,7 @@ python3 -m unittest discover -s tests -v
 ## Gerar as saídas
 
 ```
-python3 ../native-ai/.agents/skills/native-ai-construir/scripts/gerar_saidas.py --raiz .
+python3 ../../scripts/gerador_times/gerar_saidas.py --raiz .
 ```
 
 Fonte aninhada: só gera `.codex/agents` e `trechos/`.

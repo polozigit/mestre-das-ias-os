@@ -20,8 +20,8 @@ export default async function SemAcessoPage({
   const nomeModulo = modulo ? (rotuloDoModulo(modulo) ?? modulo) : null;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-bg p-6">
-      <div className="w-full max-w-sm rounded-lg border border-borda bg-bg-elevada p-8 text-center shadow-[var(--sombra-md)]">
+    <main className="palco-luz flex min-h-screen items-center justify-center bg-bg p-6">
+      <div className="entrada-pagina w-full max-w-sm rounded-lg border border-borda bg-bg-elevada p-8 text-center shadow-[var(--sombra-md)]">
         <h1 className="mb-2 text-lg font-semibold text-fg-1">Sem acesso</h1>
         <p className="mb-6 text-sm text-fg-3">
           {nomeModulo

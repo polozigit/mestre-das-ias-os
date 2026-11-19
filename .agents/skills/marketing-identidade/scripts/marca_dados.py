@@ -12,6 +12,7 @@ Uso (da raiz do projeto):
   marca_dados.py tokens   --arquivo empresa/marca/identidade-visual.md [--saida empresa/marca/tokens.json] [--check]
   marca_dados.py extrair  --arquivo empresa/marca/tom-de-voz.md
   (todos aceitam --casa PASTA, a raiz do projeto; padrão: pasta atual)
+  O dossiê lido por `conferir` pode ser da versão 1 ou da versão 2 (página do dossiê); versão desconhecida sai 1.
 
 validar   confere só o bloco: HEX #RRGGBB maiúsculo, função da cor, nomes únicos, todo HEX do bloco na tabela
           da seção Cores (e o contrário), razão de contraste recalculada pela MESMA conta do paleta.py
@@ -638,6 +639,9 @@ def main(argv: list[str] | None = None) -> int:
         except FileNotFoundError:
             print(f"FALTA: não achei o dossiê em {a.dossie or dp.DOSSIE}. Registre o dossiê primeiro "
                   "(polozi-registrar-dossie); sem ele não confiro a origem.", file=sys.stderr)
+            return 1
+        except dp.VersaoDesconhecida as erro:
+            print(f"ERRO: {erro}", file=sys.stderr)
             return 1
         except (OSError, UnicodeError):
             print("ERRO: não consegui ler o dossiê", file=sys.stderr)

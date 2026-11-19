@@ -14,7 +14,7 @@ export function KanbanBoard({ tarefas }: { tarefas: TarefaCardData[] }) {
     /* O scroll horizontal mora NESTE contêiner: no celular as 4 colunas rolam
        aqui dentro e o body da página nunca ganha scroll-x. */
     <div className="overflow-x-auto pb-2">
-      <div className="flex min-w-max gap-3 lg:gap-4">
+      <div className="entrada flex min-w-max gap-3 lg:gap-4">
         {colunas.map((coluna) => (
           <section
             key={coluna.status}

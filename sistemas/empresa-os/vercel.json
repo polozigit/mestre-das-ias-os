@@ -1,4 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [{ "path": "/api/keep-alive", "schedule": "23 11 * * *" }]
+  "ignoreCommand": "[ -n \"$VERCEL_GIT_PREVIOUS_SHA\" ] && git cat-file -e \"$VERCEL_GIT_PREVIOUS_SHA^{commit}\" 2>/dev/null && git diff --quiet \"$VERCEL_GIT_PREVIOUS_SHA\" HEAD -- . || exit 1",
+  "crons": [
+    {
+      "path": "/api/keep-alive",
+      "schedule": "23 11 * * *"
+    }
+  ]
 }

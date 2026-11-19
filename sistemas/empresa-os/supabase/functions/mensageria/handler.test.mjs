@@ -62,3 +62,51 @@ test('reentrega assinada ja persistida nao baixa nem grava a midia outra vez',as
  const response=await handle(new Request(base,{method:'POST',headers:{'x-hub-signature-256':signature},body}));
  assert.equal(response.status,200);assert.equal(downloads,0);
 });
+
+async function assinado(payload,secret='teste'){
+ const body=JSON.stringify(payload);
+ const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const signature='sha256='+Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(body))),b=>b.toString(16).padStart(2,'0')).join('');
+ return new Request(base,{method:'POST',headers:{'x-hub-signature-256':signature},body});
+}
+const CONTA='11111111-1111-4111-8111-111111111111';
+const pacote=(...messages)=>({object:'whatsapp_business_account',entry:[{changes:[{value:{metadata:{phone_number_id:'123'},messages,statuses:[{id:'wamid.recibo',status:'delivered',recipient_id:'5511999990001'}]}}]}]});
+function servicoFalso(eventos,recibos){
+ return async(_name,args)=>{
+  const op=args.p_operacao,d=args.p_dados;
+  if(op==='meta_contas')return {contas:[{id:CONTA,phone_id:'123',app_secret:'teste',graph_version:'v21.0',access_token:'tok'}]};
+  if(op==='evento_existente')return {existe:false};
+  if(op==='evento'){eventos.push(d.mensagens[0]);return {ok:true};}
+  if(op==='recibo'){recibos.push(d.provedor_id);return {ok:true};}
+  if(op==='media_upload')return {ok:true};
+  throw new Error('operacao inesperada '+op);
+ };
+}
+
+test('midia de formato recusado nao derruba o pacote: grava aviso, segue para a proxima mensagem e o recibo',async()=>{
+ const eventos=[],recibos=[];let uploads=0;
+ const handle=createHandler({serviceKey:'service',rpc:servicoFalso(eventos,recibos),storage:{upload:async()=>{uploads++;}},fetchImpl:async url=>{
+  if(String(url).includes('/midia-ruim'))return Response.json({url:'https://lookaside.fbsbx.com/x',mime_type:'application/x-msdownload'});
+  return new Response('binario');
+ }});
+ const res=await handle(await assinado(pacote(
+  {id:'wamid.ruim',from:'5511999990001',type:'document',document:{id:'midia-ruim',mime_type:'application/x-msdownload',filename:'virus.exe'}},
+  {id:'wamid.boa',from:'5511999990001',type:'text',text:{body:'oi'}}
+ )));
+ assert.equal(res.status,200);
+ assert.deepEqual(eventos.map(e=>e.provedor_id),['wamid.ruim','wamid.boa']);
+ assert.equal(eventos[0].anexo,undefined);assert.match(eventos[0].texto,/Arquivo não recebido/);
+ assert.equal(uploads,0);assert.deepEqual(recibos,['wamid.recibo']);
+});
+
+test('midia que a Meta nao tem mais (4xx) vira aviso; queda temporaria da Meta (5xx) devolve 503 para reentrega',async()=>{
+ const eventos=[],recibos=[];
+ let status=404;
+ const handle=createHandler({serviceKey:'service',rpc:servicoFalso(eventos,recibos),storage:{upload:async()=>{}},fetchImpl:async()=>new Response('{}',{status})});
+ const msg={id:'wamid.img',from:'5511999990001',type:'image',image:{id:'midia-x',mime_type:'image/jpeg'}};
+ assert.equal((await handle(await assinado(pacote(msg)))).status,200);
+ assert.equal(eventos.length,1);assert.match(eventos[0].texto,/Arquivo não recebido/);
+ eventos.length=0;recibos.length=0;status=500;
+ assert.equal((await handle(await assinado(pacote(msg)))).status,503);
+ assert.equal(eventos.length,0);
+});

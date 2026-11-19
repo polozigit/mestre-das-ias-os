@@ -17,9 +17,17 @@ marque dúvidas e considere concluído quando houver um documento para eu valida
 
 As Skills começam por `AGENTS.md`, consultam o Mapa e abrem apenas os documentos necessários. O usuário não precisa repetir caminhos de arquivos.
 
-Trabalhar sozinho é o padrão: a IA não delega por conta própria. Delegar é
-exceção pedida pelo dono ou prevista em instrução do `AGENTS.md`/de uma
-Skill — sempre pelo NOME do agente, um por vez.
+Um agente só é o padrão: a IA trabalha sozinha, sem gerente e sem avaliador
+em pedido comum (criar uma skill, por exemplo, é 1 agente). Subagente só para
+parte grande e independente, ou revisão de risco prevista numa Skill, sempre
+pelo NOME do agente.
+
+## Pedido grande: peça o plano antes
+
+Trabalho com várias partes ou que segue em outra conversa? Diga "planeja
+antes": a IA usa `$polozi-planejar-trabalho`, pergunta uma coisa por vez, grava
+o desenho e os marcos e espera o seu "ok" antes de construir. Pedido pequeno
+a IA faz direto.
 
 ## Quando pedir orientação
 
@@ -33,11 +41,13 @@ Confirme fatos, números, promessas, nomes, prazos e destinos. Conteúdo ainda n
 
 Neste manual e no AGENTS.md as habilidades aparecem como `$nome`, que é o
 que a IA emite. Na tela do app você também pode escolher digitando `@` e
-clicando na lista — é a mesma habilidade.
+clicando na lista. É a mesma habilidade.
 
 ## Loop de melhoria
 
-A IA PROPÕE (linha `proposta` em `operacao/DECISOES.md`, vinda de um erro
-repetido ou da retrospectiva semanal), você APROVA falando no chat ("aprova
+Uma regra nova nasce da retrospectiva que você pede ("hora da retrospectiva")
+ou de uma pendência anotada em `operacao/PENDENCIAS.md`; fica como linha
+`proposta` em `operacao/DECISOES.md`. A IA não propõe regra por conta própria.
+Você APROVA falando no chat ("aprova
 a D-N"), a IA APLICA com `$polozi-aplicar-regra`. Você nunca edita o
 AGENTS.md a mão.

@@ -8,11 +8,10 @@ A fundação Polozi e os times já vêm dentro deste repositório (`.agents/skil
 
 ## Times da empresa
 
-Mantida por `$polozi-instalar-time`, nunca à mão.
+Mantida por `$polozi-instalar-time`, nunca à mão. Aposentados (`capacidades/APOSENTADOS.json`) não são reinstalados por rotina.
 
 | Time | Agentes | Estado | Verificado em |
 |---|---|---|---|
-| marketing | marketing-revisor, marketing-pesquisador | ativo | 2026-10-26 |
-| pmo | pmo-conferente | ativo | 2026-10-26 |
-| tecnologia | tecnologia-revisor-seguranca | ativo | 2026-10-26 |
-| native-ai | native-ai-construtor, native-ai-avaliador | ativo | 2026-10-26 |
+| marketing | marketing-revisor, marketing-pesquisador, marketing-analista | ativo | 2026-11-19 |
+| pmo | pmo-conferente | ativo | 2026-11-19 |
+| tecnologia | tecnologia-revisor-seguranca | ativo | 2026-11-19 |

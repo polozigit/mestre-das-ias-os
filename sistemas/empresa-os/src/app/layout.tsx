@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { nomeSistema, descricaoSistema } from "../../config/empresa";
 import { marca } from "../../config/marca";
 import { SCRIPT_TEMA } from "../lib/tema";
+import { FaixaTeste } from "../components/layout/FaixaTeste";
+import { LuzDoCursor } from "../components/ui/LuzDoCursor";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -34,7 +36,11 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body>{children}</body>
+      <body>
+        <FaixaTeste />
+        {children}
+        <LuzDoCursor />
+      </body>
     </html>
   );
 }

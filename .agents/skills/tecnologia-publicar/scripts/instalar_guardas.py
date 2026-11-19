@@ -86,6 +86,14 @@ NOMES_SECRETS_GITHUB = (
     "SUPABASE_PROJECT_ID",
 )
 
+# Os 2 secrets que `deploy-db-homologacao.yml` consome (o token de acesso e o mesmo
+# acima). Nascem no `credenciais/.env` pelo `conectar.py homologacao`; sem eles o
+# workflow de homologacao nao tem o que usar e o passo avisa `[pendente]`.
+NOMES_SECRETS_GITHUB_HOMOLOG = (
+    "SUPABASE_PROJECT_ID_HOMOLOG",
+    "SUPABASE_DB_PASSWORD_HOMOLOG",
+)
+
 ENDPOINTS_DEPENDABOT = ("vulnerability-alerts", "automated-security-fixes")
 
 # Workflows que saíram do kit em 26/10/2026 (a checagem passou a rodar no
@@ -566,7 +574,23 @@ def gravar_secrets(ctx: Contexto) -> Resultado:
         if resultado is None or resultado.returncode != 0:
             return Resultado(False, "", mensagem_erro=f"`gh secret set {nome}` falhou: {_saida(resultado)}")
 
-    return Resultado(True, f"ok: {len(NOMES_SECRETS_GITHUB)} secrets gravados via gh secret set")
+    homolog = {nome: env.get(nome, "") for nome in NOMES_SECRETS_GITHUB_HOMOLOG}
+    if not all(homolog.values()):
+        print(
+            "[pendente] gravar_secrets: homologação ainda não criada (faltam "
+            f"{', '.join(n for n, v in homolog.items() if not v)} em credenciais/.env). "
+            "Rode conectar.py homologacao e depois este passo de novo."
+        )
+        return Resultado(True, f"ok: {len(NOMES_SECRETS_GITHUB)} secrets gravados via gh secret set; homologação pendente")
+    for nome, valor in homolog.items():
+        resultado = _com_valor_em_arquivo(
+            "tecnologia-secret-", valor, ["gh", "secret", "set", nome], ctx.casa,
+        )
+        if resultado is None or resultado.returncode != 0:
+            return Resultado(False, "", mensagem_erro=f"`gh secret set {nome}` falhou: {_saida(resultado)}")
+
+    total = len(NOMES_SECRETS_GITHUB) + len(NOMES_SECRETS_GITHUB_HOMOLOG)
+    return Resultado(True, f"ok: {total} secrets gravados via gh secret set (3 de produção, 2 de homologação)")
 
 
 # ---------------------------------------------------------------------------

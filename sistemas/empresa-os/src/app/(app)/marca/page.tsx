@@ -9,6 +9,7 @@ import { AbasMarca } from "./_components/AbasMarca";
 import { IdentidadeMarca } from "./_components/IdentidadeMarca";
 import type { LogoParaTela } from "./_components/BlocosVisuais";
 import { montarPaineis } from "./_components/PainelDocumento";
+import { painelDaPersona } from "./_components/PersonaMarca";
 
 export const dynamic = "force-dynamic";
 
@@ -93,7 +94,18 @@ export default async function MarcaPage({ searchParams }: { searchParams: Search
     painelMarca = <IdentidadeMarca marca={marcaCompleta} logos={logos} />;
   }
 
-  const paineis = montarPaineis(grupos, abertos, textos, imagens, painelMarca, textoIntegralPedido && temIdentidade ? hrefMarca("marca") : null);
+  // Persona: o estudo (bloco persona-dados) ou, sem ele, os blocos do molde antigo. Fora dos dois,
+  // painelDaPersona dá null e o documento aparece em texto, como antes.
+  const abertoPersona = abertos.persona;
+  const painelPersona = painelDaPersona(
+    grupos.persona,
+    abertoPersona,
+    abertoPersona ? (textos.get(abertoPersona.id) ?? null) : null,
+    imagens.get("persona") ?? null,
+  );
+
+  const voltarMarca = textoIntegralPedido && temIdentidade ? hrefMarca("marca") : null;
+  const paineis = montarPaineis(grupos, abertos, textos, imagens, painelMarca, voltarMarca, painelPersona);
 
   return (
     <div className="flex flex-col gap-6 pb-24">

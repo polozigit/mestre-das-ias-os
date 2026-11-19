@@ -17,10 +17,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-# IDs por tier (decisão I32, 07/10/2026: Sol = gpt-6.1-sol e Luna = gpt-6-luna, provados no
-# Codex 0.160.1; Terra não tem ID novo) [24a:modelos/f3, f4, f5]. A Casa roda no Terra; os agentes
-# da fundação vão no Luna desde 09/10 (A41, limite do Plus): rotina e checklist, 20x mais barato.
-# Fonte: learn.chatgpt.com/docs/pricing e /docs/models, lidas em 09/10/2026.
+# Modelo do chat vem do seletor do app; estes IDs valem apenas para agentes específicos
+# (decisão I32, 07/10/2026: Sol = gpt-6.1-sol, Luna = gpt-6-luna; Terra não tem ID novo) [24a:modelos/f3, f4, f5].
 MODELO_CODEX = {"sol": "gpt-6.1-sol", "terra": "gpt-5.6-terra", "luna": "gpt-6-luna"}
 
 MARCADOR_INICIO = "<!-- AGENTES:INICIO -->"

@@ -1,6 +1,6 @@
 ---
 name: polozi-retrospectiva
-description: "Revisa a semana e propõe até 3 regras novas pro dono aprovar. Use na retrospectiva semanal; não use pra fechar trabalho."
+description: "Revisa a semana, anota até 3 lições e propõe até 3 regras pro dono aprovar. Só sob pedido; não serve pra fechar trabalho."
 ---
 
 # Polozi Retrospectiva
@@ -9,19 +9,24 @@ Revisar o que aconteceu na semana (changelog, pendências, tasks concluídas)
 e propor até 3 regras novas, no formato de linha do `operacao/DECISOES.md`,
 pro dono aprovar. Lê também o registro da vigília (`operacao/vigilancia/`).
 Não decide, não aplica, não commita — quem aprova é o dono, e quem aplica é
-`$polozi-aplicar-regra`.
+`$polozi-aplicar-regra`. Roda só quando o dono pede ("hora da retrospectiva"):
+o kit não agenda rotina nenhuma para ela.
+
+Ideia das lições adaptada do `continuous-learning-v2` do affaan-m/ECC
+(licença MIT), sem o observador em segundo plano: aqui a lição é escrita só
+no arquivo da retrospectiva, a pedido, e nunca vira regra sozinha.
 
 ## Regras desta skill (nunca conta com o AGENTS.md carregado)
 
-Uma tarefa agendada pode rodar esta skill sem a doc oficial confirmar que o
-AGENTS.md do projeto é carregado nesse contexto — por isso as travas moram
-AQUI, não lá:
+Esta skill pode rodar sem a doc oficial confirmar que o AGENTS.md do
+projeto é carregado nesse contexto — por isso as travas moram AQUI, não lá:
 
 - Nunca rode git: quem salva no GitHub é a skill `tecnologia-publicar`.
 - Escreva SÓ em `operacao/retrospectivas/` — nenhum outro arquivo muda.
 - Nunca escreva em `operacao/vigilancia/`: lá quem escreve é a skill
   `tecnologia-vigiar`.
 - No máximo 3 propostas por retrospectiva.
+- No máximo 3 lições por retrospectiva, todas no formato fixo da seção "Lições".
 - Cota de execução: `nao medido` — não existe comando oficial que devolva
   isso sem credencial; nunca invente um número.
 - Nunca leia `credenciais/.env` nem peça chave.
@@ -88,8 +93,8 @@ vira `<SKILL_DIR>` — a pasta que contém `scripts/retrospectiva.py` (sem o
 `scripts/retrospectiva.py` no final).
 
 Nenhum caminho achou → **PARE**: esta skill está instalada incompleta
-(falta `scripts/retrospectiva.py`). Mostre ao aluno e peça pra reinstalar o
-`polozi-fundacao.zip` e reiniciar o app. Não improvise a retrospectiva sem
+(falta `scripts/retrospectiva.py`). Mostre ao aluno e peça pra
+baixar o zip do kit de novo, descompactar e abrir no aplicativo a pasta que tem o `AGENTS.md` dentro, não a de fora. Não improvise a retrospectiva sem
 script, não rode nada relativo, não copie script pra dentro da Casa.
 
 ## Rodar
@@ -104,16 +109,36 @@ O script só conta tasks concluídas pelo arquivo (`operacao/tasks/`). Se
 `credenciais/CONEXOES.md` já tiver o banco da empresa conectado, complemente
 a contagem consultando o painel — o script não fala com banco nenhum.
 
+## Lições (formato fixo)
+
+Depois de rodar o script, acrescente ao FIM do arquivo criado (nunca em outro
+arquivo) a seção `## Lições`, com no máximo 3 lições, cada uma assim:
+
+```
+### L-1
+- Gatilho: <a situação em que isto vale, em 1 frase>
+- Ação: <o que fazer quando o gatilho aparece, em 1 frase>
+- Evidência: <onde se viu: tarefa, arquivo, commit ou linha do registro>
+- Confiança: baixa | média | alta
+```
+
+Regras: lição sem evidência não entra; confiança `alta` só com 3 ou mais
+ocorrências com evidência, `média` com 2, `baixa` com 1; sem lição nova,
+escreva `Nenhuma lição esta semana.` Lição não é regra: ela só vira regra se o
+dono disser `aprova a D-N` e o `$polozi-aplicar-regra` aplicar (a lição aprovada
+vira 1 proposta de `operacao/DECISOES.md`, como as outras).
+
 ## Fechar
 
 1. Dizer o caminho do arquivo criado (`operacao/retrospectivas/AAAA-MM-DD.md`).
-2. Listar cada proposta em 1 linha.
+2. Listar cada proposta e cada lição em 1 linha.
 3. Perguntar: "quer aprovar alguma? fale `aprova a D-N`."
 
 ## Verificar
 
 - O arquivo do dia foi criado e nenhum outro arquivo da Casa mudou.
 - No máximo 3 propostas foram listadas.
+- A seção `## Lições` existe, com no máximo 3 lições e as 4 linhas (Gatilho, Ação, Evidência, Confiança) em cada uma.
 - A seção Vigília aparece, e diz `sem registro de vigília nesta semana`
   quando a pasta não existe.
 - Nenhuma chave, senha ou trecho de `credenciais/.env` apareceu na saída.
@@ -121,7 +146,7 @@ a contagem consultando o painel — o script não fala com banco nenhum.
 ## Limites
 
 - Nunca rode git — isso é sempre da skill `tecnologia-publicar`.
-- Nunca aplique uma proposta sozinha — isso é sempre do `$polozi-aplicar-regra`, e só depois do sim do dono.
+- Nunca aplique uma proposta ou lição sozinha — isso é sempre do `$polozi-aplicar-regra`, e só depois do sim do dono.
 - Nunca escreva fora de `operacao/retrospectivas/`.
 - Nunca invente número de cota — escreva `nao medido` e aponte o painel de uso do Codex.
 - Nunca peça chave, senha ou token no chat.

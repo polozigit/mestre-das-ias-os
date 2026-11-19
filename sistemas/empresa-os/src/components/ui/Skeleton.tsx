@@ -5,7 +5,7 @@ export function Skeleton({ className }: { className?: string }) {
     <div
       className={cn(
         // bg-sutil já flipa no dark via theme.css — sem variante dark: aqui.
-        "animate-pulse rounded-md bg-bg-sutil",
+        "brilho rounded-md bg-bg-sutil",
         className,
       )}
     />

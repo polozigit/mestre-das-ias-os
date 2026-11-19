@@ -1,7 +1,7 @@
 {
   "kit": "mestre-das-ias-os",
-  "gerado_em": "2026-10-27T00:00:55Z",
-  "origem_git_sha": "df36f2083",
+  "gerado_em": "2026-11-19T07:57:23Z",
+  "origem_git_sha": "b4c85e940",
   "fundacao_skills": [
     "polozi-aplicar-regra",
     "polozi-arrumar-a-casa",
@@ -12,22 +12,13 @@
     "polozi-criar-github",
     "polozi-instalador",
     "polozi-instalar-time",
+    "polozi-planejar-trabalho",
     "polozi-registrar-conexao",
     "polozi-registrar-dossie",
     "polozi-retrospectiva",
     "polozi-transferir-trabalho"
   ],
   "times": [
-    {
-      "nome": "native-ai",
-      "agentes": [
-        "native-ai-construtor",
-        "native-ai-avaliador"
-      ],
-      "skills": [
-        "native-ai-construir"
-      ]
-    },
     {
       "nome": "tecnologia",
       "agentes": [
@@ -62,12 +53,2571 @@
       "nome": "marketing",
       "agentes": [
         "marketing-revisor",
-        "marketing-pesquisador"
+        "marketing-pesquisador",
+        "marketing-analista"
       ],
       "skills": [
         "marketing-persona",
         "marketing-identidade",
         "marketing-logo"
+      ]
+    }
+  ],
+  "gerenciados": [
+    {
+      "caminho": ".agents/skills/marketing-identidade/SKILL.md",
+      "sha256": "6a3376a1ce9eb9f2e42884963484de61e3898cd8c64c8275931f2464bed06f7a"
+    },
+    {
+      "caminho": ".agents/skills/marketing-identidade/referencias/metodo-identidade.md",
+      "sha256": "2eeb1c3c221e3f568eb3b2f030bd1b08c15cb6bc47f93889aabbc86ee56ae5ea"
+    },
+    {
+      "caminho": ".agents/skills/marketing-identidade/referencias/modelo-identidade-visual.md",
+      "sha256": "d0cd8f3e019e189cc6a5d8226cc82005190b8e07c3d4c1ef34c63cad209489c3"
+    },
+    {
+      "caminho": ".agents/skills/marketing-identidade/referencias/modelo-tom-de-voz.md",
+      "sha256": "72c9766bd9a85e44f6aa2874ef2f69604b1ae24679eb7452c413d2ea136395a5"
+    },
+    {
+      "caminho": ".agents/skills/marketing-identidade/scripts/marca_dados.py",
+      "sha256": "8c230af4d19bb23c8063fb9b033723ab44b83c73d6ce088df8fd139e85c4d5b6"
+    },
+    {
+      "caminho": ".agents/skills/marketing-identidade/scripts/material.py",
+      "sha256": "1e44d8c809882d29dca0e1ad1e0b7d8522d439d42064985ba24775736128d87f"
+    },
+    {
+      "caminho": ".agents/skills/marketing-identidade/scripts/paleta.py",
+      "sha256": "4a350faaf11d4c218c5308d4f5155c87f0999853a4b41cbabfb26dd63443bb5d"
+    },
+    {
+      "caminho": ".agents/skills/marketing-logo/SKILL.md",
+      "sha256": "d6d9a0461250e704f0392cd8ea9eb71cdab0762db8248a88eea6d5c3abbe904e"
+    },
+    {
+      "caminho": ".agents/skills/marketing-logo/referencias/modelo-logo.md",
+      "sha256": "4319f684f6fcad76fd731de3683a72fae06bae8f6df1fc75220b33d970469dfc"
+    },
+    {
+      "caminho": ".agents/skills/marketing-logo/scripts/logo.py",
+      "sha256": "979ad42b916873fae5b3ca718f9eb4c795cb68c386e221d0247e6deb2ebe4048"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/SKILL.md",
+      "sha256": "2cfabea8fbcbbc79788d842460e0d000697654a71b0011a452057d58651a1aed"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-0-escopo.md",
+      "sha256": "64bc791b1feac8ef07602936197d237269406266f981c28b93f8e87b7e9d0f3f"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-1-hipotese-do-dono.md",
+      "sha256": "c267551e160fd2ca4c861838c4ebed26c70385673db964351d7da5e055a75108"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-2-pesquisa.md",
+      "sha256": "8c370c77187278835249b52d1afe4ad21850f035442853aef8aafa57b4115bf3"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-3-analise.md",
+      "sha256": "10d18131fecb929cc905cd36f931cfa4ac259fe6c0972e2b9e7203426ad8f0e5"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-4-descobertas.md",
+      "sha256": "19be893642fbb717f7636f34c91f41d08c76d2be63aa14309c4fd0388ed530a6"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-5-entrevista.md",
+      "sha256": "51b92ae34fa81e3ab112c7b14ef302d096f36e9f62683450e5a61bc791fcd715"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-6-montagem.md",
+      "sha256": "528e585128d6d6a1c3bfc40d14ed65a4782319ffa3bf1305a01f6367d473ecbd"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-7-plano-de-mensagem.md",
+      "sha256": "87dd4f30a27a3adcf30b29e4fcba6de295693b137a5d2ca8ecec90e103cca7ba"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-8-revisao.md",
+      "sha256": "d53f5a3cdfb85d0ac4717339dffe1c587b8c1460d7cb24d91bd7ce42ecb19de7"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/etapas/etapa-9-apresentacao.md",
+      "sha256": "2bbcc26b68186242ae0ff46e5e9592bcbdacfaf5e83b4901913838024447ddab"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/metodo-persona.md",
+      "sha256": "dfe0bf60b4ca739f78f7f6c329ae57a1846a8910a05843256a75497f300445cc"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/modelo-persona.md",
+      "sha256": "d99c79f8973567ebdcfe30a713a6dd4acb10fe0f034264a1d737e3a353f060ea"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/referencias/planilha-clientes-modelo.csv",
+      "sha256": "db76de313882ae9dc625587241505d9f3ee686abd305b9607cd984434a4031f5"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/scripts/aprovacao.py",
+      "sha256": "adc903cc9e0c41b522185db8baa9d625dbbf3998acbdaa25d264c0c41e917ae8"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/scripts/clientes_para_persona.py",
+      "sha256": "9f12b7491620b5b373813a788c68612117d591a191dfb9d4fba162eda45cc8bb"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/scripts/dossie_para_persona.py",
+      "sha256": "a800d441e7d6a20f87578e38106635653cd2888702da9253e784da82609f89a1"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/scripts/estudo.py",
+      "sha256": "17ec4ddae574a43ee5729f0ae4045fc246b5fa0975d966e5461da7145b127126"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/scripts/mapa_estado.py",
+      "sha256": "38cac7953ec2899c66ba340849f1b8505f528d8f6fe341b6cb15306c9ff4d24b"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/scripts/persona_estudo.py",
+      "sha256": "350b9e1657f4de9cc45aa65c2309b405597c393219ca511cf2964fa92b80e2d4"
+    },
+    {
+      "caminho": ".agents/skills/marketing-persona/scripts/publicar_documento.py",
+      "sha256": "fb960a5f1200a8b2bbee633feb528db36c25a003868e8118235a378104b64944"
+    },
+    {
+      "caminho": ".agents/skills/pmo-pontos/SKILL.md",
+      "sha256": "e37c52886d56b58216e7af05214b11caa45b6071f84c7c6aa6204577f7ece52a"
+    },
+    {
+      "caminho": ".agents/skills/pmo-pontos/scripts/pontos.py",
+      "sha256": "f7f2cf014f4cdcda5b63fae3e2bcdab879d71049346c4529272eae38d1dfa5a8"
+    },
+    {
+      "caminho": ".agents/skills/pmo-quadro/SKILL.md",
+      "sha256": "25200ed1f72d9c07bc863e854c26da29b25f4fd1a23c41aa92601e3902fffb53"
+    },
+    {
+      "caminho": ".agents/skills/pmo-quadro/scripts/nucleo.py",
+      "sha256": "85e2545f9865179f870ad564dd07ebafa4220846f9ad1dac0891437027b7f885"
+    },
+    {
+      "caminho": ".agents/skills/pmo-quadro/scripts/quadro.py",
+      "sha256": "8f5801adaac043cb40ddbe3f0267fd2e1751ec4c117640e926369d9f1304bf75"
+    },
+    {
+      "caminho": ".agents/skills/pmo-revisao-semanal/SKILL.md",
+      "sha256": "a70d2bd1cee65e00804498e8565ff78a0cccbe58ce9337b4f8396f1f7c6e3cb9"
+    },
+    {
+      "caminho": ".agents/skills/pmo-revisao-semanal/scripts/revisao.py",
+      "sha256": "aa9bfd80829f76efc87d3f5bd852c581205268f12c5a16cc527c89cb0bf8602a"
+    },
+    {
+      "caminho": ".agents/skills/pmo-semana/SKILL.md",
+      "sha256": "526e17a1ecbadbc6fbed053bed7fc95d4797601567762398f686e2798e11d2aa"
+    },
+    {
+      "caminho": ".agents/skills/pmo-semana/scripts/semana.py",
+      "sha256": "773bb78c43dad1ad513312f6ef9d6a50517885dc2ca6ec07009890ae332bdea6"
+    },
+    {
+      "caminho": ".agents/skills/pmo-trilha/SKILL.md",
+      "sha256": "5b2b6fbc48942aa111550e0690c55ed7a029094d46bcaaa340fe6bb60576bc78"
+    },
+    {
+      "caminho": ".agents/skills/pmo-trilha/scripts/trilha.py",
+      "sha256": "a07741fe1c1599ca05b21c2d92d130fe4ef13283524491e00a17659aa36c747e"
+    },
+    {
+      "caminho": ".agents/skills/polozi-aplicar-regra/SKILL.md",
+      "sha256": "fbb66d08eee50ad3386905a0ede5880d2457252a3b552cc6206bd311c23f70bc"
+    },
+    {
+      "caminho": ".agents/skills/polozi-aplicar-regra/agents/openai.yaml",
+      "sha256": "8904cde67ee8044d2c9f4a23077f19f742f0476a9a752b96ae3c555857e9667b"
+    },
+    {
+      "caminho": ".agents/skills/polozi-aplicar-regra/scripts/aplicar_regra.py",
+      "sha256": "d00c9c8b2f49af244ab55fcefd4462be1e2a5c00e78bd214426643b6f1cbc3e3"
+    },
+    {
+      "caminho": ".agents/skills/polozi-arrumar-a-casa/SKILL.md",
+      "sha256": "12679f82093580c3ab92c6fce84f0ce9dd89694b0b899cb1bc48e73bbfb3c734"
+    },
+    {
+      "caminho": ".agents/skills/polozi-arrumar-a-casa/agents/openai.yaml",
+      "sha256": "36b90c6b8ea4eda92516480ba96016e08f84fd6ae1b03d6cf91fa2b5719b0a64"
+    },
+    {
+      "caminho": ".agents/skills/polozi-arrumar-a-casa/scripts/arrumar_a_casa.py",
+      "sha256": "ff36ee10a19a8485cb3f901e74e027689b6358b42265ab5bb1fbd8c53824d54a"
+    },
+    {
+      "caminho": ".agents/skills/polozi-buscar-versao-anterior/SKILL.md",
+      "sha256": "a118d07054cd49b7bbd2ed3dfa35f649f5837afc3805e4cfd47cd3e841b46b6b"
+    },
+    {
+      "caminho": ".agents/skills/polozi-buscar-versao-anterior/agents/openai.yaml",
+      "sha256": "c234c624e9fb18f90e9245464f426340b3b95f8d5956ec02832b5c5f030ce03a"
+    },
+    {
+      "caminho": ".agents/skills/polozi-chamar-time/SKILL.md",
+      "sha256": "8822bc30a6ed3bf0696d7e777a7e89c46ca9059166fedd2710bc35b889d44414"
+    },
+    {
+      "caminho": ".agents/skills/polozi-chamar-time/agents/openai.yaml",
+      "sha256": "8012be58c83303f1d5046422fac084b5ebad7c63d162d63e676d7c7c1bccafba"
+    },
+    {
+      "caminho": ".agents/skills/polozi-concluir-trabalho/SKILL.md",
+      "sha256": "513ce658ca4c110f29f086bfdfcfcb9535dd256e92141f7b3974c4c80c7dc626"
+    },
+    {
+      "caminho": ".agents/skills/polozi-concluir-trabalho/agents/openai.yaml",
+      "sha256": "09d00480c654ac67f7e7a5cc8b384e510b7cf2ab8d12f5d3ca20f6771ad6da1a"
+    },
+    {
+      "caminho": ".agents/skills/polozi-concluir-trabalho/assets/modelo-plano-encerramento.json",
+      "sha256": "7e8e791b1b29badd122af5346559a97a66830e7da2927de76ecf2618cdc9e152"
+    },
+    {
+      "caminho": ".agents/skills/polozi-concluir-trabalho/scripts/concluir_trabalho.py",
+      "sha256": "bedf6e19832ac3c72f4b01e9c90925a6dea3b527db0be2b656576ab5df3f29f2"
+    },
+    {
+      "caminho": ".agents/skills/polozi-criar-empresa-ia/SKILL.md",
+      "sha256": "fadb05486ebe6144f40e973be4ad1bb5546680ee39b5e45da3c341035d78cef1"
+    },
+    {
+      "caminho": ".agents/skills/polozi-criar-empresa-ia/agents/openai.yaml",
+      "sha256": "f06db1b6bd3c31fd0ea78b57eb3fdf3a54bcbfeeb8f02ace7de5bb217c18154e"
+    },
+    {
+      "caminho": ".agents/skills/polozi-criar-empresa-ia/assets/agents-spec/agentes.json",
+      "sha256": "37cbdfe22be921cc803b34cd221051e46aa20e8b8ba87285a12381f9ca3485ce"
+    },
+    {
+      "caminho": ".agents/skills/polozi-criar-empresa-ia/assets/agents-spec/gerar_agentes.py",
+      "sha256": "5bdff04695a83fa8b46d870abc05c873cd413d9c06fa09f559e4cbd928925ffe"
+    },
+    {
+      "caminho": ".agents/skills/polozi-criar-empresa-ia/scripts/criar_empresa_ia.py",
+      "sha256": "7ade38e87a5168511c51b39a4607be503508b9b9ef266833155852c1b495e1ae"
+    },
+    {
+      "caminho": ".agents/skills/polozi-criar-github/SKILL.md",
+      "sha256": "d10256390de3bda38b4d21677b6510b91aa39f1ed97d84f53b4d32a9addfd300"
+    },
+    {
+      "caminho": ".agents/skills/polozi-criar-github/agents/openai.yaml",
+      "sha256": "3d034f5933eecd2a5bf7fe6a2d4a66892f690b3ddff6e801899a21eb23388284"
+    },
+    {
+      "caminho": ".agents/skills/polozi-criar-github/scripts/identidade_git.py",
+      "sha256": "926d88c7f1ebb8d910d0f5ccf429dcdb70261fa1605af76ca5e45beb89bcea03"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalador/SKILL.md",
+      "sha256": "d7949bd93f410b05af3eee8a54b1014d963abb39de9cf8cc7a6a69f20a9e0c81"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalador/agents/openai.yaml",
+      "sha256": "e7a46b41d6d69625ed1c136761a312a65ea9c0af078ef6c7b742807eed5bd857"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalador/scripts/instalar_requisitos.py",
+      "sha256": "36c34a882b674a706923557a551f06a086d7a8b50342ab2a8ffc2e309b85e260"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalador/scripts/ligar_acesso_total.py",
+      "sha256": "feecade40b33e8bea60f244ee3f1e6e9099bba74d2315e07ac7487f695f2b0a3"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalador/scripts/preflight.py",
+      "sha256": "76433472ce9422d3d1dd6106eb21b642fa99bc213fbdeeed32626276c39262e0"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalar-time/SKILL.md",
+      "sha256": "333ce00bec16d86e2b73a1ae3d3db9ea584e71b9730757ebe1de11833f21201d"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalar-time/agents/openai.yaml",
+      "sha256": "9549938e4cf670143c60a1146b9c0d898650908745787cf7e192e785a30c4a2f"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalar-time/scripts/instalar_time.py",
+      "sha256": "e049c51b4f7d6a0f03997449205b2eede3b12a6bb9ffba00fc2ffcbfa9333ab4"
+    },
+    {
+      "caminho": ".agents/skills/polozi-instalar-time/scripts/sincronizar_catalogo.py",
+      "sha256": "fc20aa602012cef5110038af5377b7025a17c12c12ed7aca8036031aabbf1f8f"
+    },
+    {
+      "caminho": ".agents/skills/polozi-planejar-trabalho/SKILL.md",
+      "sha256": "63b3d0bd5b96c99febc219b59b52758b5dfc9ba11512897e54ff5643f74736f7"
+    },
+    {
+      "caminho": ".agents/skills/polozi-planejar-trabalho/agents/openai.yaml",
+      "sha256": "c1372d09d9c69def54b46665c941bb0ffbc74db6676f0d924cf14375361a8515"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-conexao/SKILL.md",
+      "sha256": "efa4d16b0e357deef00ea8ab16739651af6c82f763941c8b4277b44348470154"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-conexao/agents/openai.yaml",
+      "sha256": "09ae98215f56e003eb58c66b467e7dd79088621ef44165440ff03e5affab10e7"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-conexao/scripts/provar_conexao.py",
+      "sha256": "d065458dae3ee5118420a510e96f8eb72e431a45f38939099eba0cca5365de7a"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-dossie/SKILL.md",
+      "sha256": "05a97bd3dac31843c9399bcee2a56e5a519bab25ecbf1b05aebf8d80f8bba89e"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-dossie/agents/openai.yaml",
+      "sha256": "3e75f00551e5c1fbd642a3ad696f8735726549731ae8e4e9bdc0012294485ce9"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-dossie/assets/guia-perguntas-dossie-empresa-numerado.pdf",
+      "sha256": "045803834179f17668e842ab1573ff40f643f4789f17fbb7265581ca8cb64c5f"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-dossie/assets/mapa-v1-v2.md",
+      "sha256": "49dc2ded498ec41be83e40ec9ac16348a52b082f31d40f9cde85b8c3e7197a7e"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-dossie/assets/modelo-dossie-leia-me.md",
+      "sha256": "c06d212e9526cb2863daf003b0288541cbfd710cb83b96dc1c869fe6f657d0f4"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-dossie/assets/questionario-dossie-v1.json",
+      "sha256": "f33a7305469c93d885d84b06a743e95d0bb9c71f40fc8190dbcfc9a58070890d"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-dossie/assets/questionario-dossie-v2.json",
+      "sha256": "24044f31a58cbec0e9f84bcb164f30b6ba0e968b4012fe871114bf2400707424"
+    },
+    {
+      "caminho": ".agents/skills/polozi-registrar-dossie/scripts/registrar_dossie.py",
+      "sha256": "c6e0b442029b6e80fb71a0de2ff693e5021f43f605edcc75feff2b12767a8cc4"
+    },
+    {
+      "caminho": ".agents/skills/polozi-retrospectiva/SKILL.md",
+      "sha256": "0e24ec80013fa4ad17605372677c6d37dad665020b7e5a9c7e370680ea2cba6b"
+    },
+    {
+      "caminho": ".agents/skills/polozi-retrospectiva/agents/openai.yaml",
+      "sha256": "a3de53c90cc96e34a3b122545ae8afb4c149e38137148fcf579b86d08e2c1633"
+    },
+    {
+      "caminho": ".agents/skills/polozi-retrospectiva/scripts/retrospectiva.py",
+      "sha256": "cd7b016873a6ef0cfeec972ae070a3196b924e99c40e4ae04f0b1f3fa5111af2"
+    },
+    {
+      "caminho": ".agents/skills/polozi-transferir-trabalho/SKILL.md",
+      "sha256": "856930f849fec63e71987bc6a62b8c2325dde2954a80dc9373307b542e2c3d8e"
+    },
+    {
+      "caminho": ".agents/skills/polozi-transferir-trabalho/agents/openai.yaml",
+      "sha256": "ddfc4d38e6de0c700dd959c32bd07d35e6ef608113ecc52594b411c7ccc61cfa"
+    },
+    {
+      "caminho": ".agents/skills/polozi-transferir-trabalho/assets/modelo-handoff.md",
+      "sha256": "3280ae7972c0c1e2b153dc5f7d2bb4872a5e61ce041f7f0594073ee2b36b355f"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-acessos/SKILL.md",
+      "sha256": "24cbd3f12d0e0a951df2c95e8fcafc32cb75299da425c5b0061096c657343b1d"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-aplicar-marca/SKILL.md",
+      "sha256": "eea7818078eaae00c5881c7cbbbdf51b8968d6e838b6dd4af358f38a32d99e26"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-aplicar-marca/agents/openai.yaml",
+      "sha256": "4f0349a34cf9470157173f52ec8c4147ebc5725880021c82b6c56aceb34fa1b0"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-aplicar-marca/referencias/fala-com-o-dono.md",
+      "sha256": "4e018fea381059da39da5f247e8f9200fddc9c460b19d0f88dd9c39245c1a1aa"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-aplicar-marca/referencias/regras-de-cor.md",
+      "sha256": "ec6391ca42fb231182907ee25aaf126ac9eed49935dbe95207841dc0429ec5a7"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-aplicar-marca/scripts/aplicar_marca.py",
+      "sha256": "a59a62b3e2ace1746aa8c06f496ee2ba43cde061d9931489ed6106fec5e86841"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-conectar/SKILL.md",
+      "sha256": "38067a70e5a60f3600972f9b3b9e3a41cb51cbf1c435344b8f863524db955398"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-conectar/agents/openai.yaml",
+      "sha256": "cf35e7dbcf413629a099c50943ac5073006c9b0523182fdcc952e30876f5dc94"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-conectar/referencias/roteiro-cliques.md",
+      "sha256": "93558bd602e0925442b53d933b11f7625c00afaa18ad1557babeeead5e26cbba"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-conectar/scripts/conectar.py",
+      "sha256": "0a84d611f56d29e46180b61512d49756994d89f01d73c0f9ec6ef4b813399478"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-construir-tela/SKILL.md",
+      "sha256": "5e952bd8bbe13e09f03f32385406a66ab137587f1a6bae2563f12a3a5598a8ea"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-definir-o-que/SKILL.md",
+      "sha256": "cdbfe93ff993071c4111400910a3da02a02e29ae74d6bc7c05aae6c73ac6ffd1"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-mudar-banco/SKILL.md",
+      "sha256": "784a0ab94e53c7807a18ad952aeb1138212ec26903f673ed9583c0638a7aeb9c"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-mudar-banco/scripts/classificar_migration.py",
+      "sha256": "25dd11b26f7f9515b9d8adf70ef82f8db2c3af0488e3088933373d9cb717f1d4"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-mudar-banco/scripts/veredito.py",
+      "sha256": "eb9af2fd5f1e29581a517c8f7079b2b4fbdb3db1879a5da55da667737ad94c32"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-publicar/SKILL.md",
+      "sha256": "4d60d05c94fad52647d36896813bc3d751a0157de1366afd4136ee4664f86eb2"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-publicar/scripts/arquivos_protegidos.py",
+      "sha256": "aebef186cd5b13b28c8d7a5600ad22d0aaa9f9c02be65f3c641467c1987a909f"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-publicar/scripts/checar_local.py",
+      "sha256": "117250e406ba90746b353e831a35cb11b978b1b1b0cddac99529e1338fff2520"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-publicar/scripts/checar_producao.py",
+      "sha256": "74b8c7bbb7db3495c995cddd21fa9999a2277e0c92d3043daac0ed7543c81bdd"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-publicar/scripts/instalar_guardas.py",
+      "sha256": "37729d65c586fdfda679f84711d4849667e60ae17878ce408d861c057643dd03"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-publicar/scripts/salvar.py",
+      "sha256": "27153952c1f7cb452e9a8bf4579bbaa240e8ca6a0b956241493b64e3b759ad49"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-sistema/SKILL.md",
+      "sha256": "cfdbc2d08b301023ddaced287bce4c9185e1aa6df7a71b26ea7d1976e681131d"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-sistema/referencias/regras-do-sistema.md",
+      "sha256": "35c22966f38da24ab6da9c7a911202f3f233cb0c54fb357c171e61bc457baa74"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-sistema/scripts/gerar_mapa_sistema.py",
+      "sha256": "bc641ead80528b9cac1024df7fc8871c6cf0b2bc49008bce5ed76fa663221f07"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-vigiar/SKILL.md",
+      "sha256": "43973999b14f929ee22abe639eb28d15c09980290e5127ef4736cead6a5e612d"
+    },
+    {
+      "caminho": ".agents/skills/tecnologia-vigiar/scripts/testar_restauracao.py",
+      "sha256": "7d9d18f76d5ad7af6bd2af14c425a337b347fa7da221832c6b314a27eb6ec9a6"
+    },
+    {
+      "caminho": ".claude/agents/marketing-analista.md",
+      "sha256": "7d1ad85209fc547a167e5fde9a5966196c16a6e68e8e2e8117a973ef575c659f"
+    },
+    {
+      "caminho": ".claude/agents/marketing-pesquisador.md",
+      "sha256": "ffb77f5ebeddb62e621fad2f97d0549154b1b4b0b10f2424cd2e56d0e06107b3"
+    },
+    {
+      "caminho": ".claude/agents/marketing-revisor.md",
+      "sha256": "40448bb2306781f3a85f06385c7f81f945d60ffa787e0ab6103e08ed088e602b"
+    },
+    {
+      "caminho": ".claude/agents/pmo-conferente.md",
+      "sha256": "4cb9e14ff767cf0203fc435d5f72feb7952d40ebc8501aa679a1f5ca9e250eb3"
+    },
+    {
+      "caminho": ".claude/agents/tecnologia-revisor-seguranca.md",
+      "sha256": "7e31994b0988cd0e529fdd0ac55b3bc5228efa8dcdca85030b016f65fd958cca"
+    },
+    {
+      "caminho": ".claude/settings.json",
+      "sha256": "d959bba24413addb2c24cdeaff226966a683be70062e814acd78ff5722945296"
+    },
+    {
+      "caminho": ".codex/agents/marketing-analista.toml",
+      "sha256": "b0e080e7a27371308a505a8a7b326f54e19c0c05bd8765df7a930f1ced6b4a1a"
+    },
+    {
+      "caminho": ".codex/agents/marketing-pesquisador.toml",
+      "sha256": "bab61ccc7ba9ef3fed714a88c5c81ba8adf5c91d4e598061fd8e5ccf8475c1bc"
+    },
+    {
+      "caminho": ".codex/agents/marketing-revisor.toml",
+      "sha256": "7c192d0e1facf3fcf924bf8cedb58ab7e82b946654bd7235454c2068a24b4fc1"
+    },
+    {
+      "caminho": ".codex/agents/pmo-conferente.toml",
+      "sha256": "520c76ca810ecac81797b4d8c9b6908881ecf7fc8ef74daaa4895bdc87cafd2c"
+    },
+    {
+      "caminho": ".codex/agents/polozi-sistema-qa.toml",
+      "sha256": "791fa65629b31856b4ef2f7c5f1eea541262cead6920d85faf85fad79ea26e8c"
+    },
+    {
+      "caminho": ".codex/agents/tecnologia-revisor-seguranca.toml",
+      "sha256": "a7eb200309b4231b140b3895f1ac1540ef51e2bf0e611349564d5c0934f302c3"
+    },
+    {
+      "caminho": ".codex/config.toml",
+      "sha256": "15c082bdcea0fe22b79b97de26cce198e62b6980594d471b026dd7b4b36665f1"
+    },
+    {
+      "caminho": ".codex/hooks/guarda.py",
+      "sha256": "0c3a93a3c4b0ab3c2976412586a08f2cd79aa5ec4339a6465c68f27ef02daa12"
+    },
+    {
+      "caminho": ".codex/hooks/registro_trabalho.py",
+      "sha256": "e033714ac4aa7d5f79b7b0cf24633ff5752e6510e471376c76c5702ff256ef3c"
+    },
+    {
+      "caminho": ".codex/hooks/verificar_estado.py",
+      "sha256": "4cc38c4e547bdf416d5f187422a7c9deb5b98109d12c491e91ef3efa6b1dd3bd"
+    },
+    {
+      "caminho": ".codex/hooks.json.modelo",
+      "sha256": "6e2d598b2440db1871d101a26ac08247e43fbc2fc8450ba7992e690b75b1b981"
+    },
+    {
+      "caminho": ".codex/rules/empresa-ia.rules",
+      "sha256": "59818d9cb3a225d0ec747680be73d28861558b5797a5dbc6c907e3666a7bff20"
+    },
+    {
+      "caminho": ".githooks/pre-commit",
+      "sha256": "653d9e51175b020ff6942c8da9daf3728b96f1f1a1329f0409b86e2f93d9977f"
+    },
+    {
+      "caminho": ".githooks/pre-push",
+      "sha256": "a4adc26fe6cad24ab921ff2177b6429ddd2c4a9c8315616c2acfbe3c692ccb8b"
+    },
+    {
+      "caminho": ".githooks/regras-segredo.sh",
+      "sha256": "fbc1f383c7a5540777f51cb7e453a24926ceae5e02ce6539895495e4a485c5bf"
+    },
+    {
+      "caminho": ".github/dependabot.yml",
+      "sha256": "e1ed24c14f9176bbe14dc2d2492328102ca2a89569bbc6b6028f2f08fbca1c41"
+    },
+    {
+      "caminho": ".github/workflows/deploy-db-homologacao.yml",
+      "sha256": "14469edcf0ed6daec2bc28696bc2a0c1543565154edef79978ee7112b027f04b"
+    },
+    {
+      "caminho": ".github/workflows/deploy-db.yml",
+      "sha256": "511cd566463e89266bfe25794db0cbd7a9ce32982e4bc1a7801291f245a92d91"
+    },
+    {
+      "caminho": ".gitignore",
+      "sha256": "f043d737928fd6e9b92adcfd2db0798eb0acbb70fc53ec959cba4d5368a30bc2"
+    },
+    {
+      "caminho": ".gitleaks.toml",
+      "sha256": "093aadb2bc5a93f50048cc13d6e229d89f2bef5bdb1026b94e8e204316fdd4c3"
+    },
+    {
+      "caminho": "AGENTS.md",
+      "sha256": "33f4ab295cab616ca6424fe2203f7d94a0d4e4a0d692c9b583012ad2dee1b604"
+    },
+    {
+      "caminho": "CLAUDE.md",
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49"
+    },
+    {
+      "caminho": "README.md",
+      "sha256": "94bf7efff40404599f1e4d2d719760232d49171eca3dec78fb87c089e50687bd"
+    },
+    {
+      "caminho": "capacidades/APOSENTADOS.json",
+      "sha256": "0ffffeccb11eceb2fa21a4ffc5de2669c8c542e6fd444f144f1309994f2556fe"
+    },
+    {
+      "caminho": "capacidades/LEIA-ME.md",
+      "sha256": "60733eec83b6ebd5f76ebf88cd7d4bb8bf4d40e711a56481f5a309ce0f4cb615"
+    },
+    {
+      "caminho": "manual/LEIA-ME.md",
+      "sha256": "bbca69e9535f9cdacfea0987feae09bbaaf67036f44b44e8a9ccc359ca576165"
+    },
+    {
+      "caminho": "manual/como-trabalhar.md",
+      "sha256": "6bab94b996e14b1c06f1fcd6898f44656b5eb0c2c752273284b58ec8a719d931"
+    },
+    {
+      "caminho": "manual/conexoes-e-seguranca.md",
+      "sha256": "1a0b5d70d2c80aea461fe86e319232ae5e981b9bf6f0843367ec68e0ccdd81c7"
+    },
+    {
+      "caminho": "manual/fluxo-operacional.md",
+      "sha256": "8a5dbea1aa4e25b81ad3911d06fac45b1be5a15754d31488fa842eba212f709d"
+    },
+    {
+      "caminho": "manual/modelos-e-esforco.md",
+      "sha256": "08df239d60e86c1bf62fcae49dd40cf7378d52d530c1de9b94e080846b050223"
+    },
+    {
+      "caminho": "manual/qualidade-e-encerramento.md",
+      "sha256": "c522fe8c09a1c8bbcfa8d87471a48d13a9364309f1254163b38e7dc6a6235959"
+    },
+    {
+      "caminho": "manual/sessoes-e-contexto.md",
+      "sha256": "6f3d1e9b8fbbb471761f8fd4a97440d8fbd22ad2ef6994aed1a0172fcac80a75"
+    },
+    {
+      "caminho": "sistemas/AGENTS.md",
+      "sha256": "8377c9393c3bb3b5afaddce2c08a225e3da3bb3a201c20520cd92ef0757768c6"
+    },
+    {
+      "caminho": "sistemas/LEIA-ME.md",
+      "sha256": "3100550f7042fe0ef7aa15fdeb167f1532de8e71191c2f61f187cb446a1d1cb6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/.github/dependabot.yml",
+      "sha256": "e1ed24c14f9176bbe14dc2d2492328102ca2a89569bbc6b6028f2f08fbca1c41"
+    },
+    {
+      "caminho": "sistemas/empresa-os/.github/workflows/deploy-db-homologacao.yml",
+      "sha256": "14469edcf0ed6daec2bc28696bc2a0c1543565154edef79978ee7112b027f04b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/.github/workflows/deploy-db.yml",
+      "sha256": "511cd566463e89266bfe25794db0cbd7a9ce32982e4bc1a7801291f245a92d91"
+    },
+    {
+      "caminho": "sistemas/empresa-os/.gitignore",
+      "sha256": "f52124e4b7d3bf6b405389545d670cfe91eddd862e6ed6524d0e464d013a1d21"
+    },
+    {
+      "caminho": "sistemas/empresa-os/AGENTS.md",
+      "sha256": "56038dcf67330c675309d51006bb78861285ce715ccc65ee73619caed77e7526"
+    },
+    {
+      "caminho": "sistemas/empresa-os/DESIGN.md",
+      "sha256": "8e222bffeaba34937221491d370563a147b21d64206e7e0c1edf6121bf79600c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/LEIA-ME.md",
+      "sha256": "44fc468320bcd55e5403e97afd9ce642f20dd584c3f9d5e12c121ac5e2c19f48"
+    },
+    {
+      "caminho": "sistemas/empresa-os/conexao.md",
+      "sha256": "04f1073f0c3ad28cabc1b57c9bf48588ec477407c1ce5ea1c2dc09ca729be7c1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/agentes-nucleo.json",
+      "sha256": "ea5cb5e1e364a6ba46ca427ae237f8d4b754ca9551299f9fe16d42bb17fe168d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/agentes-nucleo.test.ts",
+      "sha256": "95e4bfdd1257c0025340b32c2a472f5cd6a36f456ec1ad3f32d695a90fc579c2"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/agentes-posicao.json",
+      "sha256": "a43aaf0aac98c2f6620c3c075a082b4e0c5a102703ad0432254a3598aab67e0a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/agentes-posicao.test.ts",
+      "sha256": "776317876b603343639653c7c0b40921fd6487fbc5dc78ed5c9f8f795e620692"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/empresa.test.ts",
+      "sha256": "525337ba03f834267059fe226f706b5214e6be79d33d83e94bdd21d5a9d9b4a7"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/empresa.ts",
+      "sha256": "c29d18e594c0e8103b200a6b650fb046eaf66a70e10edbe68a5eb73bc633b72c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/leiame.test.ts",
+      "sha256": "65cd8f28ce8023577128c607e5232709a290d223527f14f1e10caeb6c720fcd6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/marca-tipo.ts",
+      "sha256": "131444779ccc3d8cbbe4698fcb9085c07ec365d3665a2a2ad8727fea3fa8040a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/marca.test.ts",
+      "sha256": "d7f1acb866f0530fc802d83e6454ce878f3b3932b6a4657ce6bfd0bdb9a8a0c9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/marca.ts",
+      "sha256": "4bf034eab10e3c797549d78b604adbbf302a28f35be2d6e1e8d71014a6a56200"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/organograma.json",
+      "sha256": "d34415fce94950a5d13928e65c1070756ce08b5480755f00b21fdc378cbd89dc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/organograma.test.ts",
+      "sha256": "d1b466b478f801cfcdfc30ec9e1f5b1030b2f9363e40ee5679e803a2c4f301bf"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/plano-reconciliar.mjs",
+      "sha256": "24197d2d4933b589f203834f831bd51c0c8a7ac2946d4ac5d4efb3fe8e4cf298"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/plano-reconciliar.test.ts",
+      "sha256": "e1f4ae5376fbe426c0d95cb1a81a06df999db0c49e423353a51b8edc6f327b3a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/planos/mestre.json",
+      "sha256": "2b21ad48f440e16aa95c64a43f316473e1d17d78840277f99c90c84f411ebff6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/planos.test.ts",
+      "sha256": "9704d7985ca301781e8e147378b5064bfdaea407dac8aa23cc3f2c1f1c10db08"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/senha-dono.mjs",
+      "sha256": "89c906d564855df6f8abb593c7e0fdcc1d7e69c86fc74c1273dca29bf57eb231"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/setup-inicial.test.ts",
+      "sha256": "c3f343692f9816371ce96a85175b8cf6058c71729a19d44985223a16b71d2651"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/supabase-env-servidor.mjs",
+      "sha256": "3f132892c351c96aef5fe37404c75c9483a93d2f58063a104acdf17c0513f8f8"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/supabase-env.mjs",
+      "sha256": "5514255a2bb21d369e7a15591a744e2002d5caf9aeb26741ba2ea0b800d49563"
+    },
+    {
+      "caminho": "sistemas/empresa-os/config/supabase-env.test.ts",
+      "sha256": "7e7f897782e9bea245f3bee7971f1c5b540e50da8f91db39b0f016cb6c982065"
+    },
+    {
+      "caminho": "sistemas/empresa-os/eslint.config.mjs",
+      "sha256": "94ba2b8f8a0c0d68380d657964b5e6b4e6972c66a9ead42d3dd858ac0a7aaf51"
+    },
+    {
+      "caminho": "sistemas/empresa-os/next.config.ts",
+      "sha256": "bbdf95eaad73dfdab6cb44d2f68e7841bf580afb4e2a877f31bc4f2af2945642"
+    },
+    {
+      "caminho": "sistemas/empresa-os/package-lock.json",
+      "sha256": "f1774671614699f20f787669ff183290036a7153c3de929b824d90c51956f03c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/package.json",
+      "sha256": "3704261e8d6a674e3aab596ab016e9e12679546545cab10aecf2c9dda0059a11"
+    },
+    {
+      "caminho": "sistemas/empresa-os/postcss.config.mjs",
+      "sha256": "dfac7ac2d86d326a0e5adb024e7943c181393ed17a5fcb8f0315b24c7da6ddde"
+    },
+    {
+      "caminho": "sistemas/empresa-os/public/marca/logo.svg",
+      "sha256": "40cb8c2dcac0d83983768dce1d434d38dd20537063bb60f8d535a97c5f7ba9ee"
+    },
+    {
+      "caminho": "sistemas/empresa-os/scripts/gerar-zip.sh",
+      "sha256": "aa9f24d530f2628f4248def8f707f593d76adf7a34b1d03778c9113593b0432a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/scripts/setup-inicial.mjs",
+      "sha256": "9969c5d0729c6b8e566e2482a1326444434d965e15fd0a01c749adaa0ae71fe6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/scripts/testar-migrations-local.sh",
+      "sha256": "6e8f68345122a12b7654087a69f04ff562bb1b9ae7040e1ecb73550157f95cdc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/agentes/[name]/page.tsx",
+      "sha256": "2ccf10c18fd64f3ac47381a7c1d43ee065abbcda2db0e89633005d15eb1f1cc1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/agentes/layout.tsx",
+      "sha256": "fea5b458553ec9ac7fcd13deb27f6b0c371dd0ef824c2b9720adbd25e19f8ff3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/agentes/page.tsx",
+      "sha256": "6eef6d80cef77cfbbb5150901e7e7fd318163339bbd4c84757f046d6035f5156"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/agentes/skills/[nome]/page.tsx",
+      "sha256": "bed8646bb4fe05d6170d565c3ebca575d1d4cb5ccef814798755f0a85950d6e0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/agentes/workflows/[nome]/page.tsx",
+      "sha256": "1b341df8a7799b5d5303f983ef392c1bb417ac927ae9c374aed63e651f4bb55b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/atividade/layout.tsx",
+      "sha256": "809f13ada6b1e9c0b4f22983eddf4830c9dfc95d35c9cd5f5d6bb7139a477939"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/atividade/page.tsx",
+      "sha256": "551959bfcbd960af47e4ffe79c25094ea93eff146515759dde3d1655fe13bcd9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/configuracoes/actions.ts",
+      "sha256": "daf9edb72e188316f8eab237a3282c2358ee531a47a8810cca1fa516ab6ecbc4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/configuracoes/layout.tsx",
+      "sha256": "5fe48d60f172922f6b266fbc82ddee2ff294866f566bf60dbdcf629ff4f19363"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/configuracoes/page.tsx",
+      "sha256": "55e2337870a19a6fb9066a8532a124a69a749f209853b55a7267fb88dddf1c42"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/configuracoes/whatsapp/page.tsx",
+      "sha256": "75cf331add246853bb546ec33f52fea7395fa7efcb14dc1d7ebfb724324c9ac6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/conta/senha/actions.ts",
+      "sha256": "4a999f8cc4a676ddf685f0a5d7bbade45120935e7dc5da764c4c3a424a2260fa"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/conta/senha/page.tsx",
+      "sha256": "f5e8c13e110d1af812bd8090d7ed0ae6a7059a4d71d3cf890167faa1abee0d9d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/cronograma/layout.tsx",
+      "sha256": "4a8ca71efae335dff364093e46a8f767c5128778e8dc1f3d38fb82d491ceb01e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/cronograma/page.tsx",
+      "sha256": "14477cc8d42c22e8f88d6fe09e7f1f166537827426c3ac40af6224908e55c8d8"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/error.tsx",
+      "sha256": "52cb5d7c77115d7411e8da8edb473fbe6b77f9655d4a0efc70f44f769dfe45a6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/inicio/layout.tsx",
+      "sha256": "5c34f36ac246d00b0d2f12e13f3d4574f23738d81b11617748fba3d9d290506d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/inicio/page.tsx",
+      "sha256": "373ea254d8e3ada510dbe3228a8436d19975a23234cfe105aa09e2b013b3b5e7"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/layout.tsx",
+      "sha256": "2c0d75784cfa5f1a653a1a8294728a54aaa2d4eba723d8ba040c456ad1878286"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/AbasMarca.tsx",
+      "sha256": "7b03793fb3ccc0036c025f43645b6ee9867fde7005226dc2ec0a2e39439e675d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/BlocosPersona.tsx",
+      "sha256": "0877f2a9f9b740bee3203b176377021fb97847835709e2b4fe09a712b5fde1ed"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/BlocosVisuais.tsx",
+      "sha256": "0fa1fe4ca126b05ce975b1ff2cc91000e7704c09b9168fdbc970f993585f04aa"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/EstudoPersona.tsx",
+      "sha256": "1441029fbbc90c5e754ab6cc5b6ece804fbb77ccb0525c93e667eda249baed73"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/IdentidadeMarca.tsx",
+      "sha256": "07704a0dac10a93a8a3092e265273cf4f60134354277c1d3a7675be34fad68ea"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/NavDivisoes.tsx",
+      "sha256": "a8222c053c8a71b48f9db42a6bffabdec3edef4d501453007ef5d93ae94355f1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/PainelDocumento.tsx",
+      "sha256": "1628c7a87fc84a0bf2662f44f4c1f9cdd258957bb8b3fd06ab5605d1b3543912"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/PersonaMarca.tsx",
+      "sha256": "b683361475f0b87b5cf7fcd80b9ea390f330a08b6cf07c00ddd31cefaafe66b4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/estudo/diagramas.tsx",
+      "sha256": "6e7b421db335a07ca994a3e2c83bad627fdfe73a29800468a65e428d9f05a2c3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/estudo/pecas.tsx",
+      "sha256": "f2f984dee6d929ce32039ea5b129c8e1883494c14748dc084498f0f16c88a5a7"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/_components/marca.render.test.ts",
+      "sha256": "bb4491f0808c73984ae81cba52d9d405690823c0444e7fb7a6db05ff77ecc21f"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/layout.tsx",
+      "sha256": "d09f8c6f0b8387ff9a5e1b0f5139e139847e63f2f4751a5fcd3e957a13fcd866"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/marca/page.tsx",
+      "sha256": "6d816c7cee6f0553d010aa7700b795217656b502c1df6b6c9cffe8655d23ef74"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/mensagens/page.tsx",
+      "sha256": "0cd134ba8e0ecf4c1c36190ca5bb9ca15ce58ab63406896eced83ba156f14f02"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/AtribuicaoOnet.tsx",
+      "sha256": "8f6536fbdf4ccd202ba9888f7019a9f682cb83cb4bafc419ad45a20e42b5d57d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/IndiceCargo.tsx",
+      "sha256": "17f8c4de16cba8b2ab83e5a9cde6b1164e41c9d2dc670b0abbec9a534aa2f66c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/OrganogramaView.tsx",
+      "sha256": "984396d6d23c93df054708ce163438796524408caecc16126daa732fd48ab76a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/PacoteCargo.tsx",
+      "sha256": "f772f888f93eb4ce105d67a0d04e801007601a024b3e5ead90afea2bc2507ed8"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/PainelCargo.tsx",
+      "sha256": "beba9b1789f03b569b03051dc2852bf5902f8cd961fcd99b9898ac009e48be3c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/Palco.tsx",
+      "sha256": "1a6c1c44927e2721479095b5e8603d18233fb4efdc4fe891e3f0d8636611b879"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/TituloSecao.tsx",
+      "sha256": "5089c2d06c8a0a87632229cbcde426c9f6d31f3135de1ed6d10cf6a52b51efd2"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/Workflows.tsx",
+      "sha256": "949234f98819c5333e6590985548031d689e8e7b54d9ac6b02d8e34da2bf442f"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/atribuicao-onet.render.test.ts",
+      "sha256": "11cbf65bcd45375f0997dc274dbb8df68bb3ebc57fb3d5d5a59b073a1b383609"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/_components/summary-playbook.render.test.ts",
+      "sha256": "e9ac22e7465d411756de6c77233bae134071699fda91680d8ea1cd7f8805c378"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/layout.tsx",
+      "sha256": "40c0013f3248506542e5b6aef8434f3545d91c32a6a38800092c4f47f81b5abe"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/organograma/page.tsx",
+      "sha256": "01e606414bd9ebb5bc9314beb1bd2a2ed42ede341e81c8256d4ccea8d473dc15"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/tarefas/[id]/page.tsx",
+      "sha256": "7a27b169aa64fbedf965c2c99408cf1e86c3ca323ac764eeb0533a3def91e2a8"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/tarefas/actions.ts",
+      "sha256": "df8ebf0a9185ae05c487eeb68ee3afa17ea2866a0d6052802deb035d07a69265"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/tarefas/layout.tsx",
+      "sha256": "a0b5b55727533595e6b9b93f05ae55f8b599b4a9c3f2080a6cd65bb325cc5fbf"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/tarefas/page.tsx",
+      "sha256": "c1aa57c3bcae22466c7832fb46729347a20db19a5c4b0ff496442b1d228e8fda"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/telas.test.ts",
+      "sha256": "4a6e9c2ee964213e496403e5a49e884df666543f446c92ca9395b85098f823a0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/template.tsx",
+      "sha256": "a1909f8c80cbdd79e2dc43fc7896ee6f3a862eacd1178e137656bd60f11182f2"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/usuarios/actions.ts",
+      "sha256": "a600a3a94feedaf8308a5044eceaeefe8e11126c12016eadcb1aff24e0ef901e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/usuarios/layout.tsx",
+      "sha256": "ac33e74088db05f06da74c1a8793f4ff5d0178db21c7a16e2d4c0264aa593bea"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/usuarios/page.tsx",
+      "sha256": "a377be22d0a553022f85bfd508134e083303857563463997c2f1b56886ba2c39"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/usuarios/regras.test.ts",
+      "sha256": "b04d812e85c6af55c6ba57d4c73223362951bbc21043817dbe4a4b9a5acd4d35"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(app)/usuarios/regras.ts",
+      "sha256": "67123272f9e92c10262447e5369c0503d09c1764115af40cabfb1f0f57ef41f4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(public)/auth/callback/page.tsx",
+      "sha256": "80019811f543379d9cd9494532ee81dab4dec41ec6abf702a004e975c91ebf41"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(public)/auth/definir-senha/page.tsx",
+      "sha256": "4fe28fec66b18f19ce222aefab6f319e0aaa27c1cc7d0e4d3f3831a876239450"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(public)/login/actions.ts",
+      "sha256": "02a58a122ccdfac9c351eab9a5d7b987ab6366160bde6b87be039e11f9bdc568"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(public)/login/page.tsx",
+      "sha256": "1e1d221b32cab04f1b90ec581e4ee65fe1fc146f20b2a3d84ded10b20f1b7800"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/(public)/sem-acesso/page.tsx",
+      "sha256": "3fc6023d0ac9cab95f4bcbc7c4fbbd7ec95542de4ed2aaee25860b8bca0ed5e9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/api/keep-alive/route.ts",
+      "sha256": "ba32d61c4e1f77fb41ebf0aea6fe1de6f4c95b8dfc49e09db37ce3c3da23b915"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/api/mensageria/dispatch/route.ts",
+      "sha256": "86e1788ed2da57f5d0f2c863ad2f32c3ab2c5b2b24e6c58295297b6078d73a53"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/api/mensageria/media/route.ts",
+      "sha256": "eed843d7b4891d11743d84c54b8aa6aca7d1b89b9b74944006a1dbfdd758a84c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/api/mensageria/meta/route.ts",
+      "sha256": "56c81cdc5a5b81d328127c0e5f7bb169f3936d71b885dd6eab65f62490fcbdcc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/api/mensageria/templates/route.ts",
+      "sha256": "71fce46e640c0237a3bd4eba403b9c7696f2a59815a40bd124cf6ef3db30d268"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/globals.css",
+      "sha256": "80ea9e2b3c92679f0665a0c0d51907b94e08d2b2f4a0310f283650df436fd633"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/icon.svg",
+      "sha256": "71cfec7ec23741293d82a513e877bcda1a3b31d36331b0a83ca15b0ecdd265ee"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/layout.tsx",
+      "sha256": "00b1301634715b77ae4ebb058578c7af07ce87fbfada4b9406322ebcf4c1702a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/movimento.test.ts",
+      "sha256": "e1155f8dd442c9825e8b2245028c05f44699783aba0a113587935fc9e244dc60"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/page.tsx",
+      "sha256": "e4f81c320f2cb955e49d808d5378ce2eeec0818de4847ee23a5a2d0b006184d7"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/app/theme.css",
+      "sha256": "c85ac9f61ecb55deb9d064d4dc97bc8267590ca4c925b517626c8b45fbab13d9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/admin/ConvidarMembroSheet.tsx",
+      "sha256": "861834781ada6e2b58f315e3dad65b2bcd77690471a3f722e4bd1e96095ea2a9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/admin/EmpresaForm.tsx",
+      "sha256": "9d97b9db0f4c90837a59433a6dd687ae65a2a376455c97b25be750f48bd30179"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/admin/GerenciarMembroSheet.tsx",
+      "sha256": "b9f2de2b076bb6de23006e03564a2e6cbcdd410cf771073092ec3668b3755bf3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/admin/MembrosTable.tsx",
+      "sha256": "fd2b2131ee55504d4fd7b4a04cec38a4fc576c159141cb91ee3e5bbb75995dd3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/admin/MensagemDeAcesso.tsx",
+      "sha256": "c30908d1a468726e1f3386492c112ea069eb723e52a82ef053db7f03254b4421"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/catalogo/AbasCatalogo.tsx",
+      "sha256": "6c61d6e019e8e024171582c17a569cf6c18c16ad4c0f5c3a46bd281578084d8c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/catalogo/CardArtefato.tsx",
+      "sha256": "8b5efdd666ae02b4627f264058dedcdae9855246b68ad74b13e0a65d60ac0510"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/catalogo/CodigoDestacado.tsx",
+      "sha256": "a776eefb4a3def3446d99f318b9c46e72e6bb1f476ee1b493c8c525c561375d0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/catalogo/DetalheArtefato.tsx",
+      "sha256": "500a9aff07545e1e71d499541f82667fd464c1ff7ca084a6a662a3b686afd4dd"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/catalogo/ListaFiltravel.tsx",
+      "sha256": "15f051c5bca9ee58d36d810649c02ab38cefe9ea958d43db566d9105451859b5"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/catalogo/catalogo.render.test.ts",
+      "sha256": "8527d49ab7feeb84de9979324849bdd41f0018e543672854768e96c1504e82f0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/conta/FormTrocarSenha.tsx",
+      "sha256": "34ac7ce6ffe1ce4c94d89c6410cc0a4dca6acc243871306aeae7fef10367bce5"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/cronograma/BotaoCopiar.tsx",
+      "sha256": "3f83928e84f40fb2e6c732e7aec8494f43eef2218e480bb9069fbe56e2b80484"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/cronograma/ComoFazer.tsx",
+      "sha256": "aba5a7717e4e7438bdc411912e68c0723cae9a7125118cbc0b5fed67f6fc47dc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/cronograma/LinhaDoTempo.tsx",
+      "sha256": "2512ed7e1983ebc6dd2fd2c037b43e0cb09a1aab649c9710fc4ccafeca98874c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/cronograma/PassoAPasso.tsx",
+      "sha256": "69fd23887bcf84185f4259619be61e51df34d78ac6c08265ce3adaee9f83f8bc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/cronograma/como-fazer.render.test.ts",
+      "sha256": "e7473a298fb3d209aa86114c0f4387384d71fda6e9fc6712fe804e05fa1b42a3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/cronograma/cronograma-telas.test.ts",
+      "sha256": "4fe448b1343365753549c8936265eee2bebba026f1b926d63ba6e4dcec3d27c5"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/cronograma/cronograma.render.test.ts",
+      "sha256": "534bd595a2de966bc13c9214e20210b70faf62e49fd108a7cf94dd0eefbbafaf"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/layout/AvisoSenhaProvisoria.tsx",
+      "sha256": "53178c1852947e72c8bb596ebdcdd518f09de828da19e6e0e9abce72c98bbae4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/layout/FaixaTeste.tsx",
+      "sha256": "5684da5e395f76e971f37a793510304680e97b2c5cebfe618b763457f08829c7"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/marca/LogoMarca.tsx",
+      "sha256": "3e09217095b4ac2940f77de66a74f1368173621ac3798d810ee5bdc9528ea7ee"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/mensageria/AISetupGuide.tsx",
+      "sha256": "c7e08eb828fdf3d57422a58006c78c9ebfec789bc6caed113aff6c385765fb45"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/mensageria/AccountSettings.tsx",
+      "sha256": "3c003df61a4f4a4a0427f4de0c9486374600a4256861e4e660e4f5d7cfd15115"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/mensageria/Composer.tsx",
+      "sha256": "6b7aad55d705f0ba602a5ca54594b999afbc2808089a236ae115f3ae9b0651e0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/mensageria/Drafts.tsx",
+      "sha256": "cb50e2067ac3560136b3514b8000a304f86d14cbd9dc1eabd29c12d59eeb223d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/mensageria/GuiaCodexDialog.tsx",
+      "sha256": "2b3e7957acb23b1a8873f34666eb73822c02037e7704e0874f3c30d07b21cf05"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/mensageria/Inbox.tsx",
+      "sha256": "2cb168be3f6427aefbbbd4bb15f357698e02848d4e4a353358292e22a4038a1b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/mensageria/MessageAttachment.tsx",
+      "sha256": "35122d3f64279f0978942596af71f4c5425cd52e55a9be3729e11286409458d9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/mensageria/VoiceRecorder.tsx",
+      "sha256": "6a83bc690cd86dfa27e47b7b436e0537f8b2e5a9fade227670c94aafc7f82732"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/CardAgente.tsx",
+      "sha256": "816c345f7053c23bbe453cbb9c46803f6a2ad6deef39ae6442304221f030cf33"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/ItemAtividade.tsx",
+      "sha256": "7ed8ddfae5903c6ffee67f0b390792b8cf3a0c446421153e0eb7b543246b3814"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/LinkBotao.tsx",
+      "sha256": "aea96da4a42fcce5a5c8c41cf463ca32c3dac21b3a47636176c2bbb82091e28c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/SaudacaoAoVivo.tsx",
+      "sha256": "8b37fc5223a7531ec18f8cd99c86ee2afbbb0c2a0e86340f6e5431397f65a4c3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/atividade-dados.ts",
+      "sha256": "704a040cea88398ae3ee1ad94d8f12f82d19c8bfb5e76a7c27f77593110967ce"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/atividade-helpers.test.ts",
+      "sha256": "2508c463527c34b9b996c8087b0058e89dc526c750a04b2bab529353bc77127c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/atividade-helpers.ts",
+      "sha256": "cb96ff51d6fa971a455e268f88307b58aa44b58ca9fc32351b82d709b2127370"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/saudacao.test.ts",
+      "sha256": "3b124879008ecd646e9e69e0c54ecc60603801bdaf6f85ef69cfce238a4932bd"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/painel/saudacao.ts",
+      "sha256": "65cbd6b8aac26b653e24075e911c467c8c7ea0d817c6b6bec7f06451d43be6b4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/MobileNavProvider.tsx",
+      "sha256": "d911014593b85ec02d61405c318064ab251b40585658dbaf352e3c2059de6a31"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/NavegacaoProgresso.tsx",
+      "sha256": "1ab6196dc4799236d391d3826086a7d60eebbdf4f99620f1da7b8f8eff5b28c8"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/Sidebar.tsx",
+      "sha256": "451c077c4718c5410bc949bc471e9c611749e236797a157a712612891016ae7d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/ThemeToggle.tsx",
+      "sha256": "db6b8086bc56bb1ca688d45d4bc3abd46ff55ec938f0562b74881d071e5ee1e3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/TopBar.tsx",
+      "sha256": "ff6362ee7b6da778cf5b5f7098fbfe1b78f0d23b75ae65bdf68a146a3b991c1b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/UserMenu.tsx",
+      "sha256": "c7bb91f3e9a89782f2875e03d3ca28af0d2c51f8816ed5d5eaee5a8a0394edeb"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/gaveta.test.ts",
+      "sha256": "58cf1c17c3fbe35fead5777e3cee60b94ab6d8f6812a2702a716354ded9690cc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/gaveta.ts",
+      "sha256": "3fc47b44e5ab2d56ea1f55e1ce6253bfbd27e9516ca64b6fcaec32fcc3dc2cf6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/shell/sidebar.render.test.ts",
+      "sha256": "ee35e04c00293513ad51f128c6bd70eb6fab90f6156c019fce92db4d67467b0e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/tarefas/KanbanBoard.tsx",
+      "sha256": "ead4859d36dc00851a5c108543bf71d93b208fccf1202824895a0e34d5ad79c5"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/tarefas/MoverStatusMenu.tsx",
+      "sha256": "0154cb6a27af8e5f85f073054d79b51a60bc92c8c990c2567f43263aa9e31da6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/tarefas/NovaTarefaSheet.tsx",
+      "sha256": "7f9e54c7d245df2f7796d720c75e60a777ecf58e2fa8198499f6980dccb5a5fc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/tarefas/TarefaCard.tsx",
+      "sha256": "ce113efb79714997a6761e539305268a98206b0991346852f67e8f21476aa880"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/tarefas/TarefasTable.tsx",
+      "sha256": "cb951bc474619a94a41bb2837943f8053a290f6e3b9d9c4f7f365f34e18baa14"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/tarefas/VisaoToggle.tsx",
+      "sha256": "7456b6595010e2537665fc05b4a30f6b8a32fe30223ee91cb6186660649f3570"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/tarefas/pills.tsx",
+      "sha256": "a9970a1baf925b5ce68f37dd9386f385ec23711bcaa5434ba91011aa9d7edd47"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/tarefas/tarefas.render.test.ts",
+      "sha256": "510f6ad1ed5f58e8043da8ebf24b6ad27c177474ead6305f676cf188df4d5c58"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/Button.tsx",
+      "sha256": "9738ed40efd78c0df56d7ddd48d6139b8298d9c5ad19488a00dc650d30036aca"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/Card.tsx",
+      "sha256": "2341288adc4090134b6546fcba8c223358e1471d6b31e5c5daf7f715d8523a69"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/Empty.tsx",
+      "sha256": "28af68350ce39c537ae2ab87c78292c3484146fea72e1e612a60b4bf3241f500"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/KpiCard.tsx",
+      "sha256": "13ed6ef8124fd4462fb9c35add5f59b72e685f2aa3ec03ee33bcfb66181ad09c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/LuzDoCursor.tsx",
+      "sha256": "fa77632c8d6aed248c0b1b6c26d2f4c5060d7f1eec547b60e3c7a222fcf80f7e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/Markdown.tsx",
+      "sha256": "47d8c11c0c7f3524c02379526056fe73b8adcf879c88629184fb56bc26f9cead"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/Pill.tsx",
+      "sha256": "1fae2e3f3eefd08be38efd36c60de5893f5b0f9a8943c8a1d4e06701923941c4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/ResponsiveTable.tsx",
+      "sha256": "1eba78618bdac75557343c27c4e4779cd869bdc8dcb4f596fb0fc99f297d83d8"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/SegmentedControl.tsx",
+      "sha256": "ee3771dce95f52ba7dbdcc93f1930b166d348fea75c8c7657cad838de258f23c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/Sheet.tsx",
+      "sha256": "c79f61494d78821555571367a2cbc565ec46c6d5059473db913cd523f05ec807"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/Skeleton.tsx",
+      "sha256": "15fed1dea894410e091454fb756044242974a02b8900cc44f8507bb4bf1f763f"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/TempoRelativo.tsx",
+      "sha256": "6c381b3f9cb6e8604f451719935726708ace28f2d4767aaa65c7dd66ea0793ed"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/components/ui/Timeline.tsx",
+      "sha256": "551e5e3ddf1be0d2aecc253485f5330622fef76ca856dfc0e0d4ff5f5e916a35"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/action-result.ts",
+      "sha256": "13c823cde0be4c227fae1cfbcaa398c44426fa8a713771431b763443686ef9c1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/agentes/agrupar.test.ts",
+      "sha256": "429f3291f9f1e05dea288e76f83759219efdf4b35835d3f2324bbbc49b8c3e2b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/agentes/agrupar.ts",
+      "sha256": "bc8618042a32208a718bde4b28798357637ce42de10445f0cbf5b37e049061a4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/agentes/detalhe.test.ts",
+      "sha256": "aec942fd47e95aff2e1b841eadc05b950d24ecb769d67154bdd69e9d5f90d354"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/agentes/detalhe.ts",
+      "sha256": "aa7edc667da5f6ac5c0b5824a3011936a3726cb6131823c5b8278981ed044598"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/agentes/nome.test.ts",
+      "sha256": "58d6d05936830b7b3683a6d6ce22a9b6e0305dfbf459b7be736167630da41dee"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/agentes/nome.ts",
+      "sha256": "dcc3b2585fe41c0acafc2ea113ad0684710fce58cdf295f12255db749ea567c2"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/ambiente-teste.test.ts",
+      "sha256": "6faf27cde834113f69d9f6fdb7d2cb1a5dd42848950397eb460b56abc7e8e68e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/ambiente-teste.ts",
+      "sha256": "07c743e4561d985c94cbe028e120cda8ac6b903c06a64aa2211894cef8a31370"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/auth/PermissionsProvider.tsx",
+      "sha256": "7f33386b7c98057ed17a6b9668e50b58218fd7b5e85c3d095d696447d46ded8c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/auth/guards.ts",
+      "sha256": "b7b2768ca16c0912f4d32da5b076cc7c74c559e83b9094b92db709ca53f7d60a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/auth/permissoes.test.ts",
+      "sha256": "0c427adb286efc721abac5a460a7abf568899cee234459aff5f269c7d5c9ca07"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/auth/permissoes.ts",
+      "sha256": "ccccc498e3e58ac004b3dea95f48790ce82cdad33dcf395d3976f20f4478483b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/auth/sessao.ts",
+      "sha256": "cd5a7be7a6f41dd36f3a26479ac21c5c48d19f8ad15d4e852bad4afa1ac6f719"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/carregador-tsx-para-teste.mjs",
+      "sha256": "a55f4cc058ea1b456186f4e2004d105052cc90e06ea74a1e493b68df8564df6a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/catalogo/busca.test.ts",
+      "sha256": "9b7e10ad746e1b64446f01423236565090284c2118a833b7fd97e5f33c9840ac"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/catalogo/busca.ts",
+      "sha256": "8d877994f6f8454edf684a72c2d6de3b47a5de1034e9ce3d7a60b09304a8fdf9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/catalogo/catalogo.test.ts",
+      "sha256": "10faa648f4e1558810ee0edfbcb0143f6094c39e8df09fcc8f0dd24d1c23e3b4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/catalogo/catalogo.ts",
+      "sha256": "eab81f8c0941ae55d69f06b1f91b393d4281a729fde3bf8c48c04276664afe87"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/copiar.test.ts",
+      "sha256": "70f6630d5dc44a22e7640821e5c35882651d643d78b5fcee693b256a5e172316"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/copiar.ts",
+      "sha256": "954e5112a33822d6d473189a5cc3e2a9d97f94d41c055dc8ded74398529b7bc6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/cronograma-dados.ts",
+      "sha256": "a21ed60a776bc0544ab653aee2252e6e35f2b38d51a2abea659eea5e4350b18b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/cronograma.test.ts",
+      "sha256": "c2b45abec1160f9217fa53900d1e177b6e740d0039c3d542157b9436ad32627c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/cronograma.ts",
+      "sha256": "ee4096634d4fe6a75b9418378c412d5903150a7bd5bdf50624584000f92f40a9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/fonte-para-teste.test.ts",
+      "sha256": "6b123455208cc29b2f8fe901d14a0bbe2b41faf40aac6fd909cf90d23f20728e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/fonte-para-teste.ts",
+      "sha256": "0003739f918be5949635909ddcde301c024a774545ff7db72ec4ac8f3cf1494d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/format.test.ts",
+      "sha256": "56d9b815c699cf12b2c78c87ee2a4f4d755f1c2fc2ad81c9f7514589cb3a37e1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/format.ts",
+      "sha256": "ba169dc7e7beeadbffc539255e276eb6abee7db89dcdece07bc8ecc0d3ac809c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/hoje.ts",
+      "sha256": "0c7c12ad50875b833ee7906e62290db62a3fd4816bf858f4c3d25285147e93e6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/keep-alive.test.ts",
+      "sha256": "1fa0749c3967e0a646f37c600dbac659eb2877f80a233927248f3b9662c809d2"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/keep-alive.ts",
+      "sha256": "8ce8156ccb71ad25496697b21060bc5a44d6abef602befd8301c6b79f4735392"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/marca-dados.test.ts",
+      "sha256": "cf19625f88778a9fb9e8f80cb503668f66989eb992672cb8792d63912e8511a0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/marca-dados.ts",
+      "sha256": "899d463557f0b52004020a719f9129ebde12a9bbe45cde6416c0b5483e67016a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/marca.test.ts",
+      "sha256": "4d6d64dd662e43f3ca1dab114f6d59e2400da890fbdfa50349c997842d6f63ef"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/marca.ts",
+      "sha256": "2fa7caaff143e31827cb00a33bd1a1eb17983128887ec44c4e28b62f3bebd474"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/api.ts",
+      "sha256": "73a59c4dd48320605129e49c811588c711f495cfc6dcc5ce02b808b4472c5092"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/guias.test.ts",
+      "sha256": "83caba3b1eca0b64ff07288cd8dd5fe52bd6790d422e9e6995fb8d80ca909e77"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/guias.ts",
+      "sha256": "dfa78f249f7b4fd0bab1c44043d61317e2457f84091455e4999faee0f0f52fd9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/modelo.test.ts",
+      "sha256": "55a60203ea4facbd172b53b27a824c78a0439691b14913e686811927d967575e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/modelo.ts",
+      "sha256": "5b3a5768a1583dd6a467fcdb1d268e0beacbe1532f9f985000e3c8bec3e1dda1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/qr-state.test.ts",
+      "sha256": "31dc89f99f1a83a728e9ec7c775e60ac0decc23b9eb945bd4fb7f2912943b7b4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/qr-state.ts",
+      "sha256": "07a9ff36978d93381ebe9d4914667b8941baf33b73783dff52a1212e319e33c4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/telefone.test.ts",
+      "sha256": "64a41a54dbe91fb4a839ff35464d7eeb9c9ef5bdbd395cbe0bc9965514825302"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/telefone.ts",
+      "sha256": "0e4712525e6be406bd65107b4841831287185985167726ec9a62608b8e4f74ce"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/templates.test.ts",
+      "sha256": "1f46e58f3c479e9ea6a4224412713c11a3883900940b0dab39821933f8c27876"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/templates.ts",
+      "sha256": "878a04836045c02f2bdd8eea125f30e1154e725d058caea6e7ce77009f8b4982"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/thread-state.test.ts",
+      "sha256": "ba0819910b9c40ea4ab14d191bf793d4cf44d04983df9ba0484c37b605c3652b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/thread-state.ts",
+      "sha256": "e94b3b1d5f35eb7d9ecdd2ebd0d30e9b86b891771fda03ddd3a4764a0752d5c3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/tipos.ts",
+      "sha256": "63a42d43d2d2c10ba358469a14517b14e8e7a72445235c0f0e08cc09232bb52b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria/useMensageria.ts",
+      "sha256": "675f593fedc4c727be0fe71ba86aea17b31cdb2b0a37da480e6bac4d7e7f261b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria-servidor/seguranca.test.ts",
+      "sha256": "6b0d1ba68b23bf43429f1ccf82abf0f728c6ca6e8eb550cfd63a5dc4bfe4374b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/mensageria-servidor/seguranca.ts",
+      "sha256": "f319979c0c2410a9b263e30b81aa77998c28cb9ec05fb3feef60f668c4658cd1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/nav.test.ts",
+      "sha256": "88031bd1cf548f49a7e5c2e443f7e4989985cd7786c6879029c3c1fdb243cd48"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/nav.ts",
+      "sha256": "129f2646eee70d9a26a4fef2e0ab06a7162b38c834bc15ed9e9659b1459ec760"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/navegacao.test.ts",
+      "sha256": "4c76b5d13aa8b858f23a858bd47890f575cbb6424db79fdaf6771ffca7bc3cfb"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/navegacao.ts",
+      "sha256": "c9ac1b1e183c02561db7091679974216a3aa9d181a759ccfbb055f62b164d7af"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/next-image-para-teste.mjs",
+      "sha256": "686eef99f8ba39db24520dab8f31b3d01a84f2beddbcce416a5e1a022e0b9b7d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/numero-contado.test.ts",
+      "sha256": "8a0ab2f98929fbee198715c837904355dd0e17e6f1dfcf1ec12b9aba327704d4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/numero-contado.ts",
+      "sha256": "307fa222d511ec7fd0c0f93e92d7148d18d16db7c45f48e52d9c3b99a528f8a1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/arvore.test.ts",
+      "sha256": "4b1fa9079b7666f5396f57ef928b45af37a98e3b09aa3036d396ad43d74b403a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/arvore.ts",
+      "sha256": "1703f38cb5a8c832047380333c6a4b39eab0e7bc6f62cf5485b17ac2fa1bc506"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/cargo.test.ts",
+      "sha256": "3d123c9637b8f9f504600269e93ce798a01fd290b57655a833a73ee8a0439dcc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/cargo.ts",
+      "sha256": "08bee0854ae487425cfffa25f932f0e99034c653a850491f029596d12f5dd484"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/consultas.ts",
+      "sha256": "d5f571e016737037096f0ad18f1ef7c3bd594b42fcc316f1231f426a6e2d6ac5"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/documentos.test.ts",
+      "sha256": "9d915405c050b2c5d44a496a59d353682571e9afdeec18a8ea9bd54c9cd83e9e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/documentos.ts",
+      "sha256": "3600e073fd190281162430f1010c18dfc89638aff66075231cf742e853200c2f"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/markdown.test.ts",
+      "sha256": "1694240b9fe5a3cb0a7668fb95b128e717c5c155879650ae09db610462f48793"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/markdown.ts",
+      "sha256": "769f5e70076f570b64d2fd4064deed30f90c328f6090bd7722a4adf30c68886e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/ocupacao.test.ts",
+      "sha256": "87344ebe41eb2ba02d1dab0969e2d384aa3f4bf6a684f899a1424151f413b7af"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/ocupacao.ts",
+      "sha256": "bc0bcca17e244c02873c4724a6d393eec86780baf4864a6d54910ca6906b6e07"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/onet.test.ts",
+      "sha256": "81a4d7073f0c3c38e2a5a3bd671ee578f02f69a370120a9916303449add04dda"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/onet.ts",
+      "sha256": "a238fdbece8c68d240777587e73e52be7355df6377aab9f0ad42f048f1b5c54e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/organograma/tipos.ts",
+      "sha256": "526a236640e1082b35bdfd15f5df0a508485fa222aafdae39d048b0436e143df"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/persona-dados.test.ts",
+      "sha256": "4d0bb9ac9b4f6ff827bf53cb2af5c26c75879dd19100b5b073446032921efa15"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/persona-dados.ts",
+      "sha256": "ff2fd1674f4120ff2f3d013f8727bb27b0a7ece87a368fa2ffff2c6358cc9f86"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/persona-estudo.exemplo.ts",
+      "sha256": "ff29d72d308775f6a37394d02963a8ef1d3c3e089941162e4372c78f380ddbd9"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/persona-estudo.test.ts",
+      "sha256": "0334f5571dde7196f26f9d553c2cb7ca227ceab5b5fc6d5a4e75bdf66fc0dddf"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/persona-estudo.ts",
+      "sha256": "0c849d0c2ca0bd8f003f99253d53192de8a6673cd92681c08d99748b64574481"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/plano-mestre.ts",
+      "sha256": "b947ac1ff2ddccea9a297cce5c8a43fab82591714e59f78dddca57e7b8330148"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/plano-textos.test.ts",
+      "sha256": "10e3bbc27db318c8d78322f251067eb3d650fb208cb1ebf2ba99d1dc77cc09ec"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/plano-textos.ts",
+      "sha256": "66de7b974d843a927a92441479ccf175bd4a7b66e35f85ad7d6e996eae524c9c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/senha-equipe.test.ts",
+      "sha256": "a48158048068f6dedc524fadfd3f10eae3e02e227cd11b491144318675f18250"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/senha-equipe.ts",
+      "sha256": "8808c80b760fa3fe9caf5155dfca1371ee9e8f9c5093c7784b6d0f3fbb7377ba"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/senha-provisoria.test.ts",
+      "sha256": "3b603d34cfec64cb90d25fc5866b1affb66cc9463f771a12ac5480e0fce4491d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/senha-provisoria.ts",
+      "sha256": "6fb5640e1e7cfdd1e94f6e1c16033738c5de22c68df958012fdfcacea9af9276"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/supabase/client.ts",
+      "sha256": "7b724668ac732c808b2f182917a30fd33bd394fbf47e482ca7ce36a32d1d93eb"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/supabase/env.ts",
+      "sha256": "b186d34020bc968f854d2b6d46f07aeedb583e79e855ee3d8ce6a1c11429b398"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/supabase/preview-dono.test.ts",
+      "sha256": "842577ec44487ffd90946e78d28520f5ea9b1db681e8f3412334de1f6d1b8609"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/supabase/preview-dono.ts",
+      "sha256": "e61e7113d920f31436fd24b658f6a50d415bd184a4356e859f7cf0c5c7d0572f"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/supabase/proxy.ts",
+      "sha256": "f4cff8227e85c7903e2ef2a9ab3a0357aa0f25d466135ea0c6c17dfd9134670b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/supabase/server.ts",
+      "sha256": "16e9a0f35081d3f5857b2102ef2a136f15afcaf591c23f371a2ec8afedb9b8e6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/supabase/service.ts",
+      "sha256": "bc4410ce25c30b5253ada41499a04e06c4183da3a3d475ac104ea5c95373d416"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tarefas/grupos.test.ts",
+      "sha256": "b6b5637d4bd4249b70fca26c06cf1a28f02fd0ce03b6c6f986e9e887e8b133a7"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tarefas/grupos.ts",
+      "sha256": "ba294ff52b05efae1a17f015896e9aaaf2f03501fb04c1cb2b591ecff9054fdc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tarefas/kanban.test.ts",
+      "sha256": "3f2c2365edbbf6bcb43da50ebf352139e5c893448b5bc91f923d9004ff18b735"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tarefas/kanban.ts",
+      "sha256": "9b0489dec0c7d64df6c6d62eb162e1d2aade521aca07909292ffc132d6d5d82a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tarefas/rotulos.test.ts",
+      "sha256": "33426080e1ee46f29504c9b15d2511fecf9f420c8a373fae1ecfec1409d7fb65"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tarefas/rotulos.ts",
+      "sha256": "42d33fc5683496afb7abf4e9e327e1fdf0c1bcf3b23063bdae43df89a97361ad"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tarefas/status.test.ts",
+      "sha256": "7d7ea53b9b8ed9b88f0f970bb7f5b8226f5e088a1877a7dec03bfc50e05b40b8"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tarefas/status.ts",
+      "sha256": "92a8f8f26029201c44750abddefde19997ad5838762123b51e156ee9baaa941d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tema.test.ts",
+      "sha256": "dd0c63d08847ab0b274013d50ca1fab44de9437d6e9811d9447af97b0e26f6e0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tema.ts",
+      "sha256": "20ab3f9433ecfd5a806850ea914262c7b0114ffad48b995ad7ad4c7a988dd913"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/tokens-proibidos.test.ts",
+      "sha256": "637d5eb11039cbc48be14910e4a19a7fde2a50da32771e4fc52e5e01921cf2e0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/utils.test.ts",
+      "sha256": "a5d25b82412cd96309b80a2872ee64db0b79382e37b8c40ae5cd38401a1a9299"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/lib/utils.ts",
+      "sha256": "98950290916b07c9ebffe32aaf4f3aefac0d36be972041f5d57a32744e7c7b9f"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/proxy.test.ts",
+      "sha256": "0b05a31ec123c348f53fa63fc5616c9bdca71f1b8c4b87c62c4267b2de62e85d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/proxy.ts",
+      "sha256": "88b460bd205cd418ed44f5e4ae483825e5b3fd9e7ababf0dbb75ba475b0cea1d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/types/database.ts",
+      "sha256": "2fa48b3b4b701e011c74bb2ba51c59939d298e16e2e6c8ba90685ae06a41d6e5"
+    },
+    {
+      "caminho": "sistemas/empresa-os/src/types/supabase.gen.ts",
+      "sha256": "aff5d108e2c8f3299bf6b222e552106d7e798d9861f132f2681940fba5dcfb17"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/.gitignore",
+      "sha256": "507699eb91144818edf61d3a079212cacf31d8db520eae428e3b48fcf0d6919c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/PROVAS-MIGRATIONS.json",
+      "sha256": "4709ea43937d8b5398ded0079958306c88cbb9b2cf431c188be6ffb1b8a12377"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/README.md",
+      "sha256": "24c8a9a120c994a3db9c1bf02b21b27d3523b9d991230f2edcbe660a1a9fccb6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/arquitetura/adrs.yml",
+      "sha256": "ec48c695eb7fd5087cf1d1aefd2e06bd260b576fcb65ba054fbae34269afa5e0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/arquitetura/excecoes.yml",
+      "sha256": "a936d8b845fde141ce1a90f0684ed7fe3b19a26b76067fd22e6119703c7994eb"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/config.toml",
+      "sha256": "83eeec690314ba2b539248e158214bec262a549ca7fca4610541c3b6ce9cec15"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/functions/mensageria/core.mjs",
+      "sha256": "ea204d7fc0fb9cc8a5646d5699356e44baa81d351a8f1e342f864e41efa55e4b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/functions/mensageria/core.test.mjs",
+      "sha256": "9626d1af2c83c43dcd16a2da2fc5d218a1f4ab58f844773ab206fc5bf683f2bf"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/functions/mensageria/handler.mjs",
+      "sha256": "dc59471c8c69671e4e65b1eed1241c32e1692d4035c387afe5d1ff83265916a0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/functions/mensageria/handler.test.mjs",
+      "sha256": "84418d3698be82937188d405808c7e9edfba8bd8330d93bbfc0490ca7458d108"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/functions/mensageria/index.ts",
+      "sha256": "0294a7d8eec31571135f9f4a20732433e8a7ea2dbf8c25d66f26c557bc9ced2e"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0001_gates_seguranca.sql",
+      "sha256": "096ca0b885ec7929b6dc776ad5f9d528430076a1fc8255a46f79235edc251dd1"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0002_empresa.sql",
+      "sha256": "cc41716338f894451a44dd9973ee9ad34c0cffdc8e2f0b0363edbb99f21f7e25"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0003_usuarios_permissoes.sql",
+      "sha256": "ae1d2e91db9cf199a16d1e09231905b226d98e540ee6c77f32bdc16ef3ea95b2"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0004_rbac_helpers.sql",
+      "sha256": "02ffbdf5bd3d97d73716bc8dd224259b55489ca28a3d86f697e6de7548ad805f"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0005_agentes.sql",
+      "sha256": "47202b1d1afa05a0263c0896cf11c6091d522314792ad072c2c4b87c5ea9d0af"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0006_tarefas.sql",
+      "sha256": "8e20b7aea8667c8f1a251531e4be83336d04d9a304a16f830336a24f56ed5dfc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0007_atividade.sql",
+      "sha256": "190d33afe2c808aee6e5ce6f787daeb0e4c0d48f6f81788b0058bff0e23ec199"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0008_seed_funcao.sql",
+      "sha256": "06bf4e1c26a8ffb53c9f4edaa60980c1d91490a451c734af220bcb2a0c17175a"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0009_execucoes_agente.sql",
+      "sha256": "a23c9b2c3525779870b36e7093ff491f1c7d70b478f440fc00503b7aaa6565c4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0010_documentos_publicados.sql",
+      "sha256": "5df98a42bab477a61019c3dfd78ebdbe23f74ffe9dd7ebd3706a27939c13ef97"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0011_melhorias.sql",
+      "sha256": "6aae7e42f454aecfef1fe7af92c3efac45d02f4e224ee53dcb955db4ffc6c0d3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0012_fundacao_extensao.sql",
+      "sha256": "91865fb995ea414ac7b2dae37e991694a0e1bbe0932fdc4541c3a1ef97f2537d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0013_modulo_ligavel.sql",
+      "sha256": "8fbd37aa1e4d4bd3e6036608c01cb6353bc7c026691435a6753eb481388c814c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0014_tarefas_plano_modelo.sql",
+      "sha256": "6553b2682cd05729612b2eb1ead5aa1cc35c7cd163995139f65cb2368df053fd"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0015_nucleo_comum.sql",
+      "sha256": "8dd34e4061d8c9e938a101826a261bca8e8267b8b2cda1764a49c160a74f2be2"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0016_tarefas_plano_instancia.sql",
+      "sha256": "d15743f51e939a96bd41b2cc9a2e74494ff5e728af2fe53616a69e09859f9e55"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0017_conexoes.sql",
+      "sha256": "2562763edae2a3870c4733f0a9bf2d849a55fdd127bac42caf96b8fc4c786de6"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0018_whatsapp.sql",
+      "sha256": "12d7054f60b15ae0bf2d2f974172ea0611b1b47d4f47c00b440bb2f9182b8179"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0019_organograma.sql",
+      "sha256": "057ed77a7283a45b373771f262d5f516dbb27f234474385da97d85d737eb20fe"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0020_organograma_ocupar_agente.sql",
+      "sha256": "294daf234948649c958fc6a2db24bcac048951a8d70d9b308eacef49646d2a3c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0021_whatsapp_grupo.sql",
+      "sha256": "bb261f4d080429c4425096fa20d594e930a29d31cfbb96a7b997b6d6fdff0475"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/0022_catalogo_ia.sql",
+      "sha256": "cd39b9db2aa8976056252dfdfd00cb06d078d7bc2bc0034f7f29672d5103dd12"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/20261021184127_mensageria_multiatendimento.sql",
+      "sha256": "acbd2756931410c44238fc7c74dc9b35ae09d22011e7f54dc6fada3611686673"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/20261021194632_mensageria_ordem_e_leitura.sql",
+      "sha256": "9c20814d3d1806f35c882298ef736f0ec8f4465850d9c83a3405c90e49f0793b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/20261022145513_mensageria_nomes_grupos.sql",
+      "sha256": "abd09b2cacef79232ed1987006a1fff3045654361df57ca284fba1d1e258f555"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/migrations/20261117120000_mensageria_ligar_computador.sql",
+      "sha256": "b54416c21c530145e9227001b77853f38c96d724a7e38002578eaa6a48e10904"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/seed_exemplo.sql",
+      "sha256": "5dab9a89bfe59e8262f697ef1acedc8361c2f43492d5c94b9ba78f98f618b30b"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/000_arquitetura.sql",
+      "sha256": "fc5fd453470140eca3edb39d902c8239e6aa1cb594d4ab1acb28fd0de2e2f72f"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/001_estrutura.sql",
+      "sha256": "55f9a393ae9140b6d6fc929db6f1bb972a09b011587a6e63be13b199bbcdeece"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/002_rls_como_usuario.sql",
+      "sha256": "f0c0b77844857356a8f6937a0830f17da8984916d063262373bec08dd291ed67"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/003_invariantes.sql",
+      "sha256": "e4c6b4e9207abbd1ad8ac823804ba7f31329c592c047dfee059a8f67cfd49499"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/004_anon.sql",
+      "sha256": "fc4e86b81c54d362966be661d9e3412ad55854ce912311db2077c1d54f8bcb12"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/005_modulo_ligavel.sql",
+      "sha256": "5cf98b50ad5b1662aae9cec8fb25be55b524d5a088fbb045d6aff76c163b17f7"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/006_tarefas_plano_modelo.sql",
+      "sha256": "33875ebd36997289f860d337c61e1a0a3718cea11f3819a9ad0aadc0cd3689fc"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/007_nucleo.sql",
+      "sha256": "73ea1c51a82955e5e7cd1c7383a514a838b3004175511873abee9561df0b2531"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/008_tarefas_plano_instancia.sql",
+      "sha256": "ede4d546242897db7dcc876d684e8eaece9c2848181e4d60b66adb907af9c7b4"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/009_conexoes.sql",
+      "sha256": "548ef22e6ca740be7ba36b5738561d28a7c600d02976d68c7876ac080b3c7340"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/010_whatsapp.sql",
+      "sha256": "23bd16b2e6f60d5894d8ae2ffa5ce4772972cb44b71941efa07fa39ac68afcc3"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/011_atividade_usuarios.sql",
+      "sha256": "25e386c972bc86228987fbcc6dd1e10836e0822193c465449564dcbaad12a56c"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/013_organograma.sql",
+      "sha256": "dfad5c7ada830a68865d6eeadf83c0b3884dd08240cddfed8014c1a31c98aa86"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/014_organograma_ocupar_agente.sql",
+      "sha256": "357842b6d38bc57ce85803e13f697d6ae2172fd2b357fbf2f7185c36ff1aacb0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/015_whatsapp_grupo.sql",
+      "sha256": "263d8f78dd52f92e5458afb7c789423c3e3788adc33935cea7f92db22fe645f0"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/016_catalogo_ia.sql",
+      "sha256": "8a9703abf3aba700d5e193f6066886b6300f93de9ddfce78407b568db7e29328"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/018_mensageria.sql",
+      "sha256": "b95f50c72a864a1934aa44eec809e3c97be5fbe710c98caa39b6a8aa30779618"
+    },
+    {
+      "caminho": "sistemas/empresa-os/supabase/tests/019_mensageria_ligar_computador.sql",
+      "sha256": "b10be0df82e5324cf0f07b20981e86fa9c6de695b106bd2ef0c7627b23a6cb55"
+    },
+    {
+      "caminho": "sistemas/empresa-os/tests/test_arquitetura.py",
+      "sha256": "d17e4512b4728e4b6a219833f411155e970b58832232c2fe36cc6a270463300d"
+    },
+    {
+      "caminho": "sistemas/empresa-os/tests/test_workflows.py",
+      "sha256": "4f7c1133fe1719f360078f6f716adc2374fa281db77631e3d21227af630b9cb7"
+    },
+    {
+      "caminho": "sistemas/empresa-os/tsconfig.json",
+      "sha256": "b4435470654bb55d7b6502cc13cb3eacfab499216dd2c2c0f486e4e972d1f2b2"
+    },
+    {
+      "caminho": "sistemas/empresa-os/vercel.json",
+      "sha256": "d14a74c9e5b8fcfbf6994b260ed040027e7e6b7ffe7e98018c08a021d3334a45"
+    },
+    {
+      "caminho": "sistemas/whatsapp/.gitignore",
+      "sha256": "4755f7fda178f3fd276f41e3d889bffe83245fd801dab60a95a37b00fd8f47e4"
+    },
+    {
+      "caminho": "sistemas/whatsapp/DISPARO-EM-MASSA.md",
+      "sha256": "f7e4a2c3f2a0e12230084212b53369cdd66da9eeda6379d016ee11791b8b5568"
+    },
+    {
+      "caminho": "sistemas/whatsapp/ENVIO-PARA-TESTE-WINDOWS.md",
+      "sha256": "a6328c2c1c7920905cb94f7785703596fa53ecc818415a733b18032f63f3458f"
+    },
+    {
+      "caminho": "sistemas/whatsapp/GUIA-AGENTE-CODEX-CLAUDE.md",
+      "sha256": "5a538ba3e79e6b7e04492c221bbb6c1b6da495c18c73f14450baf79f6059e9d2"
+    },
+    {
+      "caminho": "sistemas/whatsapp/GUIA-ALUNOS.md",
+      "sha256": "fb074b80292931a9adf20b69725983e651fe43ce8d226223781822a26c696591"
+    },
+    {
+      "caminho": "sistemas/whatsapp/GUIA-IA-ATENDIMENTO.md",
+      "sha256": "85358edf9dac90c93f1d04bd26e19c90db2afebe426b2af7a4fdd8dc9d6e58ff"
+    },
+    {
+      "caminho": "sistemas/whatsapp/INSTRUCAO-UNICA-PARA-O-ALUNO.md",
+      "sha256": "c5031915056483828013c6b30f298c49b680acb94eab617e28f063eff7b9095b"
+    },
+    {
+      "caminho": "sistemas/whatsapp/LEIA-ME.md",
+      "sha256": "72b39212e70be7005468486ec9bdddce61e26959ea6dc72abf8c718fc15f838e"
+    },
+    {
+      "caminho": "sistemas/whatsapp/MULTIATENDIMENTO.md",
+      "sha256": "d87cdaf9c43a7b96a4580cc027b702c4a6fadb926beea31ef4f8e75732655873"
+    },
+    {
+      "caminho": "sistemas/whatsapp/package-lock.json",
+      "sha256": "b072e23717d08da96e041e78b9787610a3f32dfb24dfec0dffef9f637e0c4136"
+    },
+    {
+      "caminho": "sistemas/whatsapp/package.json",
+      "sha256": "5a2d85982e9fd53c9040b37229aec35ac991fce77ed41b886f112a7a1622490a"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/assistant-core.mjs",
+      "sha256": "2451454457ecf33ddc8c8ece45a30d78f2a90b738f024fbc2ca118f4f96e5e2e"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/assistant-process.mjs",
+      "sha256": "181ee55ed8703a384295d43752b9f07faf5a7ecde46ba90ce4ac0093926150d5"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/autostart.mjs",
+      "sha256": "4ece8436e9477606668a96876afb813dee725befc9bb6f067db1b158380a08f9"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/bootstrap-agent.mjs",
+      "sha256": "27224710eb10a4eea67a51e824abafc0d1fc0267c2098412d3d73368320739da"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/cliente-ia.mjs",
+      "sha256": "1322799700175cf1b5ac3875c04deccd545f05d9b935683d05ceb01f4950dfa2"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/codex-config-backup.mjs",
+      "sha256": "2e8b87ee61684c7de8a82c9a3864648ef3397c32e3144984b8007d12e997e993"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/conectar.mjs",
+      "sha256": "18ec65a606293b70e8aacaf7517c136aa66e5acfe77e2175d4ee5636c37ccf6e"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/engine-client.mjs",
+      "sha256": "02b5a036b5c600bd04967774e219c6bfe4bf373c6a43f8d16ce2d8f30ac3b075"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/engine.mjs",
+      "sha256": "73809e9794c11725c26c9c6af088fc762b6531f2337fbeba0cd132a7924c0ff7"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/enviar.mjs",
+      "sha256": "789230556b5158c3b1b24ea00546399f2386d5329d8670e1568ce88725d27b4e"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/ia-empresa.mjs",
+      "sha256": "d55906988b474631e78ed7ca8f26c5850ceeb4af7569f27645147a49dc221c6e"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/incoming-event.mjs",
+      "sha256": "3381ffbe851615ff969313ef9cdb0ee3facc874715536669ba4801b332dfda97"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/install-mcp.mjs",
+      "sha256": "8046c4d13d7908e535f79fd71abb22b4342cd011b7e479ab969183deb7ee68ab"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/live-assistant.mjs",
+      "sha256": "a6a461d81f9a8e28dd8fbc79389c6cea8e767931d213bef44c91473bca569a81"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/local-paths.mjs",
+      "sha256": "21135d5657209e96cbd7674809b956f40dc187db11aae0915aebe04dd47087c1"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/mcp-server.mjs",
+      "sha256": "9644eff8c646667e5f1064f1e4f2086a135421f9bfbbeda2a16d282c2170891f"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/midia-temp.mjs",
+      "sha256": "3fd8e60590b97b8c0e0289ae06c477ad5fdce96f0610717cba2605e552a345ee"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/midia.mjs",
+      "sha256": "26751acfee415c4c91a6ebed2e3c0d83ddedf38f394ea32913106f13fdea1c49"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/auth-store.mjs",
+      "sha256": "6af57f7ac166bdc1d62251ede2e4ed5d96e826467a60ae679862ee3ea9cb3839"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/baileys-adapter.mjs",
+      "sha256": "55644ba7fc2d1ba8d737c281d1aba7638dd496239803fa1053312da5ab8914cc"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/cli.mjs",
+      "sha256": "c69c89ca011129e90c3f9df5c0a52d4ef59ddba27d1076532ca77d489e38ff2c"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/device-client.mjs",
+      "sha256": "0aa53dd8f8a7e9583d2b2551e21e5ab7678a8736e2713535068ced0c755dd188"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/drafts.mjs",
+      "sha256": "13320aff5b3806ef81be3ac68db292f4c5ac57515ca82f00203c71a370f4c6f4"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/group-names.mjs",
+      "sha256": "a3d101d2d42ca8859d552bcffe0a6a07754854a93cc4422042f85c2a61328739"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/incoming-media.mjs",
+      "sha256": "1d0710d9145fad35dbf714026e48e327d0802b59b05b35b74daa31e4c5d159f5"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/ligar.mjs",
+      "sha256": "25a350bfeb0ef33c21f9743728861a03697a1ce0a65319b7175671ea5bae045d"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/mcp-server.mjs",
+      "sha256": "5601ad85ac417639e2df5b4a0876eb57104223a7e459d6782c73d4421013977b"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/media.mjs",
+      "sha256": "d6a947dd0e7ef4ef6d3f6381d0555178f4d3c0c10a2cd172ee26234944a34543"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/messages.mjs",
+      "sha256": "e115cfd7f4011f5ef1e903471b044537ce4f9d9391cfb95053b1f763ee5c393c"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/meta-media.mjs",
+      "sha256": "09f6201e1bb854f16624a11511deed0865e4ed03be8b146b4974850f2254fcfd"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/raw-inbox.mjs",
+      "sha256": "ce08339aea338793905424e4718d3d9b272ada7c5dc5faec07c170275054fb49"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/runtime.mjs",
+      "sha256": "edb1ae44e78cf8c41660527e17f4839706c8b31707ee72d1b81a6177088d6f35"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/servico.mjs",
+      "sha256": "18fe5d8de4b4526ccae5a1063fe60716d34fbee0b0f8a2b1d5971d475fafb2dc"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/shared-client.mjs",
+      "sha256": "c93a37f2fabd54f78bff319a593272035005fbc551d8362c30b16fc8015e97d8"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/multicanal/spool.mjs",
+      "sha256": "b055b2c69632db13af384000f96e8532ed15e201b54a3fea03ec09731d0883c0"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/pairing-page.mjs",
+      "sha256": "070e99ca8b0037bc0461534687dd0c2115b50dbc9da4d70ba8914bf8326625d7"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/preflight.mjs",
+      "sha256": "4d36af62c5b742240769193931ab39452ca3392ddb2c79478cc5ff5fe256570f"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/process.mjs",
+      "sha256": "22e3af2697e9a1d98779a1fbe8776d4415b55a87f0ed6e5c54641ec8aa461755"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/receive-test.mjs",
+      "sha256": "1620ba656c1a99663c724c2b7a887ec183965ccb1242e4143b8dd778c0e24c74"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/registro-supabase.mjs",
+      "sha256": "c8b09d56953b477ccd94979d0fa38b8f2b69aeb94471ea262d73b4e43350e31a"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/reset-session.mjs",
+      "sha256": "7e7e58e73a7b3eb5115e097261f620efe636a5e8ad4c8ede99f389f564c21030"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/retire-evolution.mjs",
+      "sha256": "9f84a0a0d8b47cf3226a5a9e96add345b5536c8e1f1e4dabd2f1961993b878c2"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/retire-waha.mjs",
+      "sha256": "720121384da2419f608e34ec6140561f745bedaa18ca2324c9f5bd2c6c53b32c"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/send-own-test.mjs",
+      "sha256": "a336ee28b8905039957c84c0a07334af4830b70e20f66121c3c68e6965a2839a"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/send-test.mjs",
+      "sha256": "233e4f668a5a7f31bce6aa539ddef18b1bbaa95637c282a77b3dbcd41cd0908c"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/setup.mjs",
+      "sha256": "18350f46cd7c5a2e779f651d036c337215f927a26780a7f06a4096a8dc071ecd"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/start-background.mjs",
+      "sha256": "a06db30d74963a9a195b8ef16ac925d967068e0568d9e0410e25be3b5f63841c"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/start-pairing.mjs",
+      "sha256": "1d5b5415ccb76c01755f852fcee2e7d1cacc64c9659a282797bfe158b28aa87c"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/status.mjs",
+      "sha256": "633ac58351732b6fa63604077cc344773e39fd3c0e8739c20d7088c68ea3bdb5"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/stop-live-assistant.mjs",
+      "sha256": "d8feeceaa1290ad60326c98460fd99dad48ee5a1112fdbc95fb9af3a5da1e727"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/stop.mjs",
+      "sha256": "73eee8cf8d5e8ab9400c5b508cdaf9ed8e6a03466ee4ff1e9e588b3df716319f"
+    },
+    {
+      "caminho": "sistemas/whatsapp/src/validation.mjs",
+      "sha256": "c066a5464dc19bc44cb94ed336a266fee99b09bee10fa6fa19163f32759c8d33"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/assistant-core.test.mjs",
+      "sha256": "bc1072e54e87ac803d974cc8ec60d80df7a77e372481e0fbc739467d6ffee6c3"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/autostart.test.mjs",
+      "sha256": "083729a1e55a82495ef17aaab14c5fc652e6935a2404a7207cd181ce8607b593"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/cliente-ia.test.mjs",
+      "sha256": "55961d23ed306c43bff6402f82829eb9c22820da3af3548eef947d3168bc98b4"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/codex-config-backup.test.mjs",
+      "sha256": "94e7822d0ff28f8d6ac5638204edf1344936d46b27aeca05b8dbc1d1a7d5382c"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/conectar-docs.test.mjs",
+      "sha256": "04f0f73efd1463e8ef403424c5610137acec11fda8a4fcaa759485a88ea5f05e"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/conectar.test.mjs",
+      "sha256": "c85c2b7d567508e32a99470c73237dbe329dfd6a639afa586f7fa8ba6d797756"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/engine-client.test.mjs",
+      "sha256": "7bc32c07691e9c0fb06dc7cacf8f8f5158ff3ebdc1b15f1ad1c8f374c819ef7f"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/engine-envio-midia.test.mjs",
+      "sha256": "eebab1635f5b8ca3e28d3368de797042704ed79fffa1c0ff6b3bc8cc942f4a1b"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/engine-grupos.test.mjs",
+      "sha256": "aa49c06a07d304bbb43fc51c88dba60c37629b599fe62bdb416086a73cbb0ded"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/engine-harness.mjs",
+      "sha256": "3bc550676668ae8b3cd28e0a228381271edf97dbcea0c65ac81b44fca7f3a696"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/engine-midia-recebida.test.mjs",
+      "sha256": "15831a5d6028b4f7a819178cb8101b0d5e0bfed96834d36bbd4df9c4fad61ed2"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/engine.test.mjs",
+      "sha256": "2effe41971ea04cbd75a2a2af8ecf847ab99d61bd71daee5a15aa9288e9d16c8"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/enviar.test.mjs",
+      "sha256": "59703b3e32133f3ae5ab7659db823843bcc31f828507c877591a1ec4789ff68c"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/ia-empresa.test.mjs",
+      "sha256": "e26eca82212030998337579e96e25f09907d1324acc6f85ea3be924c8ea4137a"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/incoming-event.test.mjs",
+      "sha256": "1edf9ed8a782ca02c7b7a48a8a913ccd7f4d07487b2ae85aa5bd156cb80fa860"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/install-mcp.test.mjs",
+      "sha256": "1ed7a5ffc5321f88df134e0eb05295ed61db8845a1c67d6cd5a99a490998d6c5"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/local-paths.test.mjs",
+      "sha256": "194e9163f90ee1cc3c850240e30af968cbc7ea5afab82e84a57ba6c0380f3cc5"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/mcp-server.test.mjs",
+      "sha256": "06f9e010facfe30f572c2b67617a45c35ae8154c7e32787a5a9a723c1b3349f0"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/midia.test.mjs",
+      "sha256": "be7fe6818b95616380b77882ccc765791367fa8cd623b5ef1d3d8b5751a2291f"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-auth.test.mjs",
+      "sha256": "fa3fa9311fc4fd977ed47e7bd20156b659128a6bbebf4318a37d137ca40b90a4"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-groups.test.mjs",
+      "sha256": "6c0d270db620932f43a29fe38a8a342f026d92827fb53cf098cfe48f7a7b7b55"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-ia.test.mjs",
+      "sha256": "94302ec54276d7df2345938f63b175b40c258deea75737d56ee6f0f658632e1b"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-inbox.test.mjs",
+      "sha256": "7265208de7bb253d73889fe913d57d62152aa0bdde6563186cc32a67620ebc15"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-incoming-media.test.mjs",
+      "sha256": "1794ca342f34bbf6337ce39c59bd0ee08d3767afc305b062df800e08e6bafd96"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-ligar.test.mjs",
+      "sha256": "88d0bd5f4a7fdd64fd306f832d41475dc78250766adbdacd3bfbbeaf157dc92a"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-mcp.test.mjs",
+      "sha256": "2cc175930d36bcb2e9d2f2cff38ca6bc2284a943dae2105680cacdfdf3531763"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-meta-media.test.mjs",
+      "sha256": "9e6b0e6821c58e0b7b483dd45c1ea5ddf9131c63c093ca1b7604ed9d6fa1ccca"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-reconnect.test.mjs",
+      "sha256": "63e19abf67b5048f18869d6f4c948e6a09619084a8801ed432fd1e0667d4f0e1"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-runtime.test.mjs",
+      "sha256": "049f08ef9f87e7d913e0fdea7712dc60c3a03ab2efbd8f4500e7cb750d1d2f76"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/multicanal-servico.test.mjs",
+      "sha256": "acdbf73b68659340e4fcc47c004323b4d2cd6091913c3f76fcdc5ef2dc626aa5"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/preflight.test.mjs",
+      "sha256": "85851ee6d0b6d341599cc6edf9319ee1172506e87c828719c132272e4e899961"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/registro-supabase.test.mjs",
+      "sha256": "e09a2734b3217a55df110c37e02bff82b3e9d63eed3ea24bb13a6d54ac329194"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/retire-evolution.test.mjs",
+      "sha256": "2d5b481c54790da7e8572b5a544d21fd2a5f50d280010a10412714e8693d1f53"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/setup.test.mjs",
+      "sha256": "de533e6ef3f6b2f83d92ecb7d776f6a0978661cabd2a57975f82c0c0abbf1bde"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/start-background.test.mjs",
+      "sha256": "ed1bb381a08c7dd2fe30df99679ee71428109211d9b067425a5c4c03e2c8b159"
+    },
+    {
+      "caminho": "sistemas/whatsapp/tests/start-pairing.test.mjs",
+      "sha256": "9eba245023f94242d1827c63380d701a9a1f4dca90ad94aaac2f2a94891db8a6"
+    },
+    {
+      "caminho": "times/marketing/DESENHO.md",
+      "sha256": "c5566e030e2d56d9de0636b8af843d664677ede872dab8a97480d106395d1325"
+    },
+    {
+      "caminho": "times/marketing/LEIA-ME.md",
+      "sha256": "c569ca01a04dce5ed8f39349c6648439241b31a766fef6e3700f74b9024857a3"
+    },
+    {
+      "caminho": "times/marketing/agentes/marketing-analista.md",
+      "sha256": "bc204f3090287b9f933972162d9453f010c5d5a3797a2d016fdeaa324c0be1de"
+    },
+    {
+      "caminho": "times/marketing/agentes/marketing-pesquisador.md",
+      "sha256": "93a795f65cd5973b1fa63183bd7c09b2a34f5af25a4009120e79c7e4c5c6c4ae"
+    },
+    {
+      "caminho": "times/marketing/agentes/marketing-revisor.md",
+      "sha256": "0ef756a825f3b60270a2985dc6bff3ba2fd85f84cb20a4232bf757d2e4001c76"
+    },
+    {
+      "caminho": "times/marketing/time.json",
+      "sha256": "cbe25c2c92fdf4ee6378f32e2d17f8fec4d3f7d134931adf52592c68dfc6123e"
+    },
+    {
+      "caminho": "times/marketing/trechos/AGENTS.md",
+      "sha256": "dc074028cc70321aa50297e6598108a3d5c596ef9d3e2560b98dcc330320bf77"
+    },
+    {
+      "caminho": "times/marketing/trechos/codex-config.toml",
+      "sha256": "bb4c9762c4f0a719fcb9f57b6fdf3aaf1987e7d4c07e13d07dc7916ddbe1830c"
+    },
+    {
+      "caminho": "times/pmo/DESENHO.md",
+      "sha256": "2292eaef8751b75d92e70fc1561f631bff146c7fbadde99430f9d9bb606207ce"
+    },
+    {
+      "caminho": "times/pmo/LEIA-ME.md",
+      "sha256": "a453773c04ae83e1e3821467716d80988a9cac8a326ca8b8b4f6e7635a523114"
+    },
+    {
+      "caminho": "times/pmo/agentes/pmo-conferente.md",
+      "sha256": "7427b386b1a015b0f01c6610131a49d6e5375cc55bab3192ecf2a81a24fb8e2f"
+    },
+    {
+      "caminho": "times/pmo/time.json",
+      "sha256": "7c8d514b7b955aa60c16e3645cea744ef62d9a12066b14956ea79c62dcf2a3a9"
+    },
+    {
+      "caminho": "times/pmo/trechos/AGENTS.md",
+      "sha256": "315e2bbe468b6d9f1bf64fc74bb8214ff4f93ceec4f4de4917c73e571c0f274e"
+    },
+    {
+      "caminho": "times/pmo/trechos/codex-config.toml",
+      "sha256": "21589baecb6c5e654c919704cbb0d7269f93c091dae401f1fb375d68e34fa37d"
+    },
+    {
+      "caminho": "times/tecnologia/LEIA-ME.md",
+      "sha256": "1ea8a9e54242c8fb849e0ed8c802f35f2f8c8017bc028a5dcea219b2a8c7d074"
+    },
+    {
+      "caminho": "times/tecnologia/agentes/tecnologia-revisor-seguranca.md",
+      "sha256": "630de2457e6ffcdd2b5dbb8d75fb2be69f5e48dc0488ca0e01e2ff368bdfc663"
+    },
+    {
+      "caminho": "times/tecnologia/time.json",
+      "sha256": "7b311bb6424e4839b0d5a60bd79b39d421b0cf37151082603914c07023b79af4"
+    },
+    {
+      "caminho": "times/tecnologia/trechos/AGENTS.md",
+      "sha256": "d9dbf5c8267d97f6b55b4bba569d2a5269ea918acedfa7ea5cf59907c9333091"
+    },
+    {
+      "caminho": "times/tecnologia/trechos/codex-config.toml",
+      "sha256": "a2b5e3c85e38251f348bd0a131faf98a5e1ccb9414a95ba31a68f608ddbfc846"
+    }
+  ],
+  "sementes": [
+    {
+      "caminho": "empresa/",
+      "tipo": "pasta"
+    },
+    {
+      "caminho": "contexto/",
+      "tipo": "pasta"
+    },
+    {
+      "caminho": "producao/",
+      "tipo": "pasta"
+    },
+    {
+      "caminho": "metodos/",
+      "tipo": "pasta"
+    },
+    {
+      "caminho": "credenciais/",
+      "tipo": "pasta"
+    },
+    {
+      "caminho": "operacao/",
+      "tipo": "pasta"
+    },
+    {
+      "caminho": "MAPA-DA-EMPRESA-IA.md",
+      "tipo": "arquivo"
+    },
+    {
+      "caminho": "EMPRESA-IA.md",
+      "tipo": "arquivo"
+    },
+    {
+      "caminho": "capacidades/PLUGINS.md",
+      "tipo": "arquivo"
+    },
+    {
+      "caminho": "capacidades/AUTOMACOES.md",
+      "tipo": "arquivo"
+    },
+    {
+      "caminho": "AGENTS.md",
+      "tipo": "trecho",
+      "nome": "regras do dono",
+      "marcadores": [
+        "<!-- REGRAS:INICIO -->",
+        "<!-- REGRAS:FIM -->"
+      ]
+    },
+    {
+      "caminho": "AGENTS.md",
+      "tipo": "trecho",
+      "nome": "tabela de agentes gerada",
+      "marcadores": [
+        "<!-- AGENTES:INICIO -->",
+        "<!-- AGENTES:FIM -->"
       ]
     }
   ]

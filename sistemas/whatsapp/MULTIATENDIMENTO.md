@@ -7,13 +7,27 @@ pessoal do comando `Conecta meu WhatsApp` continua separado.
 
 1. A IA da empresa instala a migration de mensageria no Supabase e a função
    Edge `mensageria`. Confere permissões e abre o preview para aprovação do dono.
-2. Em **Configurações → Números do WhatsApp**, crie uma instalação e guarde seu
-   token privado. Adicione os números e libere quais usuários podem atendê-los.
-3. A IA guarda, no ambiente privado, `MENSAGERIA_URL`, `MENSAGERIA_PUBLIC_KEY` e
-   `MENSAGERIA_DEVICE_TOKEN`. Nenhum valor vai para o Git ou para o chat.
-4. Nesta pasta, rode `npm run mensageria:configurar`, depois
-   `npm run mensageria:iniciar`. O processo precisa permanecer ativo.
+2. Em **Configurações → Números do WhatsApp**, o dono adiciona os números e libera
+   quais usuários podem atendê-los. Não há token nem "instalação" na tela.
+3. Nesta pasta, com as variáveis da Casa carregadas
+   (`set -a && . ../../credenciais/.env && set +a`), a IA roda
+   `npm run mensageria:preparar` (na instalação da Casa isso já acontece). Ele faz o
+   `mensageria:ligar` e deixa o conector rodando sozinho. O `mensageria:ligar` cria (ou renova) a instalação com o nome
+   do computador (`MENSAGERIA_COMPUTADOR` troca o nome), grava o token direto na
+   configuração privada e liga a este computador os números de QR Code que ainda
+   não tinham um. A chave de serviço é usada só nessa chamada e não fica guardada;
+   o token não aparece na tela, no Git nem no chat.
+4. O `preparar` também instala o início automático do conector (`mensageria:iniciar`):
+   macOS, LaunchAgent `com.polozi.empresa-os-whatsapp` (reabre se cair, não reabre
+   depois de saída limpa); Windows, `Empresa OS WhatsApp.vbs` na pasta Inicializar do
+   usuário. Abre agora e a cada login. Se o computador for removido na tela ou
+   religado, o conector antigo sai sozinho. `npm run mensageria:parar` desliga o
+   início automático; em Linux, deixe `mensageria:iniciar` num serviço do sistema.
 5. Na tela de números, clique para conectar e leia o QR no WhatsApp do celular.
+
+Jeito antigo (só para Casa que já tinha token): `MENSAGERIA_URL`,
+`MENSAGERIA_PUBLIC_KEY` e `MENSAGERIA_DEVICE_TOKEN` no ambiente privado e
+`npm run mensageria:configurar`.
 
 `npm run mensageria:status` consulta somente os estados. A conexão usa saídas de
 rede para Supabase e WhatsApp: não abra portas do computador à internet. Node 24

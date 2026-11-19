@@ -3,6 +3,7 @@
 
 Uso:
   <interpretador> aplicar_regra.py --casa <PASTA> --id D-N [--dry-run]
+  <interpretador> aplicar_regra.py --casa <PASTA> --fechar-primeiro-acesso [--dry-run]
 
 Quem decide se a regra entra é este script, nunca o agente: qualquer guarda
 reprovando é RECUSA, sem exceção manual (a SKILL.md proíbe editar o
@@ -16,6 +17,10 @@ MESMOS marcadores no AGENTS.md; (4) roda as guardas sobre o texto
 CANDIDATO — teto de arquivo, teto da seção, seções obrigatórias, hash do
 bloco `<!-- AGENTES:INICIO -->`/`<!-- AGENTES:FIM -->` inalterado; (5) só
 então escreve o AGENTS.md e marca a linha da decisão como `aplicada`.
+
+`--fechar-primeiro-acesso` (chamado pelo instalador no fim da instalação) apaga do AGENTS.md o
+bloco entre `<!-- primeiro-acesso:inicio -->` e `<!-- primeiro-acesso:fim -->`, com as MESMAS
+guardas; sem o bloco, não faz nada (idempotente) e sai 0.
 
 SEM `subprocess` — quem commita é sempre a skill `tecnologia-publicar`. Stdlib puro.
 
@@ -37,6 +42,8 @@ MARCADOR_INICIO = "<!-- REGRAS:INICIO -->"
 MARCADOR_FIM = "<!-- REGRAS:FIM -->"
 MARCADOR_AGENTES_INICIO = "<!-- AGENTES:INICIO -->"
 MARCADOR_AGENTES_FIM = "<!-- AGENTES:FIM -->"
+MARCADOR_PRIMEIRO_ACESSO_INICIO = "<!-- primeiro-acesso:inicio -->"
+MARCADOR_PRIMEIRO_ACESSO_FIM = "<!-- primeiro-acesso:fim -->"
 
 TITULO_SECAO_REGRAS = "## Regras aprovadas pelo dono"
 
@@ -156,6 +163,51 @@ def secoes_faltando(texto: str) -> list[str]:
     return [t for t in SECOES_OBRIGATORIAS if t not in titulos_presentes]
 
 
+def remover_primeiro_acesso(texto: str) -> str | None:
+    """Texto sem o bloco de primeiro acesso (marcadores inclusos e a linha em
+    branco que o separa do resto), ou None se o bloco não existe. Só um dos
+    dois marcadores (ou fora de ordem) levanta ValueError: arquivo quebrado."""
+    inicio = texto.find(MARCADOR_PRIMEIRO_ACESSO_INICIO)
+    fim = texto.find(MARCADOR_PRIMEIRO_ACESSO_FIM)
+    if inicio == -1 and fim == -1:
+        return None
+    if inicio == -1 or fim == -1 or fim < inicio:
+        raise ValueError("marcadores de primeiro acesso incompletos ou fora de ordem")
+    antes = texto[:inicio]
+    depois = texto[fim + len(MARCADOR_PRIMEIRO_ACESSO_FIM):]
+    return antes + depois.lstrip("\r\n")
+
+
+def fechar_primeiro_acesso(agents_path: Path, dry_run: bool) -> int:
+    try:
+        texto_atual = agents_path.read_text(encoding="utf-8")
+    except OSError as erro:
+        print(f"ERRO: falha de arquivo: {erro}", file=sys.stderr)
+        return 3
+    try:
+        texto_novo = remover_primeiro_acesso(texto_atual)
+    except ValueError as erro:
+        print(f"ERRO: {erro}.", file=sys.stderr)
+        return 4
+    if texto_novo is None:
+        print("Primeiro acesso já estava fechado: nada a fazer.")
+        return 0
+    motivo_recusa = guardas_da_insercao(texto_atual, texto_novo)
+    if motivo_recusa:
+        print(f"RECUSADO POR GUARDA: {motivo_recusa}.", file=sys.stderr)
+        return 5
+    if dry_run:
+        print("DRY-RUN: nada escrito. O bloco de primeiro acesso seria apagado.")
+        return 0
+    try:
+        escrever_atomico(agents_path, texto_novo)
+    except OSError as erro:
+        print(f"ERRO: falha de arquivo: {erro}", file=sys.stderr)
+        return 3
+    print(f"Primeiro acesso fechado em {agents_path}. Use a skill tecnologia-publicar pra salvar.")
+    return 0
+
+
 def escrever_atomico(destino: Path, texto: str) -> None:
     tmp = destino.with_name(destino.name + ".tmp")
     tmp.write_text(texto, encoding="utf-8", newline="\n")
@@ -165,11 +217,24 @@ def escrever_atomico(destino: Path, texto: str) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--casa", required=True, help="pasta da Empresa IA (Casa)")
-    ap.add_argument("--id", required=True, dest="id_alvo", help="id da decisão, ex.: D-1")
+    ap.add_argument("--id", dest="id_alvo", help="id da decisão, ex.: D-1")
+    ap.add_argument("--fechar-primeiro-acesso", action="store_true",
+                    help="apaga o bloco de primeiro acesso do AGENTS.md (fim da instalação)")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
+    if bool(args.id_alvo) == args.fechar_primeiro_acesso:
+        print("ERRO: use --id D-N OU --fechar-primeiro-acesso (um dos dois).", file=sys.stderr)
+        return 4
+
     casa = Path(args.casa).expanduser()
+    if args.fechar_primeiro_acesso:
+        agents_path = casa / "AGENTS.md"
+        if not agents_path.is_file():
+            print(f"ERRO: {agents_path} não encontrado.", file=sys.stderr)
+            return 4
+        return fechar_primeiro_acesso(agents_path, args.dry_run)
+
     decisoes_path = casa / "operacao" / "DECISOES.md"
     agents_path = casa / "AGENTS.md"
 

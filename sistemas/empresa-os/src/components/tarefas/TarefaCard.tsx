@@ -8,6 +8,7 @@ import type { TarefaOrigem, TarefaStatus } from "@/types/database";
 export type TarefaCardData = {
   id: string;
   titulo: string;
+  area?: string;
   status: TarefaStatus;
   origem: TarefaOrigem;
   /** Trilha do banco (curso, plano90 ou trabalho): o link do detalhe leva o grupo pro menu lateral. */
@@ -22,13 +23,14 @@ export function TarefaCard({ tarefa }: { tarefa: TarefaCardData }) {
   return (
     <Link
       href={hrefTarefa(tarefa.id, tarefa.trilha)}
-      className="block rounded-md border border-borda bg-bg-elevada p-3 shadow-[var(--sombra-sm)] transition-colors hover:bg-bg-sutil focus-visible:bg-bg-sutil"
+      className="luz block rounded-md border border-borda bg-bg-elevada p-3 shadow-[var(--sombra-sm)]"
     >
       <p className="text-sm font-semibold leading-snug text-fg-1">
         {tarefa.titulo}
       </p>
       <div className="mt-2 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
         <CriadaPorPill origem={tarefa.origem} />
+        <span className="text-xs text-fg-3">Área: {tarefa.area === "geral" || !tarefa.area ? "Geral" : tarefa.area}</span>
         {tarefa.responsavel && (
           <span className="truncate text-xs text-fg-3">{tarefa.responsavel}</span>
         )}

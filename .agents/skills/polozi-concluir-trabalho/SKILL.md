@@ -1,11 +1,11 @@
 ---
 name: polozi-concluir-trabalho
-description: "Fecha a sessão: registra, prova que subiu pro GitHub e conclui a task. Use ao terminar; não use se ainda falta trabalho."
+description: "Fecha o trabalho: registra, salva em 1 commit e conclui a tarefa. Use ao terminar; não use se ainda falta trabalho."
 ---
 
 # Polozi Concluir Trabalho
 
-Fechar o trabalho da sessão atual: validar critérios de conclusão, atualizar a memória operacional, delegar o commit à skill `tecnologia-publicar` e só então marcar a TASK como concluída — depois que o próprio git provar que está sincronizado. Quem decide se o trabalho acabou é o `--provar`, nunca o agente.
+Fechar o trabalho da sessão atual com UM commit só: validar critérios de conclusão, atualizar a memória operacional, salvar os arquivos do trabalho e da memória juntos, registrar o recibo e concluir a tarefa. Sem "publicar, carimbar, publicar de novo": nada é escrito depois do commit. Quem decide se o trabalho acabou é a prova do git, nunca o agente.
 
 ## Antes de qualquer comando
 
@@ -70,7 +70,7 @@ o `scripts/concluir_trabalho.py` no final).
 
 Nenhum caminho achou → **PARE**: esta skill está instalada incompleta
 (falta `scripts/concluir_trabalho.py`). Mostre ao aluno e peça pra
-reinstalar o `polozi-fundacao.zip` e reiniciar o app. Não improvise um
+baixar o zip do kit de novo, descompactar e abrir no aplicativo a pasta que tem o `AGENTS.md` dentro, não a de fora. Não improvise um
 encerramento sem script, não rode nada relativo, não copie o script pra
 dentro da Casa.
 
@@ -84,21 +84,21 @@ ausentes, o caminho é que era relativo ao cwd errado).
 ## Preparar
 
 1. Ler `EMPRESA-IA.md`, consultar `MAPA-DA-EMPRESA-IA.md` e abrir `operacao/LEIA-ME.md`.
-2. Ler `credenciais/CONEXOES.md` para saber se o banco da empresa (Supabase) já está conectado — isso decide, depois da prova, se o carimbo da TASK vai pro banco ou pro arquivo.
-3. Verificar os 5 critérios de conclusão. Só prossiga se TODOS forem verdade:
+2. Verificar os 5 critérios de conclusão. Só prossiga se TODOS forem verdade:
    - objetivo atendido;
-   - entregáveis validados;
+   - entregáveis validados (cada critério C1, C2... com a evidência da versão final);
    - sem pendência bloqueante;
-   - commit feito (ou será feito nesta conclusão, via `tecnologia-publicar`);
+   - o commit será feito nesta conclusão (passo "Salvar", um só);
    - `operacao/` será atualizada por esta conclusão.
-   Faltou algum? Não conclua — diga o que falta ou proponha `$polozi-transferir-trabalho`.
-4. Identificar no chat atual: resultado entregue, arquivos envolvidos, estados que mudaram, pendências, próximo objetivo, decisões explicitamente confirmadas pelo usuário e o número da TASK em andamento (se houver).
+   Faltou algum? Não conclua: diga o que falta ou proponha `$polozi-transferir-trabalho`.
+3. Identificar no chat atual: resultado entregue, arquivos envolvidos, estados que mudaram, pendências, próximo objetivo, decisões explicitamente confirmadas pelo usuário e o id da sessão que o hook mostrou no início do trabalho (é o `--sessao` do passo "Registrar").
+4. Listar os caminhos EXATOS deste trabalho (arquivos e pastas que você criou ou mudou). Alteração de outro trabalho aberto na mesma Casa não entra: é de outro objetivo.
 5. Verificar os arquivos envolvidos. Se não for possível identificar o resultado com segurança, pedir uma descrição curta do trabalho concluído.
 6. Não aceitar inferências como decisão. Não mover, renomear, apagar, criar saída empresarial nem criar papel novo no Mapa.
 
 ## Prévia
 
-Criar um arquivo temporário fora da Empresa IA com base em `<SKILL_DIR>/assets/modelo-plano-encerramento.json`. Incluir apenas mudanças relevantes — o campo `tarefa.numero`, quando a sessão trabalhou numa TASK, só entra como referência mostrada na prévia; ele não fecha nada aqui — e executar:
+Criar um arquivo temporário fora da Empresa IA com base em `<SKILL_DIR>/assets/modelo-plano-encerramento.json`. Incluir apenas mudanças relevantes. NÃO preencher `tarefa.numero`: o carimbo de `TASK.md` não faz parte deste fluxo (a conclusão vai pelo registro, abaixo). Executar:
 
 ```
 <PY> "<SKILL_DIR>/scripts/concluir_trabalho.py" \
@@ -115,58 +115,65 @@ Pedir uma única confirmação antes de gravar.
 ## Aplicar
 
 1. Depois da confirmação, executar o mesmo comando com `--aplicar`, sempre com `<PY>` e `<SKILL_DIR>`.
-2. O script só atualiza papéis já existentes no Mapa quando o arquivo correspondente existe; preserva o histórico de Changelog, Decisões e Pendências (uma pendência resolvida muda de estado, nunca é apagada); atualiza `capacidades/PLUGINS.md` apenas quando a sessão instalou um plugin novo (não é o catálogo de Skills — esse morreu).
-3. `--aplicar` NUNCA fecha a TASK. Se o plano tinha `tarefa.numero`, o script imprime `FALTA A PROVA: rode --provar --tarefa N depois do commit e do push` — é assim mesmo; a TASK só fecha na seção "Provar" abaixo.
-4. Commit e push: acione a skill `tecnologia-publicar`. O hook `.githooks/pre-push` da Casa varre segredo em todo push — se bloquear, corrija e não suba.
+2. O script só atualiza papéis já existentes no Mapa quando o arquivo correspondente existe; preserva o histórico de Changelog, Decisões e Pendências (uma pendência resolvida muda de estado, nunca é apagada); atualiza `capacidades/PLUGINS.md` apenas quando a sessão instalou um plugin novo (não é o catálogo de Skills, esse morreu).
+3. `--aplicar` NUNCA fecha a TASK e não commita. Anote os arquivos de `operacao/` (e o Mapa) que a prévia listou: vão no MESMO commit do trabalho, no passo seguinte.
 
-## Provar (o que decide se acabou)
+## Salvar (1 commit)
 
-1. Confirme que a skill `tecnologia-publicar` já commitou e empurrou o que o `--aplicar` gravou (o hook de push varre segredo antes; se bloquear, corrige e não sobe).
-2. Rodar, sem `--plano`:
+Um comando só, com os caminhos do trabalho MAIS os arquivos que o `--aplicar` escreveu (a skill `tecnologia-publicar` descreve o `salvar.py` e a tabela de saídas dele):
+
+```
+<PY> .agents/skills/tecnologia-publicar/scripts/salvar.py -m "<o que foi entregue, em português>" <caminho do trabalho> [<caminho> ...] operacao/STATUS-ATUAL.md [<outros escritos pelo --aplicar>]
+```
+
+- Nunca `--tudo` nem `git add -A`: o `salvar.py` recusa. Só os caminhos deste trabalho.
+- O pre-commit e o pre-push varrem segredo; se bloquear, tire o segredo e repita. Nunca contorne.
+- Casa com sistema no ar e na `main`: o `salvar.py` sai 3. Siga o fluxo completo da `tecnologia-publicar` (branch + PR) e volte aqui com o SHA do commit.
+- O recibo do envio fica em cache local ignorado pelo git (`operacao/tasks/.sessoes/`), nunca num arquivo versionado. Por isso não existe segundo commit.
+- Guarde o SHA: `git rev-parse HEAD`.
+
+## Registrar e provar
+
+1. Concluir no registro, com a evidência (consulta pronta não exige `--commit` nem `--arquivo`; documento exige os dois; código exige também `--verificacao`; publicação só com `--commit` igual ao SHA do merge e o recibo `operacao/tasks/.sessoes/publicacao-recibo.json` gravado pela `tecnologia-publicar` depois de provar "no ar"):
    ```
-   <PY> "<SKILL_DIR>/scripts/concluir_trabalho.py" --destino "PASTA_EMPRESA_IA" --provar --tarefa N
+   <PY> .codex/hooks/registro_trabalho.py concluir --sessao <id da sessão> --resumo "<resultado comprovado>" --commit <SHA> --arquivo <caminho> [--arquivo <caminho> ...] [--verificacao "<checagem executada>"]
    ```
-   (omita `--tarefa N` quando a sessão não estava fechando uma TASK). O script roda `git status --porcelain` e `git log origin/main..HEAD` na Casa e decide pelo código de saída — leia a tabela abaixo antes de agir sobre qualquer resultado diferente de `0`.
+   Saída `Registro pendente: ...` = faltou evidência ou o objetivo não foi registrado: leia a mensagem e corrija, sem editar `TASK.md` na mão. Sem credencial do banco, a conclusão fica na fila local e sobe sozinha depois; diga "registrado na fila", não "no banco".
+2. Provar só o escopo (outro trabalho sujo na Casa não atrapalha):
+   ```
+   <PY> .agents/skills/tecnologia-publicar/scripts/salvar.py --provar <os mesmos caminhos do Salvar>
+   ```
 
    | código | o que o script imprimiu | o que fazer |
    |---|---|---|
-   | `0` | (sem prefixo de erro) | siga o passo seguinte |
-   | `2` | `RECUSADO:` | git não aprovou (árvore suja, commit não enviado, ou `origin` sem `origin/main`) — mostre a lista exata ao dono e volte pra `tecnologia-publicar` commitar/empurrar; nunca contorne |
-   | `3` | `ERRO: falha de arquivo:` | problema de disco/permissão — mostre a mensagem e PARE (não é caso de `tecnologia-publicar`) |
-   | `4` | `ERRO:` | estado ou uso errado da Casa — LEIA a mensagem, ela diz o que falta; se ela citar `operacao/tasks/TEMPLATE-TASK.md`, o `TASK.md` daquela tarefa está fora do formato da Casa: copie os bullets do topo do template pro `TASK.md` preservando objetivo e critério, e rode de novo; NUNCA mande isso de volta pra etapa de commit e NUNCA marque concluída a mão |
+   | `0` | `SINCRONIZADO <hash>` ou, sem GitHub do dono, `SALVO_LOCAL <hash>` | siga para o fecho |
+   | `1` | lista de arquivos fora do commit ou commit que não subiu (RECUSADO como conclusão) | mostre a lista exata ao dono e salve o que faltou com o `salvar.py`; nunca contorne nem invente frase de fecho |
+   | `5` | uso errado (caminho fora da Casa, sem caminho) | corrija o comando |
 
-3. Exit 0 e veio `--tarefa N`? Três casos, e NENHUM diz que terminou:
-   - (a) o script carimbou `operacao/tasks/TASK-N/TASK.md` com `Status: concluída`, `Concluída em:` e `Commit:` — a última linha é `FALTA A PROVA FINAL`; vá pro passo 4 (o carimbo é escrita nova, precisa commitar/empurrar antes da prova final).
-   - (b) `credenciais/CONEXOES.md` já tem o banco conectado: não tocou arquivo nenhum e imprimiu a instrução pro `polozi-gerente-de-trabalho` já com o hash provado — a última linha também é `FALTA A PROVA FINAL`; vá pro passo 4 mesmo sem ter escrito nada (é a prova final que ainda falta).
-   - (c) a TASK já estava carimbada: o script avisa `já estava carimbada` e a última linha é `Já carimbada; rode --provar (sem --tarefa) pra prova final.` — não há carimbo novo pra commitar; pule direto pro `--provar` sem `--tarefa` do passo 4.
-4. Se algo novo foi escrito no carimbo (caso a), acione a skill `tecnologia-publicar` para commitar e empurrar antes de rodar a prova final; nos casos (b) e (c) não há escrita nova pra commitar. Em qualquer caso, rode a prova final sem `--tarefa`:
-   ```
-   <PY> "<SKILL_DIR>/scripts/concluir_trabalho.py" --destino "PASTA_EMPRESA_IA" --provar
-   ```
-5. A frase de fecho é sempre a da rodada SEM `--tarefa`, copiada literal do stdout do SCRIPT — nunca uma paráfrase do agente e nunca a de uma rodada com `--tarefa`: com `origin` sincronizado, `Sincronizado no GitHub, commit <hash curto>.`; sem `origin` (GitHub ainda não existe), `salvo neste computador, commit <hash curto>.`.
+   Saídas `2`, `3`, `4` e `6` do `salvar.py` têm a tabela completa na `tecnologia-publicar`; nenhuma delas é "pronto".
+3. Frase de fecho, só com saída `0`, copiando a linha do script: `SINCRONIZADO` = "Sincronizado no GitHub, commit <hash curto>."; `SALVO_LOCAL` = "salvo neste computador, commit <hash curto>.". Diga também em qual estado ficou: salvo na branch, integrado por PR ou no ar são coisas diferentes.
+4. Informar ao usuário o que foi registrado e o próximo passo.
+5. Tarefa do plano de 90 dias ou do curso: rode `<PY> .codex/hooks/registro_trabalho.py reconciliar`; só nesse caso o quadro fecha pela reconciliação. Trabalho comum já fechou no passo 1 (`concluir`); não há fechamento automático no fim do turno.
 
 ## Verificar
 
-1. O `--provar` (e o `--provar --tarefa N`, quando houve TASK) saiu com exit 0 antes de qualquer frase de fecho ser dita ao usuário.
-2. TASK fechada — no banco (confirmação do `polozi-gerente-de-trabalho`) ou em `operacao/tasks/TASK-N/TASK.md`, com `Commit:` preenchido.
-3. `STATUS-ATUAL.md`, `CHANGELOG.md`, `DECISOES.md`, `PENDENCIAS.md` e `PROXIMA-SESSAO.md` atualizados conforme a prévia.
-4. Informar ao usuário o que foi registrado e o próximo passo, fechando com a frase que o script imprimiu — nunca uma frase escrita de próprio punho.
-5. Rodar `<PY> .codex/hooks/registro_trabalho.py reconciliar` e dizer que a tarefa do quadro (ligada pelo `- Quadro:` do `TASK.md`) fecha sozinha no fim do turno; não feche à mão.
+1. O `salvar.py --provar` saiu com 0 antes de qualquer frase de fecho.
+2. O `registro_trabalho.py concluir` imprimiu a confirmação (banco ou fila) com o SHA e os arquivos.
+3. `STATUS-ATUAL.md`, `CHANGELOG.md`, `DECISOES.md`, `PENDENCIAS.md` e `PROXIMA-SESSAO.md` atualizados conforme a prévia, no mesmo commit.
+4. Nenhum arquivo foi escrito depois do commit (git `status` do escopo limpo).
 
 ## Limites
 
-- Nunca dizer "trabalho salvo" ou "concluído" sem exit 0 do `--provar` SEM `--tarefa` — a rodada com `--tarefa` nunca diz fecho, mesmo em exit 0.
-- `RECUSADO:` (exit 2) = mostrar a lista exata (arquivos sujos, commits não enviados) e voltar pra `tecnologia-publicar` — nunca contornar, nunca inventar uma frase de fecho.
-- Exit 3 ou exit 4 NUNCA são tratados como `RECUSADO:` nem mandados pra `tecnologia-publicar` — leia a tabela de códigos e siga o remédio específico de cada um.
-- Nunca criar ou corrigir um bullet de `TASK.md` pra "destravar" o script sem que a mensagem de exit 4 tenha mandado — e, mesmo quando mandou, só os bullets do topo (nunca escrever o valor `concluída` na mão).
-- Nunca copiar o script ou o plano de encerramento pra dentro da Casa.
-- Nunca marcar a TASK como concluída editando `TASK.md` na mão — só o `--provar --tarefa N`, depois de exit 0, carimba.
-- Nunca fazer commit ou push você mesmo — sempre passar pela skill `tecnologia-publicar`.
+- Nunca dizer "trabalho salvo" ou "concluído" sem saída 0 do `salvar.py --provar` e sem a confirmação do `concluir`.
+- Saída 1 da prova = mostrar a lista exata (arquivos sujos, commits não enviados) e salvar o que faltou; nunca contornar, nunca inventar uma frase de fecho.
+- Nunca fazer um segundo commit para "carimbar" ou "registrar" a conclusão: o recibo vai para o cache e para o banco.
+- Nunca usar `--tudo`, `git add -A` ou `git add .`; nunca salvar alteração de outro trabalho.
+- Nunca marcar tarefa como concluída editando `TASK.md` na mão: só o `registro_trabalho.py concluir`.
+- Nunca copiar o script ou o plano de encerramento para dentro da Casa.
 - Nunca escrever sem prévia e confirmação.
 - Nunca registrar decisão não confirmada explicitamente.
 - Nunca apagar, mover ou reorganizar arquivos.
 - Nunca criar papel novo no Mapa durante o encerramento.
 - Nunca copiar transcrições, entregas inteiras, credenciais ou dados sensíveis para a memória operacional.
-- Nunca apagar uma pendência resolvida — ela muda de estado (`aberta` → `resolvida`), a linha fica para histórico.
-- Nunca fechar a TASK no arquivo se o banco já existir em `credenciais/CONEXOES.md` — nesse estágio o banco é a fonte oficial.
-- Nunca concluir com algum dos 5 critérios em aberto — proponha `$polozi-transferir-trabalho` em vez disso.
+- Nunca apagar uma pendência resolvida: ela muda de estado (`aberta` para `resolvida`), a linha fica para histórico.
+- Nunca concluir com algum dos 5 critérios em aberto: proponha `$polozi-transferir-trabalho` em vez disso.

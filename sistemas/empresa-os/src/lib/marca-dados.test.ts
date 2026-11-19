@@ -289,3 +289,19 @@ test("hexDaCor: só devolve HEX que passa na regex (cor que chega ao style da te
   assert.equal(hexDaCor(cores, "Nenhuma"), null);
 });
 
+
+test("dividirSecoes: título ## com 190 KB de espaços resolve em menos de 500 ms (tempo linear)", () => {
+  const espacos = " ".repeat(190 * 1024);
+  for (const texto of [`## a${espacos}b\n\ncorpo`, `## ${espacos}\n\ncorpo`, `## a${espacos}###${espacos}`]) {
+    const t = performance.now();
+    dividirSecoes(texto);
+    const gasto = performance.now() - t;
+    assert.ok(gasto < 500, `levou ${Math.round(gasto)} ms`);
+  }
+});
+
+test("dividirSecoes: título normal igual ao de antes (# do fim, espaços, ## sem texto)", () => {
+  const s = dividirSecoes("## Um título ##  \ncorpo\n##   Dois   \nx\n##\nfora\n## \nfora também\n###  Três\ny\n##Sem espaço\nz");
+  assert.deepEqual(s.map((x) => x.titulo), ["Um título", "Dois"]);
+  assert.equal(s[0].corpo, "corpo");
+});

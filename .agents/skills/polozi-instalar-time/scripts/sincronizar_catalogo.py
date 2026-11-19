@@ -399,6 +399,7 @@ def montar_catalogo(casa: Path) -> dict:
     instalados = {p.stem for p in instalados_dir.glob("*.toml")} if instalados_dir.is_dir() else set()
     times_ativos = set(it.times_instalados(casa / "capacidades" / "PLUGINS.md"))
     nucleo_cfg = _ler_nucleo_cfg(casa)
+    aposentados = it.aposentados_da_casa(casa)  # capacidades/APOSENTADOS.json: o que saiu da Casa de propósito
 
     agentes: dict[str, dict] = {}
     artefatos: dict[tuple[str, str], dict] = {}
@@ -406,6 +407,9 @@ def montar_catalogo(casa: Path) -> dict:
     skills_do_agente: dict[str, str] = {}  # nome -> developer_instructions
 
     def guardar(art: dict) -> None:
+        chave_tipo = {"agente": "agentes", "skill": "skills"}.get(art["tipo"])
+        if chave_tipo and art["nome"] in aposentados.get(chave_tipo, []):
+            art["estado"] = "aposentado"
         if not RE_NOME_ARTEFATO.match(art["nome"]) or len(art["nome"]) > 80:
             print(f"AVISO: {art['tipo']} '{art['nome']}' em {art['caminho']} tem nome fora do padrão "
                   "([a-z0-9._-], até 80); ficou de fora do catálogo.", file=sys.stderr)
@@ -441,6 +445,8 @@ def montar_catalogo(casa: Path) -> dict:
         texto = ler_texto(caminho, rotulo) or ""
         toml = ler_toml(texto)
         nome = toml.get("name") or caminho.stem
+        if nome in aposentados.get("agentes", []):
+            estado = "aposentado"
         if not RE_NOME_AGENTE.match(nome):
             print(f"AVISO: agente '{nome}' em {rotulo} tem nome fora do padrão ([a-z0-9-]); "
                   "ficou de fora do catálogo.", file=sys.stderr)

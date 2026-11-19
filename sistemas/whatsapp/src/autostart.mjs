@@ -69,7 +69,9 @@ export function collectEnvironment({ environment, nodePath, platform }) {
 
 // Sem KeepAlive: start-background termina logo depois de deixar o assistente rodando solto
 // (AbandonProcessGroup impede o launchd de matar esse processo filho quando o job acaba).
-export function buildLaunchAgentPlist({ label = LAUNCH_AGENT_LABEL, nodePath, scriptPath, workingDirectory, logFile, environmentVariables = {} }) {
+// args e keepAlive servem ao conector multiatendimento (src/multicanal/servico.mjs), que fica rodando:
+// KeepAlive so com SuccessfulExit=false, para o launchd reabrir depois de queda, mas nao depois de saida limpa.
+export function buildLaunchAgentPlist({ label = LAUNCH_AGENT_LABEL, nodePath, scriptPath, args = [], keepAlive = false, workingDirectory, logFile, environmentVariables = {} }) {
   const variables = Object.entries(environmentVariables)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, value]) => `    <key>${xmlEscape(name)}</key>\n    <string>${xmlEscape(value)}</string>`)
@@ -84,12 +86,12 @@ export function buildLaunchAgentPlist({ label = LAUNCH_AGENT_LABEL, nodePath, sc
   <array>
     <string>${xmlEscape(nodePath)}</string>
     <string>${xmlEscape(scriptPath)}</string>
-  </array>
+${args.map((arg) => `    <string>${xmlEscape(arg)}</string>\n`).join("")}  </array>
   <key>WorkingDirectory</key>
   <string>${xmlEscape(workingDirectory)}</string>
   <key>RunAtLoad</key>
   <true/>
-  <key>AbandonProcessGroup</key>
+${keepAlive ? "  <key>KeepAlive</key>\n  <dict>\n    <key>SuccessfulExit</key>\n    <false/>\n  </dict>\n" : ""}  <key>AbandonProcessGroup</key>
   <true/>
   <key>StandardOutPath</key>
   <string>${xmlEscape(logFile)}</string>
@@ -104,14 +106,14 @@ ${variables}
 `;
 }
 
-export function buildWindowsStartupScript({ nodePath, scriptPath, workingDirectory, environmentVariables = {} }) {
+export function buildWindowsStartupScript({ nodePath, scriptPath, args = [], workingDirectory, environmentVariables = {}, comment = "Polozi WhatsApp local: inicia o motor e o assistente ao entrar no Windows, sem janela." }) {
   const lines = [
-    "' Polozi WhatsApp local: inicia o motor e o assistente ao entrar no Windows, sem janela.",
+    `' ${comment}`,
     'Set shell = CreateObject("WScript.Shell")',
     `shell.CurrentDirectory = ${vbsString(workingDirectory)}`,
     'Set env = shell.Environment("Process")',
     ...Object.entries(environmentVariables).map(([name, value]) => `env(${vbsString(name)}) = ${vbsString(value)}`),
-    `shell.Run ${vbsString(`"${nodePath}" "${scriptPath}"`)}, 0, False`,
+    `shell.Run ${vbsString([nodePath, scriptPath, ...args].map((part) => `"${part}"`).join(" "))}, 0, False`,
   ];
   return `${lines.join("\r\n")}\r\n`;
 }

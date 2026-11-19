@@ -72,8 +72,8 @@ vira `<SKILL_DIR>` — a pasta que contém `scripts/provar_conexao.py` (sem o
 `scripts/provar_conexao.py` no final).
 
 Nenhum caminho achou → **PARE**: esta skill está instalada incompleta
-(falta `scripts/provar_conexao.py`). Mostre ao aluno e peça pra reinstalar
-o `polozi-fundacao.zip` e reiniciar o app. Não improvise caminho, não rode
+(falta `scripts/provar_conexao.py`). Mostre ao aluno e peça pra
+baixar o zip do kit de novo, descompactar e abrir no aplicativo a pasta que tem o `AGENTS.md` dentro, não a de fora. Não improvise caminho, não rode
 nada relativo, não copie script pra dentro da Casa.
 
 Todo comando `.py` desta skill, daqui pra frente, é
@@ -179,7 +179,7 @@ gh auth status
 Já logado, pule. Não logado:
 
 ```
-gh auth login --hostname github.com --git-protocol https --web --scopes workflow
+gh auth login --hostname github.com --git-protocol https --web --clipboard --scopes workflow
 ```
 
 (Conferir a instalação do app do GitHub pela Vercel, não pelo `gh`: `gh api` não
@@ -187,10 +187,12 @@ lista instalação de GitHub App com token de usuário, responde 403.)
 
 O escopo `workflow` vem já no primeiro login (sem ele o GitHub recusa o push
 da Casa, que tem `.github/workflows/`); logado sem ele, `gh auth refresh
---hostname github.com --scopes workflow`. O comando mostra um código, abre o navegador
-padrão (o Chrome) e espera: deixe-o rodando. Não abriu, ou abriu outro? Abra
-`https://github.com/login/device` no Chrome do aluno; ele digita o código e
-clica em Authorize. Você
+--hostname github.com --clipboard --scopes workflow`. O comando copia o código
+pra área de transferência, abre o navegador padrão (o Chrome) e espera: deixe-o
+rodando. Não abriu, ou abriu outro? Abra `https://github.com/login/device` no
+Chrome do aluno e diga: "O código já está copiado. Clique no campo, cole (Windows
+Ctrl+V, Mac Cmd+V), clique em Continue e depois em Authorize." Campo vazio: leia
+o código na saída do `gh` e mostre pra ele digitar na página. Você
 nunca vê nem pede senha ou token. Sem credential store no sistema, o `gh`
 grava o token em arquivo de texto puro — pra saber onde o seu ficou, rode
 `gh auth status` de novo; jamais force o armazenamento inseguro da CLI.

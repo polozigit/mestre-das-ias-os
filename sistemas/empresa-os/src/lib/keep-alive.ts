@@ -7,8 +7,11 @@
  * (doc vercel.com/docs/cron-jobs/manage-cron-jobs, "Securing cron jobs"). Sem CRON_SECRET, a rota
  * recusa tudo: nunca fica aberta.
  *
- * Só a produção: a Vercel não roda Cron em deploy de preview, então a homologação continua sem
- * toque diário (se pausar, restaure no painel da Supabase).
+ * Só a produção roda o Cron (a Vercel não roda Cron em deploy de preview). Por isso a produção
+ * também toca o banco de HOMOLOGAÇÃO, que o preview usa: com NEXT_PUBLIC_SUPABASE_URL_HOMOLOG e
+ * NEXT_PUBLIC_SUPABASE_ANON_KEY_HOMOLOG (as duas públicas, gravadas pelo `conectar.py vercel-env`)
+ * faz 1 leitura leve com a chave anon. Falha na homologação NUNCA muda o status da resposta: só
+ * aparece no campo `homologacao` ("ok", "falhou" ou "ausente").
  */
 
 export type ResultadoConsulta = { erro: string | null };
@@ -27,5 +30,36 @@ export async function tocarBanco(
     return { status: 200, corpo: { ok: true } };
   } catch {
     return { status: 500, corpo: { ok: false, motivo: "não consegui falar com o banco" } };
+  }
+}
+
+export type EstadoHomologacao = "ok" | "falhou" | "ausente";
+
+const TEMPO_MAXIMO_HOMOLOGACAO_MS = 8000;
+
+/**
+ * 1 leitura leve (`empresa`, 1 linha) no banco de homologação com a chave anon. RLS devolvendo
+ * lista vazia é sucesso: o que importa é uma consulta de verdade no Postgres. Só 2xx conta como "ok".
+ * Nunca lança, nunca devolve dado nem chave.
+ */
+export async function tocarHomologacao(
+  url: string | undefined,
+  chaveAnon: string | undefined,
+  buscar: typeof fetch = fetch,
+  tempoMaximoMs: number = TEMPO_MAXIMO_HOMOLOGACAO_MS,
+): Promise<EstadoHomologacao> {
+  const base = (url ?? "").trim().replace(/\/+$/, "");
+  const chave = (chaveAnon ?? "").trim();
+  if (!base || !chave) return "ausente";
+  if (!base.startsWith("https://")) return "falhou";
+  try {
+    const resposta = await buscar(`${base}/rest/v1/empresa?select=id&limit=1`, {
+      headers: { apikey: chave, Authorization: `Bearer ${chave}` },
+      signal: AbortSignal.timeout(tempoMaximoMs),
+      cache: "no-store",
+    });
+    return resposta.ok ? "ok" : "falhou";
+  } catch {
+    return "falhou";
   }
 }

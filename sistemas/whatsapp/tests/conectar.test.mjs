@@ -7,7 +7,7 @@ import test from "node:test";
 import { conectar, curto, dependenciesStale, installDependencies, maskPhone, parseFlags } from "../src/conectar.mjs";
 
 const API_KEY = "a".repeat(64);
-const PHONE = "5547991911800";
+const PHONE = "5511912345678";
 const config = { apiKey: API_KEY, baseUrl: "http://127.0.0.1:1" };
 const CONNECTED = { connected: true, loggedIn: true, ownPhone: PHONE, paired: true };
 const NOT_PAIRED = { connected: false, loggedIn: false, ownPhone: "", paired: false };
@@ -95,7 +95,7 @@ test("ja conectado: pula o QR, nao reinstala nada e imprime so o resultado", asy
   assert.deepEqual(h.lines.slice(0, 6), [
     "CONECTAR=OK",
     "WHATSAPP=CONECTADO",
-    "NUMERO=...1800",
+    "NUMERO=...5678",
     "INICIO_AUTOMATICO=ligado",
     "MCP=claude:ok",
     "REGISTRO_BANCO=configurado",
@@ -111,7 +111,7 @@ test("saida final tem no maximo 7 linhas e nunca o numero inteiro nem a chave", 
   assert.ok(h.lines.every((line) => /^[A-Z_]+=/.test(line)), "so linhas CHAVE=valor");
   assert.doesNotMatch(h.text(), new RegExp(PHONE));
   assert.doesNotMatch(h.text(), new RegExp(API_KEY));
-  assert.match(h.text(), /NUMERO=\.\.\.1800/);
+  assert.match(h.text(), /NUMERO=\.\.\.5678/);
   assert.match(h.text(), /MCP=claude:ja_existia/);
 });
 
@@ -329,7 +329,7 @@ test("parseFlags le a flag depois do -- e tambem a que o npm converte em npm_con
 test("curto mascara hex longo, tira quebra de linha e limita o tamanho", () => {
   assert.equal(curto(`a\n\nb ${"f".repeat(40)}`), "a b ***");
   assert.equal(curto("x".repeat(400)).length, 160);
-  assert.equal(maskPhone("5547991911800"), "...1800");
+  assert.equal(maskPhone("5511912345678"), "...5678");
   assert.equal(maskPhone(""), "indisponivel");
 });
 

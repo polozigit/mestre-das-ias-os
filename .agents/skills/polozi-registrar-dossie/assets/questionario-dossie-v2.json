@@ -1,0 +1,2400 @@
+{
+ "versao": "2",
+ "titulo": "Dossiê da empresa",
+ "exemplo_empresa": "Os exemplos são de uma empresa fictícia de ar-condicionado. Servem só para mostrar o tamanho da resposta.",
+ "blocos": [
+  {
+   "id": "A",
+   "titulo": "Você e a empresa",
+   "intro": "Começamos pelo básico. É rápido."
+  },
+  {
+   "id": "B",
+   "titulo": "O que vende e para quem",
+   "intro": "Agora o que a empresa vende e quem compra."
+  },
+  {
+   "id": "C",
+   "titulo": "Como atrai, vende e atende",
+   "intro": "O caminho do cliente: como chega, como compra e o que acontece depois."
+  },
+  {
+   "id": "D",
+   "titulo": "Marca",
+   "intro": "O jeito da sua marca: como fala, como se mostra e o que promete. É a base para o logo, o site e as apresentações."
+  },
+  {
+   "id": "E",
+   "titulo": "Como a empresa funciona",
+   "intro": "A rotina, as ferramentas e onde a IA pode entrar."
+  },
+  {
+   "id": "F",
+   "titulo": "Pessoas",
+   "intro": "Sobre a equipe que trabalha com você."
+  },
+  {
+   "id": "G",
+   "titulo": "Dinheiro",
+   "intro": "Quase tudo aqui é de marcar. Ninguém além da Polozi vê."
+  },
+  {
+   "id": "H",
+   "titulo": "Futuro",
+   "intro": "Para fechar: para onde a empresa vai e o que você espera da IA."
+  }
+ ],
+ "perguntas": [
+  {
+   "id": "A1",
+   "v1": [
+    "1.1"
+   ],
+   "bloco": "A",
+   "texto": "Confira os seus dados",
+   "ajuda": "É o que a Polozi já tem no seu cadastro. Se estiver certo, é só avançar. Se mudou, corrija.",
+   "partes": [
+    {
+     "chave": "nome",
+     "tipo": "texto",
+     "rotulo": "Seu nome",
+     "cadastro": "nome"
+    },
+    {
+     "chave": "cargo",
+     "tipo": "selecao",
+     "rotulo": "Seu cargo",
+     "cadastro": "cargo",
+     "opcoes_de": "CADASTRO.cargo"
+    },
+    {
+     "chave": "empresa",
+     "tipo": "texto",
+     "rotulo": "Nome da empresa",
+     "cadastro": "empresa"
+    },
+    {
+     "chave": "segmento",
+     "tipo": "selecao",
+     "rotulo": "Segmento",
+     "cadastro": "segmento",
+     "opcoes_de": "CADASTRO.segmento"
+    }
+   ],
+   "confirma_cadastro": true
+  },
+  {
+   "id": "A2",
+   "v1": [
+    "1.2"
+   ],
+   "bloco": "A",
+   "texto": "O que a sua empresa faz?",
+   "ajuda": "Fale como você explicaria para alguém que acabou de conhecer.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "A Refrigeração Pinheiro instala e conserta ar-condicionado em casas e pequenos comércios de Campinas. Também vendemos o aparelho quando o cliente precisa."
+    }
+   ]
+  },
+  {
+   "id": "A4",
+   "v1": [
+    "1.3"
+   ],
+   "bloco": "A",
+   "texto": "Há quantos anos a empresa existe?",
+   "ajuda": "Pode ser aproximado.",
+   "partes": [
+    {
+     "chave": "anos",
+     "tipo": "numero",
+     "rotulo": "Anos",
+     "min": 0,
+     "max": 200
+    }
+   ]
+  },
+  {
+   "id": "A5",
+   "v1": [
+    "1.4"
+   ],
+   "bloco": "A",
+   "texto": "Quantas pessoas trabalham na empresa?",
+   "ajuda": "Conte você, os sócios e quem trabalha fixo. Se a empresa não existia há três anos, coloque 0.",
+   "partes": [
+    {
+     "chave": "hoje",
+     "tipo": "numero",
+     "rotulo": "Hoje",
+     "min": 1,
+     "max": 100000
+    },
+    {
+     "chave": "tres_anos",
+     "tipo": "numero",
+     "rotulo": "Três anos atrás",
+     "min": 0,
+     "max": 100000
+    }
+   ]
+  },
+  {
+   "id": "A6",
+   "v1": [
+    "1.5"
+   ],
+   "bloco": "A",
+   "texto": "Em que cidade e estado fica a empresa?",
+   "ajuda": "Se tem mais de uma unidade, coloque a principal.",
+   "partes": [
+    {
+     "chave": "cidade",
+     "tipo": "texto",
+     "rotulo": "Cidade"
+    },
+    {
+     "chave": "uf",
+     "tipo": "texto",
+     "rotulo": "Estado (sigla)",
+     "max": 2
+    }
+   ]
+  },
+  {
+   "id": "A7",
+   "v1": [],
+   "bloco": "A",
+   "texto": "Você tem sócio?",
+   "ajuda": "Marque e, se quiser, conte quem decide junto com você.",
+   "partes": [
+    {
+     "chave": "socio",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "so_eu",
+       "r": "Sou só eu"
+      },
+      {
+       "v": "socio_trabalha",
+       "r": "Sócio que trabalha comigo"
+      },
+      {
+       "v": "socio_investidor",
+       "r": "Sócio investidor"
+      },
+      {
+       "v": "familia",
+       "r": "Família"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Quem decide junto com você?",
+     "exemplo": "Minha esposa cuida do financeiro e decide comigo os gastos grandes."
+    }
+   ]
+  },
+  {
+   "id": "A8",
+   "v1": [],
+   "bloco": "A",
+   "texto": "A empresa tem site, Instagram ou outras redes?",
+   "ajuda": "Tudo opcional. Cole o endereço ou o @. Ajuda a IA a conhecer seus produtos e o seu jeito de falar. Se não tem, é só avançar.",
+   "partes": [
+    {
+     "chave": "site",
+     "tipo": "texto",
+     "rotulo": "Site",
+     "opcional": true,
+     "entrada": "url",
+     "dica": "www.suaempresa.com.br"
+    },
+    {
+     "chave": "instagram",
+     "tipo": "texto",
+     "rotulo": "Instagram",
+     "opcional": true,
+     "dica": "@suaempresa"
+    },
+    {
+     "chave": "outras",
+     "tipo": "texto",
+     "rotulo": "Outras redes",
+     "opcional": true,
+     "dica": "LinkedIn, YouTube, TikTok"
+    }
+   ]
+  },
+  {
+   "id": "A9",
+   "v1": [],
+   "bloco": "A",
+   "texto": "Como a empresa começou? Por que você abriu?",
+   "ajuda": "A história em poucas frases. Serve para o site, para apresentações e para a IA contar quem vocês são.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Eu era técnico numa empresa grande e via o cliente esperar uma semana por um conserto simples. Em 2014 saí e comecei sozinho, com uma moto e a promessa de atender no mesmo dia."
+    }
+   ]
+  },
+  {
+   "id": "B1",
+   "v1": [
+    "2.1"
+   ],
+   "bloco": "B",
+   "texto": "Você vende produto, serviço ou os dois?",
+   "ajuda": "Produto é o que se entrega pronto. Serviço é o que você faz para o cliente.",
+   "partes": [
+    {
+     "chave": "tipo",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "produto",
+       "r": "Produto"
+      },
+      {
+       "v": "servico",
+       "r": "Serviço"
+      },
+      {
+       "v": "os_dois",
+       "r": "Os dois"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "B2",
+   "v1": [
+    "2.3"
+   ],
+   "bloco": "B",
+   "texto": "Vende para pessoas, para empresas ou para os dois?",
+   "ajuda": "Pense em quem paga a conta.",
+   "partes": [
+    {
+     "chave": "cliente",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "pessoas",
+       "r": "Pessoas"
+      },
+      {
+       "v": "empresas",
+       "r": "Empresas"
+      },
+      {
+       "v": "os_dois",
+       "r": "Os dois"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "B3",
+   "v1": [
+    "2.2"
+   ],
+   "bloco": "B",
+   "texto": "Quais são os produtos ou serviços mais vendidos? Qual dá mais lucro?",
+   "ajuda": "Cite de três a cinco. Não precisa da lista inteira.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "O que mais sai é instalação de ar split e limpeza. O que dá mais lucro é o contrato de manutenção mensal para comércio."
+    }
+   ]
+  },
+  {
+   "id": "B4",
+   "v1": [],
+   "bloco": "B",
+   "texto": "Quanto um cliente paga, em média, por compra?",
+   "ajuda": "Um valor típico, não o maior nem o menor.",
+   "partes": [
+    {
+     "chave": "ticket",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "ate_100",
+       "r": "Até R$ 100"
+      },
+      {
+       "v": "100_500",
+       "r": "R$ 100 a 500"
+      },
+      {
+       "v": "500_2k",
+       "r": "R$ 500 a 2 mil"
+      },
+      {
+       "v": "2k_5k",
+       "r": "R$ 2 mil a 5 mil"
+      },
+      {
+       "v": "5k_10k",
+       "r": "R$ 5 mil a 10 mil"
+      },
+      {
+       "v": "10k_25k",
+       "r": "R$ 10 mil a 25 mil"
+      },
+      {
+       "v": "25k_50k",
+       "r": "R$ 25 mil a 50 mil"
+      },
+      {
+       "v": "50k_100k",
+       "r": "R$ 50 mil a 100 mil"
+      },
+      {
+       "v": "acima_100k",
+       "r": "Acima de R$ 100 mil"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "B5a",
+   "v1": [
+    "2.4"
+   ],
+   "bloco": "B",
+   "texto": "Pense no seu melhor cliente de verdade, aquele que você queria ter dez iguais. Quem é ele?",
+   "ajuda": "Descreva uma pessoa ou empresa real: o que faz, idade ou tamanho, onde está.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "É o dono de restaurante ou padaria, com três a dez aparelhos, que não pode ficar com o salão quente. Ele quer alguém que atenda rápido e não discute preço."
+    }
+   ]
+  },
+  {
+   "id": "B5b",
+   "v1": [],
+   "bloco": "B",
+   "texto": "Que problema esse cliente queria resolver quando procurou você?",
+   "ajuda": "O que estava incomodando ele antes de comprar.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "O ar parava no meio do almoço e o técnico antigo demorava três dias para aparecer."
+    }
+   ]
+  },
+  {
+   "id": "B6",
+   "v1": [
+    "2.5",
+    "15.2"
+   ],
+   "bloco": "B",
+   "texto": "O cliente compra de novo?",
+   "ajuda": "Pense na maioria dos clientes.",
+   "partes": [
+    {
+     "chave": "recompra",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "venda_unica",
+       "r": "Quase sempre é venda única"
+      },
+      {
+       "v": "as_vezes",
+       "r": "Às vezes ele volta"
+      },
+      {
+       "v": "sempre",
+       "r": "Compra sempre"
+      },
+      {
+       "v": "mensal",
+       "r": "Paga todo mês (contrato ou assinatura)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "B7",
+   "v1": [
+    "2.8"
+   ],
+   "bloco": "B",
+   "texto": "Tem época do ano que vende mais ou menos?",
+   "ajuda": "Marque e fale quais meses são fortes e quais são fracos.",
+   "partes": [
+    {
+     "chave": "sazonal",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "nao_muda",
+       "r": "Não muda"
+      },
+      {
+       "v": "muda_pouco",
+       "r": "Muda um pouco"
+      },
+      {
+       "v": "muda_muito",
+       "r": "Muda muito"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Quais meses?",
+     "exemplo": "De outubro a fevereiro é correria. Junho e julho quase param."
+    }
+   ]
+  },
+  {
+   "id": "B8",
+   "v1": [
+    "4.2"
+   ],
+   "bloco": "B",
+   "texto": "Quem são seus principais concorrentes? Por que o cliente escolhe você?",
+   "ajuda": "Pode citar nomes. Depois diga o que você faz melhor que eles.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Concorro com a Clima Frio e com técnicos autônomos. O cliente fica comigo porque atendo no mesmo dia e dou garantia por escrito."
+    }
+   ]
+  },
+  {
+   "id": "C1",
+   "v1": [
+    "11.1",
+    "2.6"
+   ],
+   "bloco": "C",
+   "texto": "Por onde chega cliente novo?",
+   "ajuda": "Marque todos os que trazem cliente hoje. Depois escolha o principal.",
+   "partes": [
+    {
+     "chave": "canais",
+     "tipo": "multi",
+     "opcoes": [
+      {
+       "v": "indicacao",
+       "r": "Indicação de clientes"
+      },
+      {
+       "v": "redes_organico",
+       "r": "Instagram e redes (sem pagar)"
+      },
+      {
+       "v": "anuncio_redes",
+       "r": "Anúncio pago nas redes"
+      },
+      {
+       "v": "anuncio_google",
+       "r": "Anúncio no Google"
+      },
+      {
+       "v": "busca_mapa",
+       "r": "Busca do Google e mapa"
+      },
+      {
+       "v": "conteudo",
+       "r": "Conteúdo (vídeo, YouTube, blog)"
+      },
+      {
+       "v": "email_lista",
+       "r": "E-mail ou lista de transmissão"
+      },
+      {
+       "v": "whatsapp",
+       "r": "WhatsApp"
+      },
+      {
+       "v": "loja_ponto",
+       "r": "Loja, ponto ou fachada"
+      },
+      {
+       "v": "vendedor_rua",
+       "r": "Vendedor na rua ou visita"
+      },
+      {
+       "v": "ligacao",
+       "r": "Ligação e prospecção ativa"
+      },
+      {
+       "v": "parceria",
+       "r": "Parceria com outras empresas"
+      },
+      {
+       "v": "representantes",
+       "r": "Representantes ou afiliados"
+      },
+      {
+       "v": "marketplace",
+       "r": "Marketplace e aplicativos"
+      },
+      {
+       "v": "feiras",
+       "r": "Feiras e eventos do setor"
+      },
+      {
+       "v": "eventos_proprios",
+       "r": "Eventos próprios e palestras"
+      },
+      {
+       "v": "imprensa",
+       "r": "Imprensa e assessoria"
+      },
+      {
+       "v": "midia_offline",
+       "r": "Rádio, outdoor, panfleto, jornal"
+      },
+      {
+       "v": "influenciadores",
+       "r": "Influenciadores"
+      },
+      {
+       "v": "networking",
+       "r": "Grupos, associações e networking"
+      },
+      {
+       "v": "licitacao",
+       "r": "Licitação e governo"
+      },
+      {
+       "v": "outro",
+       "r": "Outro"
+      }
+     ]
+    },
+    {
+     "chave": "principal",
+     "tipo": "principal_de",
+     "de": "canais",
+     "rotulo": "Qual é o principal?"
+    }
+   ]
+  },
+  {
+   "id": "C2",
+   "v1": [
+    "11.2"
+   ],
+   "bloco": "C",
+   "texto": "Antes de vender, você ensina alguma coisa ao cliente?",
+   "ajuda": "Dica, vídeo, postagem, aula: qualquer conteúdo que ajude o cliente antes da compra.",
+   "partes": [
+    {
+     "chave": "conteudo",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "so_anuncia",
+       "r": "Só anuncio o produto"
+      },
+      {
+       "v": "as_vezes",
+       "r": "Posto de vez em quando"
+      },
+      {
+       "v": "toda_semana",
+       "r": "Conteúdo toda semana"
+      },
+      {
+       "v": "metodo",
+       "r": "Tenho método (aula, material, lista)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "C3",
+   "v1": [
+    "11.3"
+   ],
+   "bloco": "C",
+   "texto": "Qual o maior problema para conseguir mais clientes interessados?",
+   "ajuda": "O que você já tentou e não deu certo também vale.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Dependo de indicação. Já paguei anúncio duas vezes e veio muito curioso pedindo preço e sumindo."
+    }
+   ]
+  },
+  {
+   "id": "C4",
+   "v1": [],
+   "bloco": "C",
+   "texto": "Quem vende na empresa?",
+   "ajuda": "Quem conversa com o cliente e fecha o negócio.",
+   "partes": [
+    {
+     "chave": "quem_vende",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "so_eu",
+       "r": "Só eu"
+      },
+      {
+       "v": "eu_mais",
+       "r": "Eu e mais um ou dois"
+      },
+      {
+       "v": "time",
+       "r": "Um time de vendas"
+      },
+      {
+       "v": "ninguem",
+       "r": "Ninguém vende ativamente"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "C5",
+   "v1": [
+    "12.2"
+   ],
+   "bloco": "C",
+   "texto": "Existe um roteiro de venda?",
+   "ajuda": "Um passo a passo do que falar e perguntar ao cliente.",
+   "condicao": "vende_ativo",
+   "partes": [
+    {
+     "chave": "roteiro",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "cada_um",
+       "r": "Cada um vende do seu jeito"
+      },
+      {
+       "v": "na_cabeca",
+       "r": "Tem roteiro, mas na cabeça"
+      },
+      {
+       "v": "escrito",
+       "r": "Roteiro escrito"
+      },
+      {
+       "v": "escrito_treinado",
+       "r": "Escrito e treinado"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "C6",
+   "v1": [
+    "12.1"
+   ],
+   "bloco": "C",
+   "texto": "Vocês sabem em quais clientes focar?",
+   "ajuda": "Se existe um jeito de separar o cliente bom do curioso.",
+   "condicao": "vende_ativo",
+   "partes": [
+    {
+     "chave": "foco",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "todo_lado",
+       "r": "Atiramos para todo lado"
+      },
+      {
+       "v": "ideia",
+       "r": "Temos uma ideia"
+      },
+      {
+       "v": "criterio",
+       "r": "Temos critério definido"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "C7",
+   "v1": [
+    "12.3"
+   ],
+   "bloco": "C",
+   "texto": "Na hora de fechar, o que mais trava? Quais dúvidas o cliente mais traz?",
+   "ajuda": "Cite as duas ou três frases que você mais ouve antes de o cliente decidir.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Sempre perguntam se dá para parcelar e se a garantia cobre a peça. E muita gente fala que vai ver com o marido e não volta."
+    }
+   ]
+  },
+  {
+   "id": "C8",
+   "v1": [
+    "12.4",
+    "12.5"
+   ],
+   "bloco": "C",
+   "texto": "Depois do primeiro contato, vocês voltam a falar com o cliente?",
+   "ajuda": "Pense no cliente que pediu preço e não fechou.",
+   "condicao": "vende_ativo",
+   "partes": [
+    {
+     "chave": "retorno",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "esquecido",
+       "r": "O cliente acaba esquecido"
+      },
+      {
+       "v": "quando_lembro",
+       "r": "Volto quando lembro"
+      },
+      {
+       "v": "sequencia",
+       "r": "Tem sequência definida"
+      }
+     ]
+    },
+    {
+     "chave": "tentativas",
+     "tipo": "opcao",
+     "rotulo": "Quantas tentativas antes de desistir?",
+     "opcoes": [
+      {
+       "v": "1",
+       "r": "1"
+      },
+      {
+       "v": "2_3",
+       "r": "2 a 3"
+      },
+      {
+       "v": "4_6",
+       "r": "4 a 6"
+      },
+      {
+       "v": "7_mais",
+       "r": "7 ou mais"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "C9",
+   "v1": [
+    "2.7",
+    "12.6"
+   ],
+   "bloco": "C",
+   "texto": "Depois da venda, o que acontece?",
+   "ajuda": "Entrega, instalação, suporte. E como vocês continuam cuidando do cliente.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "A gente agenda a instalação em até dois dias. Depois de seis meses eu mando mensagem lembrando da limpeza, mas é quando sobra tempo."
+    }
+   ]
+  },
+  {
+   "id": "C10",
+   "v1": [
+    "5.1"
+   ],
+   "bloco": "C",
+   "texto": "O que você garante ao cliente quando ele compra?",
+   "ajuda": "Prazo, garantia, troca, devolução. A IA só vai prometer o que estiver aqui.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Garantia de 90 dias no serviço e um ano na peça. Atendo chamado de cliente com contrato em até quatro horas."
+    }
+   ]
+  },
+  {
+   "id": "C11",
+   "v1": [
+    "5.2"
+   ],
+   "bloco": "C",
+   "texto": "Tem algo que a empresa nunca promete?",
+   "ajuda": "O que você sabe que não consegue cumprir. A IA também não vai prometer.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Nunca prometo horário exato de chegada nem conserto no mesmo dia quando depende de peça."
+    }
+   ]
+  },
+  {
+   "id": "D1",
+   "v1": [],
+   "bloco": "D",
+   "texto": "Como a empresa fala com o cliente?",
+   "ajuda": "O jeito das mensagens e do atendimento. A IA vai escrever nesse tom.",
+   "partes": [
+    {
+     "chave": "tom",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "formal",
+       "r": "Bem formal"
+      },
+      {
+       "v": "profissional",
+       "r": "Profissional e direto"
+      },
+      {
+       "v": "proximo",
+       "r": "Próximo e informal"
+      },
+      {
+       "v": "brincalhao",
+       "r": "Brincalhão"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Uma frase que você sempre diz ao cliente",
+     "exemplo": "Pode ficar tranquilo que hoje ainda eu resolvo isso para o senhor."
+    }
+   ]
+  },
+  {
+   "id": "D2",
+   "v1": [],
+   "bloco": "D",
+   "texto": "Se a sua marca fosse uma pessoa, como ela seria?",
+   "ajuda": "Marque até três. Se quiser, diga uma marca que você admira e gostaria de parecer.",
+   "partes": [
+    {
+     "chave": "personalidade",
+     "tipo": "multi",
+     "max": 3,
+     "opcoes": [
+      {
+       "v": "seria_confiavel",
+       "r": "Séria e confiável"
+      },
+      {
+       "v": "proxima_acolhedora",
+       "r": "Próxima e acolhedora"
+      },
+      {
+       "v": "moderna_inovadora",
+       "r": "Moderna e inovadora"
+      },
+      {
+       "v": "sofisticada_premium",
+       "r": "Sofisticada e premium"
+      },
+      {
+       "v": "simples_acessivel",
+       "r": "Simples e acessível"
+      },
+      {
+       "v": "divertida_leve",
+       "r": "Divertida e leve"
+      },
+      {
+       "v": "tecnica_especialista",
+       "r": "Técnica e especialista"
+      },
+      {
+       "v": "tradicional",
+       "r": "Tradicional"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Uma marca que você admira",
+     "exemplo": "Gosto do jeito do Nubank: fala simples, sem enrolar, e resolve pelo celular."
+    }
+   ]
+  },
+  {
+   "id": "D3",
+   "v1": [],
+   "bloco": "D",
+   "texto": "A empresa tem identidade visual definida?",
+   "ajuda": "Logo, cores e letras que vocês usam sempre do mesmo jeito.",
+   "partes": [
+    {
+     "chave": "identidade",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "sem_logo",
+       "r": "Não tem logo"
+      },
+      {
+       "v": "logo_sem_padrao",
+       "r": "Tem logo, mas sem padrão"
+      },
+      {
+       "v": "logo_cores",
+       "r": "Logo e cores definidos"
+      },
+      {
+       "v": "manual",
+       "r": "Tem manual de marca"
+      }
+     ]
+    },
+    {
+     "chave": "cores",
+     "tipo": "texto",
+     "rotulo": "Cores principais da marca",
+     "opcional": true,
+     "dica": "azul escuro e branco"
+    }
+   ]
+  },
+  {
+   "id": "D4",
+   "v1": [],
+   "bloco": "D",
+   "texto": "Tem palavra ou expressão que a empresa sempre usa? E alguma que nunca usaria?",
+   "ajuda": "O jeito de escrever da marca. A IA vai seguir isso nas mensagens e nos textos.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "A gente sempre fala \"no mesmo dia\" e chama o cliente pelo nome. Nunca uso \"promoção imperdível\" nem gíria."
+    }
+   ]
+  },
+  {
+   "id": "D5",
+   "v1": [],
+   "bloco": "D",
+   "texto": "Qual a promessa principal da sua marca? Como você quer ser lembrado?",
+   "ajuda": "Se tem slogan, diga. Se não tem, fale com as suas palavras.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Ar funcionando hoje, não semana que vem. Quero ser lembrado como o técnico que aparece quando diz que vai aparecer."
+    }
+   ]
+  },
+  {
+   "id": "D6",
+   "v1": [],
+   "bloco": "D",
+   "texto": "Tem algum resultado, número ou elogio de cliente de que você se orgulha?",
+   "ajuda": "Serve para o site, para apresentações e para a IA usar como prova. Pode ser um caso só.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Atendo a mesma rede de padarias há oito anos, sem um dia de salão quente. E tenho nota 4,9 no Google com mais de duzentas avaliações."
+    }
+   ]
+  },
+  {
+   "id": "E1",
+   "v1": [],
+   "bloco": "E",
+   "texto": "Quem cuida de cada área hoje?",
+   "ajuda": "Uma resposta por linha. Mostra onde a IA pode ajudar primeiro.",
+   "partes": [
+    {
+     "chave": "areas",
+     "tipo": "grade",
+     "linhas": [
+      {
+       "v": "vendas",
+       "r": "Vendas"
+      },
+      {
+       "v": "atendimento",
+       "r": "Atendimento"
+      },
+      {
+       "v": "financeiro",
+       "r": "Financeiro"
+      },
+      {
+       "v": "operacao",
+       "r": "Entrega e operação"
+      },
+      {
+       "v": "pessoas",
+       "r": "Pessoas"
+      },
+      {
+       "v": "marketing",
+       "r": "Marketing"
+      }
+     ],
+     "opcoes": [
+      {
+       "v": "eu",
+       "r": "Eu"
+      },
+      {
+       "v": "outra_pessoa",
+       "r": "Outra pessoa"
+      },
+      {
+       "v": "terceirizado",
+       "r": "Terceirizado"
+      },
+      {
+       "v": "ninguem",
+       "r": "Ninguém direito"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "E2",
+   "v1": [
+    "6.1"
+   ],
+   "bloco": "E",
+   "texto": "A maior parte da sua semana vai em:",
+   "ajuda": "Onde o seu tempo realmente fica, não onde você gostaria.",
+   "partes": [
+    {
+     "chave": "semana",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "vender_entregar",
+       "r": "Vender e entregar eu mesmo"
+      },
+      {
+       "v": "tarefa_delegavel",
+       "r": "Tarefa que outro podia fazer"
+      },
+      {
+       "v": "conferir",
+       "r": "Conferir e corrigir o trabalho dos outros"
+      },
+      {
+       "v": "planejar",
+       "r": "Planejar e decidir"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "E3",
+   "v1": [
+    "6.2"
+   ],
+   "bloco": "E",
+   "texto": "Como você organiza o seu tempo?",
+   "ajuda": "O que você usa de verdade no dia a dia.",
+   "partes": [
+    {
+     "chave": "organiza",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "nao",
+       "r": "Não organizo"
+      },
+      {
+       "v": "lista",
+       "r": "Lista de tarefas"
+      },
+      {
+       "v": "agenda_blocos",
+       "r": "Agenda por blocos"
+      },
+      {
+       "v": "sistema",
+       "r": "Sistema ou aplicativo"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "E4",
+   "v1": [
+    "6.3"
+   ],
+   "bloco": "E",
+   "texto": "A equipe sabe o que é prioridade?",
+   "ajuda": "Se cada um sabe o que fazer primeiro sem perguntar.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "prioridade",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "perdida",
+       "r": "Fica perdida"
+      },
+      {
+       "v": "mais_ou_menos",
+       "r": "Mais ou menos"
+      },
+      {
+       "v": "sabe",
+       "r": "Sabe"
+      },
+      {
+       "v": "sabe_meta",
+       "r": "Sabe e tem meta escrita"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "E5",
+   "v1": [
+    "6.4"
+   ],
+   "bloco": "E",
+   "texto": "O jeito certo de fazer as coisas na empresa está:",
+   "ajuda": "Onde fica o passo a passo das tarefas.",
+   "partes": [
+    {
+     "chave": "jeito",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "minha_cabeca",
+       "r": "Na minha cabeça"
+      },
+      {
+       "v": "poucas_cabecas",
+       "r": "Na minha e na de uma ou duas pessoas"
+      },
+      {
+       "v": "escrito_parte",
+       "r": "Escrito em parte"
+      },
+      {
+       "v": "escrito_seguido",
+       "r": "Escrito, seguido e atualizado"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "E6",
+   "v1": [
+    "6.5"
+   ],
+   "bloco": "E",
+   "texto": "Quando aparece um problema fora do padrão:",
+   "ajuda": "Pense na última vez que algo deu errado.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "decisao",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "eu_resolvo",
+       "r": "Eu mesmo resolvo"
+      },
+      {
+       "v": "trazem",
+       "r": "Sempre trazem para mim"
+      },
+      {
+       "v": "resolvem_parte",
+       "r": "Resolvem uma parte"
+      },
+      {
+       "v": "ha_regra",
+       "r": "Há regra do que cada um decide"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "E7",
+   "v1": [
+    "15.5",
+    "9.2"
+   ],
+   "bloco": "E",
+   "texto": "Se você ficar 30 dias fora, sem celular:",
+   "ajuda": "Seja sincero. Não tem resposta certa.",
+   "partes": [
+    {
+     "chave": "fora",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "para_vender",
+       "r": "A empresa para de vender"
+      },
+      {
+       "v": "trava",
+       "r": "Funciona uns dias e trava"
+      },
+      {
+       "v": "com_erro",
+       "r": "Funciona, com erro e decisão acumulada"
+      },
+      {
+       "v": "cresce",
+       "r": "Funciona e continua crescendo"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Quem tocaria a empresa?",
+     "exemplo": "O Marcos, meu técnico mais antigo, segura o atendimento. Mas orçamento e compra de peça só eu faço."
+    }
+   ]
+  },
+  {
+   "id": "E8",
+   "v1": [
+    "15.4"
+   ],
+   "bloco": "E",
+   "texto": "Pense no último problema sério: um cliente reclamando ou um erro na entrega. O que aconteceu depois?",
+   "ajuda": "Marque e conte o caso em poucas frases.",
+   "partes": [
+    {
+     "chave": "melhoria",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "so_consertou",
+       "r": "Só consertamos"
+      },
+      {
+       "v": "mudou_jeito",
+       "r": "Consertamos e mudamos o jeito"
+      },
+      {
+       "v": "rotina",
+       "r": "Entrou numa rotina de revisão"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Conte o caso",
+     "exemplo": "Instalamos um aparelho na voltagem errada e queimou. Trocamos sem custo e agora o técnico tira foto do quadro antes de começar."
+    }
+   ]
+  },
+  {
+   "id": "E9",
+   "v1": [
+    "13.1"
+   ],
+   "bloco": "E",
+   "texto": "O que a empresa usa hoje?",
+   "ajuda": "Marque tudo e fale o nome dos sistemas.",
+   "partes": [
+    {
+     "chave": "ferramentas",
+     "tipo": "multi",
+     "opcoes": [
+      {
+       "v": "whatsapp",
+       "r": "WhatsApp"
+      },
+      {
+       "v": "whatsapp_business",
+       "r": "WhatsApp Business"
+      },
+      {
+       "v": "planilha",
+       "r": "Planilha"
+      },
+      {
+       "v": "sistema_gestao",
+       "r": "Sistema de gestão"
+      },
+      {
+       "v": "crm",
+       "r": "Sistema de vendas (CRM)"
+      },
+      {
+       "v": "instagram",
+       "r": "Instagram"
+      },
+      {
+       "v": "site",
+       "r": "Site"
+      },
+      {
+       "v": "loja_virtual",
+       "r": "Loja virtual"
+      },
+      {
+       "v": "emissor_nota",
+       "r": "Emissor de nota"
+      },
+      {
+       "v": "maquininha",
+       "r": "Maquininha"
+      },
+      {
+       "v": "agenda",
+       "r": "Agenda"
+      },
+      {
+       "v": "outro",
+       "r": "Outro"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Quais são os nomes dos sistemas?",
+     "exemplo": "Uso o Bling para nota e estoque, planilha do Google para os contratos e o WhatsApp Business para atender."
+    }
+   ]
+  },
+  {
+   "id": "E10",
+   "v1": [
+    "13.2",
+    "14.2",
+    "14.3"
+   ],
+   "bloco": "E",
+   "texto": "Tem alguma ferramenta que você paga ou usa e não funciona direito? E alguma que você sabe que ajudaria e ainda não colocou em prática?",
+   "ajuda": "Vale sistema, planilha, aplicativo ou equipamento.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "A planilha de contratos, que só eu sei mexer. Paguei um ano de um sistema de vendas e ninguém preencheu. E sei que precisava de agendamento online."
+    }
+   ]
+  },
+  {
+   "id": "E11",
+   "v1": [],
+   "bloco": "E",
+   "texto": "Onde ficam as informações de clientes, vendas e financeiro?",
+   "ajuda": "Marque onde está a maior parte.",
+   "partes": [
+    {
+     "chave": "dados",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "cabeca",
+       "r": "Na cabeça"
+      },
+      {
+       "v": "papel",
+       "r": "No papel ou caderno"
+      },
+      {
+       "v": "planilha",
+       "r": "Em planilha"
+      },
+      {
+       "v": "sistema",
+       "r": "Num sistema"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "E12",
+   "v1": [
+    "13.3"
+   ],
+   "bloco": "E",
+   "texto": "Quais são as três tarefas que mais se repetem e tomam tempo, suas ou da equipe?",
+   "ajuda": "Tarefa que se faz toda semana do mesmo jeito. São as primeiras que a IA pode assumir.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Responder pedido de orçamento no WhatsApp, montar a agenda dos técnicos e cobrar cliente que atrasou."
+    }
+   ]
+  },
+  {
+   "id": "E13",
+   "v1": [],
+   "bloco": "E",
+   "texto": "Você ou a equipe já usa inteligência artificial no trabalho?",
+   "ajuda": "ChatGPT, Gemini, Copilot ou outra. Marque e diga para quê.",
+   "partes": [
+    {
+     "chave": "uso_ia",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "nunca",
+       "r": "Nunca"
+      },
+      {
+       "v": "as_vezes",
+       "r": "De vez em quando"
+      },
+      {
+       "v": "toda_semana",
+       "r": "Toda semana, em tarefas da empresa"
+      },
+      {
+       "v": "processo",
+       "r": "Já tem processo rodando com IA"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Para quê?",
+     "exemplo": "Uso o ChatGPT para escrever mensagem de cobrança e legenda de post."
+    }
+   ]
+  },
+  {
+   "id": "F1",
+   "v1": [
+    "7.1",
+    "7.2"
+   ],
+   "bloco": "F",
+   "texto": "Como você contrata?",
+   "ajuda": "Marque e conte a maior dificuldade para achar gente boa.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "contrata",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "quando_aperta",
+       "r": "Contrato quando aperta"
+      },
+      {
+       "v": "etapas_cabeca",
+       "r": "Tenho etapas na cabeça"
+      },
+      {
+       "v": "processo_escrito",
+       "r": "Tenho processo escrito"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Qual a maior dificuldade?",
+     "exemplo": "Técnico bom já está empregado. Quem aparece não tem experiência e sai em três meses."
+    }
+   ]
+  },
+  {
+   "id": "F2",
+   "v1": [
+    "7.3"
+   ],
+   "bloco": "F",
+   "texto": "As pessoas certas estão nos lugares certos?",
+   "ajuda": "Marque e diga o que falta.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "encaixe",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "sim",
+       "r": "Sim"
+      },
+      {
+       "v": "maioria",
+       "r": "A maioria"
+      },
+      {
+       "v": "poucas",
+       "r": "Poucas"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "O que falta?",
+     "exemplo": "Minha atendente é ótima com cliente, mas está presa no financeiro, que ela não gosta."
+    }
+   ]
+  },
+  {
+   "id": "F3",
+   "v1": [
+    "7.4"
+   ],
+   "bloco": "F",
+   "texto": "Como você sabe quem está indo bem? Quando alguém não entrega, o que acontece?",
+   "ajuda": "Conte como é na prática, não como deveria ser.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Vejo pelo número de reclamação e de retorno. Quando alguém vai mal eu converso, mas demoro para tomar uma atitude."
+    }
+   ]
+  },
+  {
+   "id": "F4",
+   "v1": [
+    "8.1",
+    "8.2"
+   ],
+   "bloco": "F",
+   "texto": "A equipe é treinada?",
+   "ajuda": "Qualquer treinamento conta: seu, de fornecedor ou curso.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "treino",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "nao",
+       "r": "Não"
+      },
+      {
+       "v": "na_entrada",
+       "r": "Só quando entra"
+      },
+      {
+       "v": "as_vezes",
+       "r": "De vez em quando"
+      },
+      {
+       "v": "programa",
+       "r": "Programa com frequência"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F5",
+   "v1": [
+    "8.3"
+   ],
+   "bloco": "F",
+   "texto": "Como a equipe reage a mudança?",
+   "ajuda": "Pense na última ferramenta ou regra nova.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "mudanca",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "resiste",
+       "r": "Resiste"
+      },
+      {
+       "v": "aceita",
+       "r": "Aceita com esforço"
+      },
+      {
+       "v": "gosta",
+       "r": "Gosta de aprender"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F6",
+   "v1": [],
+   "bloco": "F",
+   "texto": "Entre você e quem faz o trabalho, quantos líderes existem?",
+   "ajuda": "Gerente, encarregado, coordenador: quem responde por um grupo.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "lideres",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "0",
+       "r": "Nenhum"
+      },
+      {
+       "v": "1",
+       "r": "1"
+      },
+      {
+       "v": "2_4",
+       "r": "2 a 4"
+      },
+      {
+       "v": "5_mais",
+       "r": "5 ou mais"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F7",
+   "v1": [
+    "9.4"
+   ],
+   "bloco": "F",
+   "texto": "Como você reconhece quem faz um bom trabalho?",
+   "ajuda": "Pode marcar mais de um.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "reconhece",
+     "tipo": "multi",
+     "opcoes": [
+      {
+       "v": "elogio",
+       "r": "Elogio"
+      },
+      {
+       "v": "premio",
+       "r": "Prêmio"
+      },
+      {
+       "v": "dinheiro",
+       "r": "Dinheiro"
+      },
+      {
+       "v": "promocao",
+       "r": "Promoção"
+      },
+      {
+       "v": "nao_tenho",
+       "r": "Não tenho o hábito"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F8",
+   "v1": [
+    "10.1"
+   ],
+   "bloco": "F",
+   "texto": "A empresa tem missão e valores?",
+   "ajuda": "Se tiver, fale quais são. A IA usa isso para decidir como agir.",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "valores",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "nao_tem",
+       "r": "Não tem escrito"
+      },
+      {
+       "v": "parede",
+       "r": "Tem, mas é frase na parede"
+      },
+      {
+       "v": "dia_a_dia",
+       "r": "São usados no dia a dia"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Quais são?",
+     "exemplo": "Atender no mesmo dia, falar a verdade sobre o defeito e deixar o lugar limpo."
+    }
+   ]
+  },
+  {
+   "id": "F9",
+   "v1": [
+    "10.2",
+    "10.3"
+   ],
+   "bloco": "F",
+   "texto": "A equipe fala a verdade sobre problemas e dá opinião?",
+   "ajuda": "Se alguém erra, ele conta ou esconde?",
+   "condicao": "tem_equipe",
+   "partes": [
+    {
+     "chave": "confianca",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "medo",
+       "r": "Tem medo de falar"
+      },
+      {
+       "v": "as_vezes",
+       "r": "Fala às vezes"
+      },
+      {
+       "v": "abertamente",
+       "r": "Fala abertamente"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "G1",
+   "v1": [
+    "3.1"
+   ],
+   "bloco": "G",
+   "texto": "Quanto a empresa faturou no ano passado?",
+   "ajuda": "Faturamento é tudo que entrou de venda no ano. Se for mais fácil, use os últimos 12 meses.",
+   "partes": [
+    {
+     "chave": "faturamento",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "ate_360k",
+       "r": "Até R$ 360 mil"
+      },
+      {
+       "v": "360k_1m",
+       "r": "R$ 360 mil a 1 milhão"
+      },
+      {
+       "v": "1m_2_5m",
+       "r": "R$ 1 a 2,5 milhões"
+      },
+      {
+       "v": "2_5m_5m",
+       "r": "R$ 2,5 a 5 milhões"
+      },
+      {
+       "v": "5m_10m",
+       "r": "R$ 5 a 10 milhões"
+      },
+      {
+       "v": "10m_20m",
+       "r": "R$ 10 a 20 milhões"
+      },
+      {
+       "v": "20m_50m",
+       "r": "R$ 20 a 50 milhões"
+      },
+      {
+       "v": "50m_100m",
+       "r": "R$ 50 a 100 milhões"
+      },
+      {
+       "v": "acima_100m",
+       "r": "Acima de R$ 100 milhões"
+      }
+     ]
+    },
+    {
+     "chave": "valor",
+     "tipo": "texto",
+     "opcional": true,
+     "rotulo": "Valor exato (se quiser)",
+     "entrada": "numero"
+    }
+   ]
+  },
+  {
+   "id": "G2",
+   "v1": [
+    "3.2"
+   ],
+   "bloco": "G",
+   "texto": "Do que faturou, quanto sobrou de lucro?",
+   "ajuda": "Depois de pagar tudo, inclusive o seu salário. Se não sabe, marque \"Não sei\".",
+   "partes": [
+    {
+     "chave": "margem",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "prejuizo",
+       "r": "Deu prejuízo"
+      },
+      {
+       "v": "zero",
+       "r": "Zero a zero"
+      },
+      {
+       "v": "ate_5",
+       "r": "Até 5%"
+      },
+      {
+       "v": "5_10",
+       "r": "5 a 10%"
+      },
+      {
+       "v": "10_15",
+       "r": "10 a 15%"
+      },
+      {
+       "v": "15_20",
+       "r": "15 a 20%"
+      },
+      {
+       "v": "20_30",
+       "r": "20 a 30%"
+      },
+      {
+       "v": "mais_30",
+       "r": "Mais de 30%"
+      },
+      {
+       "v": "nao_sei",
+       "r": "Não sei"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "G3",
+   "v1": [
+    "3.3",
+    "3.4"
+   ],
+   "bloco": "G",
+   "texto": "Nos últimos 5 anos:",
+   "ajuda": "Se a empresa tem menos de 5 anos, pense desde o começo.",
+   "partes": [
+    {
+     "chave": "faturamento_5a",
+     "tipo": "opcao",
+     "rotulo": "O faturamento",
+     "opcoes": [
+      {
+       "v": "cresceu",
+       "r": "Cresceu"
+      },
+      {
+       "v": "igual",
+       "r": "Ficou igual"
+      },
+      {
+       "v": "caiu",
+       "r": "Caiu"
+      }
+     ]
+    },
+    {
+     "chave": "lucro_5a",
+     "tipo": "opcao",
+     "rotulo": "O lucro",
+     "opcoes": [
+      {
+       "v": "melhorou",
+       "r": "Melhorou"
+      },
+      {
+       "v": "igual",
+       "r": "Ficou igual"
+      },
+      {
+       "v": "piorou",
+       "r": "Piorou"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "G4",
+   "v1": [],
+   "bloco": "G",
+   "texto": "Sobre o dinheiro da empresa:",
+   "ajuda": "Duas respostas rápidas.",
+   "partes": [
+    {
+     "chave": "conta_separada",
+     "tipo": "opcao",
+     "rotulo": "A conta da empresa é separada da sua?",
+     "opcoes": [
+      {
+       "v": "sim",
+       "r": "Sim"
+      },
+      {
+       "v": "em_parte",
+       "r": "Em parte"
+      },
+      {
+       "v": "nao",
+       "r": "Não"
+      }
+     ]
+    },
+    {
+     "chave": "registro",
+     "tipo": "opcao",
+     "rotulo": "Toda venda e despesa fica registrada?",
+     "opcoes": [
+      {
+       "v": "sim",
+       "r": "Sim"
+      },
+      {
+       "v": "em_parte",
+       "r": "Em parte"
+      },
+      {
+       "v": "nao",
+       "r": "Não"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "G5",
+   "v1": [
+    "16.1",
+    "16.5"
+   ],
+   "bloco": "G",
+   "texto": "No fim do mês, o dinheiro da empresa:",
+   "ajuda": "Pense na maioria dos meses.",
+   "partes": [
+    {
+     "chave": "caixa",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "nao_fecha",
+       "r": "Nem sempre fecha a conta"
+      },
+      {
+       "v": "zero_a_zero",
+       "r": "Fecha no zero a zero"
+      },
+      {
+       "v": "folga_sem_reserva",
+       "r": "Fecha com folga, sem reserva planejada"
+      },
+      {
+       "v": "reserva_plano",
+       "r": "Tem reserva e plano de uso"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "G6",
+   "v1": [
+    "16.2",
+    "16.3"
+   ],
+   "bloco": "G",
+   "texto": "Antes de um gasto grande:",
+   "ajuda": "Como você decide se pode gastar.",
+   "partes": [
+    {
+     "chave": "orcamento",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "na_hora",
+       "r": "Decido na hora"
+      },
+      {
+       "v": "nocao",
+       "r": "Tenho uma noção do que posso"
+      },
+      {
+       "v": "limite_area",
+       "r": "Tenho limite definido por área"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "G7",
+   "v1": [
+    "16.4"
+   ],
+   "bloco": "G",
+   "texto": "Tem algum gasto fixo que, olhando com calma, poderia cortar ou reduzir?",
+   "ajuda": "Assinatura, aluguel, serviço, taxa. Se não lembra de nenhum, diga isso.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Pago três sistemas e uso um. E a taxa da maquininha eu nunca negociei."
+    }
+   ]
+  },
+  {
+   "id": "H1",
+   "v1": [],
+   "bloco": "H",
+   "texto": "O que você quer para a empresa nos próximos 5 anos?",
+   "ajuda": "Marque e diga por quê.",
+   "partes": [
+    {
+     "chave": "ambicao",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "crescer_muito",
+       "r": "Crescer bastante"
+      },
+      {
+       "v": "crescer_firme",
+       "r": "Crescer devagar e firme"
+      },
+      {
+       "v": "manter",
+       "r": "Manter como está"
+      },
+      {
+       "v": "vender",
+       "r": "Vender ou passar adiante"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Por quê?",
+     "exemplo": "Quero dobrar os contratos mensais para não depender do verão e poder tirar férias."
+    }
+   ]
+  },
+  {
+   "id": "H2",
+   "v1": [
+    "4.1"
+   ],
+   "bloco": "H",
+   "texto": "Qual o plano principal para a empresa crescer este ano?",
+   "ajuda": "Se não tem plano, diga o que você está pensando em fazer.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Fechar contrato de manutenção com mais vinte comércios e contratar um segundo técnico."
+    }
+   ]
+  },
+  {
+   "id": "H3",
+   "v1": [
+    "4.3"
+   ],
+   "bloco": "H",
+   "texto": "Que números você olha toda semana?",
+   "ajuda": "Marque todos os que você acompanha. Depois, se quiser, fale com quem você olha.",
+   "partes": [
+    {
+     "chave": "numeros",
+     "tipo": "multi",
+     "opcoes": [
+      {
+       "v": "caixa",
+       "r": "Saldo do banco e caixa"
+      },
+      {
+       "v": "faturamento",
+       "r": "Faturamento (quanto vendeu)"
+      },
+      {
+       "v": "contas_pagar",
+       "r": "Contas a pagar"
+      },
+      {
+       "v": "contas_receber",
+       "r": "Contas a receber e inadimplência"
+      },
+      {
+       "v": "lucro_margem",
+       "r": "Lucro ou margem"
+      },
+      {
+       "v": "despesas",
+       "r": "Despesas e custos"
+      },
+      {
+       "v": "fluxo_futuro",
+       "r": "Fluxo de caixa dos próximos meses"
+      },
+      {
+       "v": "vendas_qtd",
+       "r": "Número de vendas ou pedidos"
+      },
+      {
+       "v": "ticket_medio",
+       "r": "Ticket médio"
+      },
+      {
+       "v": "meta_vendas",
+       "r": "Venda contra a meta"
+      },
+      {
+       "v": "leads",
+       "r": "Contatos e leads novos"
+      },
+      {
+       "v": "conversao",
+       "r": "Quantos contatos viram cliente"
+      },
+      {
+       "v": "propostas",
+       "r": "Propostas e negociações em aberto"
+      },
+      {
+       "v": "custo_cliente",
+       "r": "Quanto custa trazer um cliente novo"
+      },
+      {
+       "v": "marketing",
+       "r": "Resultado de anúncios e marketing"
+      },
+      {
+       "v": "redes",
+       "r": "Seguidores e alcance nas redes"
+      },
+      {
+       "v": "recompra",
+       "r": "Clientes que voltam a comprar"
+      },
+      {
+       "v": "perdidos",
+       "r": "Cancelamentos e clientes perdidos"
+      },
+      {
+       "v": "satisfacao",
+       "r": "Satisfação, avaliações ou reclamações"
+      },
+      {
+       "v": "atendimento",
+       "r": "Atendimento: chamados abertos e tempo de resposta"
+      },
+      {
+       "v": "entregas",
+       "r": "Produção, entregas e prazos"
+      },
+      {
+       "v": "estoque",
+       "r": "Estoque"
+      },
+      {
+       "v": "equipe",
+       "r": "Produtividade da equipe"
+      },
+      {
+       "v": "folha",
+       "r": "Folha de pagamento e horas extras"
+      },
+      {
+       "v": "painel_metas",
+       "r": "Um painel com metas de cada área"
+      },
+      {
+       "v": "nenhum",
+       "r": "Ainda não olho números toda semana"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "opcional": true,
+     "rotulo": "Quais números e com quem?",
+     "exemplo": "Olho quanto entrou na semana e quantos chamados ficaram abertos. Vejo sozinho, no domingo."
+    }
+   ]
+  },
+  {
+   "id": "H4",
+   "v1": [
+    "4.4"
+   ],
+   "bloco": "H",
+   "texto": "Decisão importante você toma mais no número ou no feeling?",
+   "ajuda": "Feeling é a intuição, a experiência.",
+   "partes": [
+    {
+     "chave": "decide",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "feeling",
+       "r": "No feeling"
+      },
+      {
+       "v": "mais_feeling",
+       "r": "Mais no feeling"
+      },
+      {
+       "v": "mais_numero",
+       "r": "Mais no número"
+      },
+      {
+       "v": "numero",
+       "r": "No número"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "H5",
+   "v1": [
+    "4.5",
+    "15.1"
+   ],
+   "bloco": "H",
+   "texto": "Se a empresa continuar exatamente como está, em 5 anos ela estará mais forte ou para trás dos concorrentes? Por quê?",
+   "ajuda": "O que pode fazer a empresa perder espaço.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Para trás. Os concorrentes já agendam pelo site e respondem na hora. Eu ainda dependo de eu estar com o celular na mão."
+    }
+   ]
+  },
+  {
+   "id": "H6",
+   "v1": [],
+   "bloco": "H",
+   "texto": "O que mais segura o crescimento hoje?",
+   "ajuda": "Marque o principal. Depois diga qual problema você resolveria amanhã, se pudesse resolver um só.",
+   "partes": [
+    {
+     "chave": "gargalo",
+     "tipo": "opcao",
+     "opcoes": [
+      {
+       "v": "falta_cliente",
+       "r": "Falta cliente"
+      },
+      {
+       "v": "falta_braco",
+       "r": "Falta braço para entregar"
+      },
+      {
+       "v": "desorganizacao",
+       "r": "Erro, retrabalho e desorganização"
+      },
+      {
+       "v": "onde_investir",
+       "r": "Escolher onde investir"
+      }
+     ]
+    },
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "rotulo": "Se pudesse resolver um único problema amanhã, qual seria?",
+     "exemplo": "Parar de perder orçamento porque demoro para responder o WhatsApp."
+    }
+   ]
+  },
+  {
+   "id": "H7",
+   "v1": [
+    "10.4"
+   ],
+   "bloco": "H",
+   "texto": "A empresa já passou por uma crise grande? O que você aprendeu?",
+   "ajuda": "Se nunca passou, diga qual foi o momento mais difícil.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Na pandemia perdi metade dos comércios. Aprendi a ter três meses de caixa e a não depender de um tipo só de cliente."
+    }
+   ]
+  },
+  {
+   "id": "H8",
+   "v1": [],
+   "bloco": "H",
+   "texto": "O que você espera que a IA faça pela sua empresa nos próximos 90 dias?",
+   "ajuda": "Um resultado concreto que faria o curso valer a pena.",
+   "partes": [
+    {
+     "chave": "fala",
+     "tipo": "fala",
+     "exemplo": "Responder os pedidos de orçamento em cinco minutos, mesmo quando estou na rua, e me avisar dos contratos que vão vencer."
+    }
+   ]
+  }
+ ]
+}

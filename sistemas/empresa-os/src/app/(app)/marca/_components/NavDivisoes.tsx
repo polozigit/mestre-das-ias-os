@@ -4,24 +4,31 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Navegação fixa das divisões da identidade. Marca a divisão que está na tela (aria-current) e, no celular,
+ * Navegação fixa das divisões (identidade ou persona). Marca a divisão que está na tela (aria-current) e, no celular,
  * rola a própria barra até ela: quem desce a página sabe onde está. Sem JavaScript, os links de âncora
  * continuam funcionando (só não há destaque).
  */
-export function NavDivisoes({ divisoes }: { divisoes: { id: string; rotulo: string }[] }) {
+export function NavDivisoes({
+  divisoes,
+  prefixo = "marca-",
+}: {
+  divisoes: { id: string; rotulo: string }[];
+  /** Prefixo do id de cada divisão na página (`marca-` na identidade, `persona-` na persona). */
+  prefixo?: string;
+}) {
   const [ativa, setAtiva] = useState<string | null>(divisoes[0]?.id ?? null);
   const lista = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     const alvos = divisoes
-      .map((d) => document.getElementById(`marca-${d.id}`))
+      .map((d) => document.getElementById(`${prefixo}${d.id}`))
       .filter((el): el is HTMLElement => el !== null);
     if (alvos.length === 0 || typeof IntersectionObserver === "undefined") return;
     const visiveis = new Map<string, number>();
     const obs = new IntersectionObserver(
       (entradas) => {
         for (const e of entradas) {
-          const id = e.target.id.replace(/^marca-/, "");
+          const id = e.target.id.slice(prefixo.length);
           if (e.isIntersecting) visiveis.set(id, e.boundingClientRect.top);
           else visiveis.delete(id);
         }
@@ -33,7 +40,7 @@ export function NavDivisoes({ divisoes }: { divisoes: { id: string; rotulo: stri
     );
     for (const el of alvos) obs.observe(el);
     return () => obs.disconnect();
-  }, [divisoes]);
+  }, [divisoes, prefixo]);
 
   useEffect(() => {
     const item = lista.current?.querySelector<HTMLElement>(`[data-divisao="${ativa}"]`);
@@ -47,7 +54,7 @@ export function NavDivisoes({ divisoes }: { divisoes: { id: string; rotulo: stri
         return (
           <li key={d.id} className="shrink-0">
             <a
-              href={`#marca-${d.id}`}
+              href={`#${prefixo}${d.id}`}
               data-divisao={d.id}
               aria-current={on ? "location" : undefined}
               onClick={() => setAtiva(d.id)}

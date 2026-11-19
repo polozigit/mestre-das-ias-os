@@ -7,6 +7,9 @@
     "node": ">=20"
   },
   "scripts": {
+    "mensageria:preparar": "node src/multicanal/cli.mjs preparar",
+    "mensageria:ligar": "node src/multicanal/cli.mjs ligar",
+    "mensageria:parar": "node src/multicanal/cli.mjs parar",
     "mensageria:configurar": "node src/multicanal/cli.mjs configurar",
     "mensageria:iniciar": "node src/multicanal/cli.mjs iniciar",
     "mensageria:status": "node src/multicanal/cli.mjs status",

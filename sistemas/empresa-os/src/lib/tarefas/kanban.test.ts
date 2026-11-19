@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ORDEM_QUADRO, agruparPorStatus, filtrar } from "./kanban.ts";
+import { ORDEM_QUADRO, agruparPorStatus, filtrar, areaDaTarefa } from "./kanban.ts";
 import type { TarefaOrigem, TarefaStatus } from "@/types/database";
 
 type TarefaFake = {
@@ -9,6 +9,19 @@ type TarefaFake = {
   origem: TarefaOrigem;
   dono_id: string | null;
 };
+
+test("área ausente usa Geral e filtro combina com origem", () => {
+  assert.equal(areaDaTarefa(null), "geral");
+  assert.equal(areaDaTarefa({ area: 1 }), "geral");
+  assert.equal(areaDaTarefa({ area: " Tecnologia " }), "tecnologia");
+  const tarefas = [
+    { ...t("a", "BACKLOG", "ia"), metadata: { area: "tecnologia" } },
+    { ...t("b", "BACKLOG", "humano"), metadata: { area: "tecnologia" } },
+    { ...t("c", "BACKLOG", "ia"), metadata: {} },
+  ];
+  assert.deepEqual(filtrar(tarefas, { area: "tecnologia", origem: "ia" }).map((x) => x.id), ["a"]);
+  assert.deepEqual(filtrar(tarefas, { area: "geral" }).map((x) => x.id), ["c"]);
+});
 
 function t(
   id: string,

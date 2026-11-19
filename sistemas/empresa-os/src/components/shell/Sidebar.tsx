@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { LogoMarca } from "@/components/marca/LogoMarca";
-import { useEffect, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { nomeSistema } from "../../../config/empresa";
@@ -64,6 +64,57 @@ export function Sidebar() {
     setOpen(false);
   }, [rotaAtual, setOpen]);
 
+  // Nome do item no menu recolhido. Fica FORA do <aside>, em posição fixa: dentro dele o balão era
+  // cortado pela rolagem do <nav> e ficava atrás da tela (e o transform do aside prende o `fixed`).
+  const [dica, setDica] = useState<{ rotulo: string; top: number; left: number } | null>(null);
+  function mostrarDica(el: HTMLElement, rotulo: string) {
+    if (!recolhida || !desktop) return;
+    const r = el.getBoundingClientRect();
+    setDica({ rotulo, top: r.top + r.height / 2, left: r.right + 10 });
+  }
+  useEffect(() => {
+    setDica(null);
+  }, [rotaAtual, recolhida, desktop]);
+
+  // Marca do item da página: UM elemento só, que desliza de um item ao outro (continuidade entre
+  // telas) em vez de o fundo apagar num e acender no outro. Vai direto no estilo, sem re-render.
+  // No clique ela já desliza para o item clicado, antes de o servidor responder.
+  const navRef = useRef<HTMLElement>(null);
+  const marcaRef = useRef<HTMLSpanElement>(null);
+  const posicionarMarca = useCallback((alvo?: HTMLElement | null) => {
+    const nav = navRef.current;
+    const marca = marcaRef.current;
+    if (!nav || !marca) return;
+    const item = alvo ?? nav.querySelector<HTMLElement>('.sidebar-link[aria-current="page"]');
+    if (!item) {
+      marca.style.opacity = "0";
+      delete nav.dataset.marca;
+      return;
+    }
+    const primeira = nav.dataset.marca !== "on";
+    // Primeira medida (ou volta de página sem item no menu): aparece no lugar, sem viajar do topo.
+    if (primeira) marca.style.transitionProperty = "opacity";
+    marca.style.height = `${item.offsetHeight}px`;
+    marca.style.transform = `translateY(${item.offsetTop}px)`;
+    marca.style.opacity = "1";
+    nav.dataset.marca = "on";
+    if (primeira) {
+      void marca.offsetHeight;
+      marca.style.transitionProperty = "";
+    }
+  }, []);
+  useLayoutEffect(() => {
+    posicionarMarca();
+  }, [rotaAtual, recolhida, desktop, grupos.length, posicionarMarca]);
+  // Fonte carregou ou a janela mudou: a altura dos itens pode mudar, a marca acompanha.
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav || typeof ResizeObserver === "undefined") return;
+    const observador = new ResizeObserver(() => posicionarMarca());
+    observador.observe(nav);
+    return () => observador.disconnect();
+  }, [posicionarMarca]);
+
   function alternar() {
     const el = document.documentElement;
     const proximo = el.dataset.sidebar === "collapsed" ? "expanded" : "collapsed";
@@ -89,17 +140,19 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex h-screen w-[var(--sidebar-active-w)] shrink-0 flex-col border-r border-borda bg-bg-elevada transition-transform duration-200",
-          "lg:sticky lg:top-0 lg:z-auto lg:translate-x-0 lg:transition-[width] lg:duration-200 lg:ease-out",
+          "fixed inset-y-0 left-0 z-50 flex h-screen w-[var(--sidebar-active-w)] shrink-0 flex-col border-r border-borda bg-bg-elevada transition-transform duration-[360ms] ease-saida",
+          "lg:sticky lg:top-0 lg:z-auto lg:translate-x-0 lg:transition-[width] lg:duration-[360ms]",
           open ? "translate-x-0 shadow-2xl" : "-translate-x-full",
         )}
         aria-label="Navegação principal"
         inert={gavetaInerte(open, desktop)}
       >
-        <div className="sidebar-header flex h-[var(--topbar-h)] items-center gap-2 border-b border-borda-suave px-4">
-          <LogoMarca alt="" width={112} height={28} priority className="h-6 w-auto shrink-0" />
-          <span className="sidebar-wordmark truncate text-sm font-semibold text-fg-1">
-            {nomeSistema}
+        {/* Logo da empresa + só "OS" ao lado: a logo já traz o nome, então o nome completo do
+            sistema não se repete aqui. */}
+        <div className="sidebar-header flex h-[var(--topbar-h)] items-center gap-1.5 overflow-hidden border-b border-borda-suave px-4">
+          <LogoMarca alt={nomeSistema} width={112} height={28} priority className="sidebar-logo h-6 w-auto shrink-0 object-contain object-left" />
+          <span aria-hidden="true" className="sidebar-wordmark text-sm font-semibold tracking-tight text-fg-1">
+            OS
           </span>
           <button
             type="button"
@@ -111,7 +164,8 @@ export function Sidebar() {
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-5">
+        <nav ref={navRef} onScroll={() => setDica(null)} className="relative flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-5">
+          <span ref={marcaRef} aria-hidden="true" className="sidebar-marca" />
           {grupos.map((grupo) => (
             <div key={grupo.id} className="flex flex-col gap-1">
               {grupo.titulo && (
@@ -127,22 +181,24 @@ export function Sidebar() {
                     key={item.href}
                     href={item.href}
                     prefetch={false}
-                    onClick={() => setOpen(false)}
+                    onClick={(e) => {
+                      setOpen(false);
+                      // Clique com tecla abre outra aba: a página daqui não muda, a marca fica.
+                      if (!(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) posicionarMarca(e.currentTarget);
+                    }}
+                    onMouseEnter={(e) => mostrarDica(e.currentTarget, item.label)}
+                    onMouseLeave={() => setDica(null)}
+                    onFocus={(e) => mostrarDica(e.currentTarget, item.label)}
+                    onBlur={() => setDica(null)}
                     aria-label={item.label}
                     aria-current={ativo ? "page" : undefined}
                     className={cn(
-                      "sidebar-link group relative flex min-h-10 items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] text-fg-2 transition-colors hover:bg-bg-sutil",
+                      "sidebar-link flex min-h-10 items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] text-fg-2 transition-colors duration-200 hover:bg-bg-sutil hover:text-fg-1",
                       ativo && "bg-acento-suave font-semibold text-acento-texto hover:bg-acento-suave",
                     )}
                   >
                     <Icone size={16} className={cn("shrink-0", ativo ? "text-acento" : "text-fg-3")} />
                     <span className="sidebar-label flex-1 truncate">{item.label}</span>
-                    <span
-                      role="tooltip"
-                      className="sidebar-tooltip pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-md bg-fg-1 px-2 py-1 text-[11px] font-medium text-bg opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100"
-                    >
-                      {item.label}
-                    </span>
                   </Link>
                 );
               })}
@@ -156,12 +212,22 @@ export function Sidebar() {
             onClick={alternar}
             aria-label={recolhida ? "Expandir menu" : "Recolher menu"}
             title={recolhida ? "Expandir menu" : "Recolher menu"}
-            className="grid size-8 shrink-0 place-items-center rounded-md text-fg-2 hover:bg-bg-sutil"
+            className="grid size-8 shrink-0 place-items-center rounded-md text-fg-2 transition-colors hover:bg-bg-sutil hover:text-fg-1"
           >
             {recolhida ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
         </div>
       </aside>
+
+      {dica && (
+        <span
+          role="tooltip"
+          style={{ top: dica.top, left: dica.left }}
+          className="surgir pointer-events-none fixed z-[60] -translate-y-1/2 whitespace-nowrap [--origem:left_center] rounded-md bg-fg-1 px-2.5 py-1.5 text-xs font-medium text-bg shadow-lg"
+        >
+          {dica.rotulo}
+        </span>
+      )}
     </>
   );
 }

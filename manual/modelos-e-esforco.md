@@ -21,11 +21,22 @@ Use os nomes disponíveis na interface atual. Se eles mudarem, escolha o equival
 
 Modelo e esforço não corrigem falta de contexto. Antes de aumentar o esforço, confira se o objetivo, as fontes e o critério de conclusão estão claros.
 
-Não troque o modelo silenciosamente. Oriente o usuário antes de iniciar quando houver ganho relevante de qualidade, velocidade ou economia.
+Não troque o modelo silenciosamente. Oriente o usuário quando houver ganho relevante de qualidade, velocidade ou economia.
 
-## No dia a dia: deixe o Terra no seletor
+## Quem escolhe é você
 
-O seletor do app vale para a conversa principal. Os agentes do kit têm modelo e esforço fixados no `.toml` de cada um, e esse arquivo vence o seletor (learn.chatgpt.com/docs/agent-configuration/subagents, lida em 09/10/2026). Não recomendamos o Luna como padrão do seletor: a OpenAI indica o Luna para tarefas focadas e repetitivas (resumo, extração, classificação), não para o trabalho geral da conversa (learn.chatgpt.com/docs/models). O kit já usa o Luna onde ele rende: nos agentes de rotina e de conferência e nos subagentes de leitura e busca, que custam cerca de 20 vezes menos por token que o Terra (learn.chatgpt.com/docs/pricing).
+O modelo e o esforço da conversa principal são escolha sua, no seletor do app. A Casa não fixa nenhum dos dois
+(o `.codex/config.toml` não tem `model` nem `model_reasoning_effort`), e a IA não troca o próprio modelo.
+
+- Planejar trabalho grande, decidir arquitetura ou analisar muita coisa: escolha o modelo mais forte (Sol).
+- Executar o que já está planejado: o padrão do app.
+- Tarefa repetitiva e totalmente especificada: vale virar uma rotina agendada.
+- Nada disso é regra de mensagem: a IA sugere quando houver ganho claro, e você decide.
+
+O seletor vale para a conversa principal. Os agentes do kit têm modelo e esforço fixados no `.toml` de cada um,
+e esse arquivo vence o seletor (learn.chatgpt.com/docs/agent-configuration/subagents, lida em 09/10/2026). O kit
+usa o Luna onde ele rende, nos agentes de rotina e de conferência, que custam cerca de 20 vezes menos por token
+(learn.chatgpt.com/docs/pricing). O Sol fica só no revisor de segurança, em esforço médio.
 
 Nenhum agente do kit roda em esforço alto. Suba o esforço só em uma tarefa específica, nunca como padrão.
 
@@ -37,7 +48,7 @@ Nenhum agente do kit roda em esforço alto. Suba o esforço só em uma tarefa es
 | Medium (padrão) | `medium` |
 | High | `high` |
 | Extra High | `xhigh` |
-| Max | não publicado — sem valor de config correspondente documentado |
+| Max | não publicado, sem valor de config correspondente documentado |
 
-O mapeamento acima não é 1:1 publicado pela OpenAI; trate como aproximação.
-`Terra` (`gpt-5.6-terra`) já vem pinado em `.codex/config.toml`.
+O mapeamento acima não é 1:1 publicado pela OpenAI; trate como aproximação. Quando você escolhe no seletor,
+ele vale para a conversa; o arquivo de configuração só entra se alguém o fixar.

@@ -8,16 +8,17 @@ import {
   sheetBackdropClasses,
   sheetPanelClasses,
 } from "@/components/ui/Sheet";
-import type { ActionResult } from "@/lib/action-result";
-import { convidarMembro } from "@/app/(app)/usuarios/actions";
+import { convidarMembro, type ResultadoAcesso } from "@/app/(app)/usuarios/actions";
+import { MensagemDeAcesso } from "./MensagemDeAcesso";
 
 const INPUT =
   "w-full rounded-md border border-borda bg-bg px-3 py-2.5 text-sm text-fg-1 placeholder:text-fg-4";
 
 /**
- * Formulário de convite num sheet (lateral no desktop, bottom-sheet no
- * celular). Só nome e e-mail: as permissões se dão no painel da pessoa
- * depois do convite (a server action valida de novo, UI não é segurança).
+ * Cadastro de pessoa num sheet (lateral no desktop, bottom-sheet no celular).
+ * Só nome e e-mail: as permissões se dão no painel da pessoa depois (a server
+ * action valida de novo, UI não é segurança). Sem e-mail: deu certo, o sheet
+ * troca o formulário pela mensagem de acesso pra copiar e mandar pra pessoa.
  */
 export function ConvidarMembroSheet({
   open,
@@ -36,23 +37,24 @@ export function ConvidarMembroSheet({
   // erro se houve submit NESTA abertura.
   const [submeteuNestaAbertura, setSubmeteuNestaAbertura] = useState(false);
 
-  // Reabriu o sheet: o gate de erro zera (ajuste de estado durante o render,
-  // padrão React; os inputs de texto são resetados via formRef).
+  // Reabriu o sheet: o gate zera (ajuste de estado durante o render, padrão
+  // React; os inputs de texto são resetados via formRef). Com ele zerado, a
+  // mensagem de acesso do cadastro anterior também some.
   const [abertoAntes, setAbertoAntes] = useState(open);
   if (open !== abertoAntes) {
     setAbertoAntes(open);
     if (open) setSubmeteuNestaAbertura(false);
   }
 
-  // Fecha e limpa quando o convite deu certo. A ref guarda o último estado
-  // já tratado: sem ela, reabrir o sheet depois de um sucesso fecharia de novo.
-  const ultimoTratado = useRef<ActionResult | null>(null);
+  // Cadastro deu certo: limpa o formulário e mostra a mensagem de acesso. A ref
+  // guarda o último estado já tratado: sem ela, reabrir o sheet mostraria de novo.
+  const ultimoTratado = useRef<ResultadoAcesso | null>(null);
   useEffect(() => {
     if (state && state !== ultimoTratado.current) {
       ultimoTratado.current = state;
       if (state.ok) {
         formRef.current?.reset();
-        onClose();
+        if (!state.acesso) onClose();
       }
     }
   }, [state, onClose]);
@@ -77,6 +79,8 @@ export function ConvidarMembroSheet({
   }, [open]);
 
   const erro = submeteuNestaAbertura && state && !state.ok ? state.error : null;
+  const pronto =
+    submeteuNestaAbertura && state?.ok && state.acesso ? { texto: state.acesso, info: state.info } : null;
 
   return (
     <>
@@ -96,7 +100,7 @@ export function ConvidarMembroSheet({
         <SheetGrabber />
         <header className="flex items-center justify-between border-b border-borda-suave px-5 py-4">
           <h2 id={tituloId} className="font-display text-lg font-bold text-fg-1">
-            Convidar pessoa
+            Cadastrar pessoa
           </h2>
           <button
             type="button"
@@ -108,15 +112,29 @@ export function ConvidarMembroSheet({
           </button>
         </header>
 
+        {pronto && (
+          <div className="flex flex-col gap-4 px-5 py-5">
+            <MensagemDeAcesso titulo="Cadastro feito" texto={pronto.texto} />
+            {pronto.info && <p className="text-sm text-fg-3">{pronto.info}</p>}
+            <div className="mt-2 flex justify-end">
+              <Button type="button" variant="primary" className="min-h-11 md:min-h-0" onClick={onClose}>
+                Pronto
+              </Button>
+            </div>
+          </div>
+        )}
+
         <form
           ref={formRef}
           action={formAction}
           onSubmit={() => setSubmeteuNestaAbertura(true)}
+          hidden={pronto !== null}
           className="flex flex-col gap-4 px-5 py-5"
         >
           <p className="text-sm text-fg-3">
-            A pessoa recebe um e-mail com o link pra criar a senha. Até você dar
-            permissões, ela só enxerga o Início.
+            O sistema cria o login com uma senha provisória e mostra uma mensagem
+            pra você mandar pra pessoa. Ela troca a senha no primeiro acesso. Até
+            você dar permissões, ela só enxerga o Início.
           </p>
 
           <div>
@@ -168,7 +186,7 @@ export function ConvidarMembroSheet({
               className="min-h-11 md:min-h-0"
               disabled={pending}
             >
-              {pending ? "Enviando..." : "Enviar convite"}
+              {pending ? "Cadastrando..." : "Cadastrar"}
             </Button>
           </div>
         </form>

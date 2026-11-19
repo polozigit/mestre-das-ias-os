@@ -73,8 +73,8 @@ vira `<SKILL_DIR>` — a pasta que contém `scripts/aplicar_regra.py` (sem o
 `scripts/aplicar_regra.py` no final).
 
 Nenhum caminho achou → **PARE**: esta skill está instalada incompleta
-(falta `scripts/aplicar_regra.py`). Mostre ao aluno e peça pra reinstalar o
-`polozi-fundacao.zip` e reiniciar o app. Não edite o AGENTS.md a mão pra
+(falta `scripts/aplicar_regra.py`). Mostre ao aluno e peça pra
+baixar o zip do kit de novo, descompactar e abrir no aplicativo a pasta que tem o `AGENTS.md` dentro, não a de fora. Não edite o AGENTS.md a mão pra
 "ajudar" — isso é exatamente o que esta skill existe pra impedir.
 
 ## Fluxo

@@ -8,11 +8,9 @@ hook, nunca força push, nunca reescreve histórico.
 Uso (rodar na RAIZ da Casa):
 
     python3 .agents/skills/tecnologia-publicar/scripts/salvar.py -m "<mensagem>" <caminho> [<caminho> ...]
-    python3 .agents/skills/tecnologia-publicar/scripts/salvar.py -m "<mensagem>" --tudo
-    python3 .agents/skills/tecnologia-publicar/scripts/salvar.py --provar
+    python3 .agents/skills/tecnologia-publicar/scripts/salvar.py --provar <caminhos>
 
-`--tudo` faz `git add -A` (use só ao salvar a árvore suja inteira, por exemplo
-no começo da sessão). `--provar` só confere, não salva.
+`--tudo` foi retirado. `--provar <caminhos>` só confere o escopo, não salva.
 
 Códigos de saída:
 
@@ -50,6 +48,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import json
 import re
 import subprocess
 import sys
@@ -65,7 +64,7 @@ MAX_LINHAS_ERRO = 8
 MAX_NOMES = 10
 
 # Repositório-modelo do curso: o aluno clona este e o `origin` fica apontando pra ele até a etapa 4
-# do instalador criar o repositório dele e trocar o origin. Mesma regex da guarda.py, do autosave.py,
+# do instalador criar o repositório dele e trocar o origin. Mesma regex da guarda.py,
 # do preflight.py e do criar_empresa_ia.py: URL https, ssh ou caminho local que TERMINE em
 # `polozigit/mestre-das-ias-os[.git]`, sem confundir com `mestre-das-ias-os-outro`.
 REPOSITORIO_MODELO = "polozigit/mestre-das-ias-os"
@@ -212,10 +211,11 @@ def producao_publicada(raiz: Path) -> bool:
     return (raiz / MARCADOR_PRODUCAO).is_file()
 
 
-def prova(raiz: Path) -> tuple[bool, list[str]]:
+def prova(raiz: Path, caminhos: list[str] | None = None) -> tuple[bool, list[str]]:
     """(provado, mensagens). Provado = árvore limpa e nenhum commit à frente do upstream."""
     mensagens: list[str] = []
-    status = git(["-c", "core.quotepath=false", "status", "--porcelain", "-uall"], raiz)
+    status = git(["-c", "core.quotepath=false", "status", "--porcelain", "-uall",
+                  *(["--", *caminhos] if caminhos else [])], raiz)
     if status.returncode != 0:
         return False, ["não consegui ler o estado do git"]
     sujos = [linha[3:].strip() for linha in status.stdout.splitlines() if linha.strip()]
@@ -237,10 +237,11 @@ def prova(raiz: Path) -> tuple[bool, list[str]]:
     return not mensagens, mensagens
 
 
-def provar_e_sair(raiz: Path, local: bool = False) -> int:
+def provar_e_sair(raiz: Path, local: bool = False, caminhos: list[str] | None = None) -> int:
     """Imprime a prova. `local` = sem origin: só a árvore limpa conta."""
     if local:
-        status = git(["-c", "core.quotepath=false", "status", "--porcelain", "-uall"], raiz)
+        status = git(["-c", "core.quotepath=false", "status", "--porcelain", "-uall",
+                      *(["--", *caminhos] if caminhos else [])], raiz)
         sujos = [linha[3:].strip() for linha in status.stdout.splitlines() if linha.strip()]
         if sujos:
             dizer(f"ficaram {len(sujos)} arquivo(s) fora do commit:")
@@ -252,7 +253,7 @@ def provar_e_sair(raiz: Path, local: bool = False) -> int:
         # estar igual ao modelo não é estar salvo no GitHub do dono: nunca "SINCRONIZADO" aqui
         dizer(MSG_MODELO)
         return 1
-    provado, mensagens = prova(raiz)
+    provado, mensagens = prova(raiz, caminhos)
     if provado:
         dizer(f"SINCRONIZADO {sha_curto(raiz)}")
         return 0
@@ -263,8 +264,11 @@ def provar_e_sair(raiz: Path, local: bool = False) -> int:
 
 def preparar(raiz: Path, caminhos: list[str], tudo: bool) -> None:
     if tudo:
-        add, esgotou = git_com_lock(["add", "-A"], raiz)
+        falhar(5, '--tudo retirado: informe caminhos exatos deste objetivo.')
     else:
+        staged = git(['diff', '--cached', '--name-only', '-z'], raiz)
+        if staged.returncode or any(staged.stdout.split('\0')):
+            falhar(5, 'Índice já contém arquivos. Preserve o staged anterior e escolha o escopo antes de salvar.')
         add, esgotou = git_com_lock(["add", "--", *caminhos], raiz)
     if add.returncode != 0:
         if esgotou:
@@ -273,13 +277,13 @@ def preparar(raiz: Path, caminhos: list[str], tudo: bool) -> None:
         falhar(5, "ERRO: não consegui preparar os arquivos: " + (detalhe[0] if detalhe else "git add falhou"))
 
 
-def commitar(raiz: Path, mensagem: str) -> int | None:
+def commitar(raiz: Path, mensagem: str, caminhos: list[str]) -> int | None:
     """Devolve a quantidade de arquivos commitados, ou None se não havia nada."""
-    if git(["diff", "--cached", "--quiet"], raiz).returncode == 0:
+    if git(["diff", "--cached", "--quiet", "--", *caminhos], raiz).returncode == 0:
         return None
-    lista = git(["diff", "--cached", "--name-only"], raiz)
+    lista = git(["diff", "--cached", "--name-only", "--", *caminhos], raiz)
     quantidade = len([n for n in lista.stdout.splitlines() if n.strip()])
-    commit, esgotou = git_com_lock(["commit", "-m", mensagem], raiz)
+    commit, esgotou = git_com_lock(["commit", "--only", "-m", mensagem, "--", *caminhos], raiz)
     if commit.returncode != 0:
         if esgotou:
             falhar(2, "git ocupado por outro processo (index.lock): tente de novo em instantes.")
@@ -351,7 +355,7 @@ def salvar(raiz: Path, mensagem: str, caminhos: list[str], tudo: bool) -> int:
         falhar(3, "sistema publicado: use o fluxo completo do tecnologia-publicar (branch + PR). Nada foi commitado.")
 
     preparar(raiz, caminhos, tudo)
-    quantidade = commitar(raiz, mensagem)
+    quantidade = commitar(raiz, mensagem, caminhos)
     if quantidade is None:
         dizer("nada novo para commitar")
     else:
@@ -359,11 +363,11 @@ def salvar(raiz: Path, mensagem: str, caminhos: list[str], tudo: bool) -> int:
 
     if not tem_origin(raiz):
         dizer(f"SALVO_LOCAL {sha_curto(raiz)}")
-        return provar_e_sair(raiz, local=True)
+        return provar_e_sair(raiz, local=True, caminhos=caminhos)
     if origin_e_modelo(raiz):
         dizer(MSG_MODELO)
         dizer(f"SALVO_LOCAL {sha_curto(raiz)}")
-        return provar_e_sair(raiz, local=True)
+        return provar_e_sair(raiz, local=True, caminhos=caminhos)
 
     saida = empurrar(raiz)
     if saida.returncode != 0 and remoto_a_frente(saida):
@@ -374,7 +378,15 @@ def salvar(raiz: Path, mensagem: str, caminhos: list[str], tudo: bool) -> int:
     if saida.returncode != 0:
         falha_de_push(saida)
     dizer(f"push ok: origin/{branch}")
-    return provar_e_sair(raiz)
+    resultado = provar_e_sair(raiz, caminhos=caminhos)
+    if resultado == 0:
+        cache = raiz / 'operacao/tasks/.sessoes'
+        cache.mkdir(parents=True, exist_ok=True)
+        recibo = {'commit': git(['rev-parse', 'HEAD'], raiz).stdout.strip(),
+                  'branch': branch, 'caminhos': caminhos, 'enviado': True,
+                  'integrado': False, 'publicado': False}
+        (cache / 'git-recibo.json').write_text(json.dumps(recibo), encoding='utf-8')
+    return resultado
 
 
 class Parser(argparse.ArgumentParser):
@@ -385,7 +397,7 @@ class Parser(argparse.ArgumentParser):
 def montar_parser() -> argparse.ArgumentParser:
     parser = Parser(description="Salva o trabalho da Casa no GitHub (commit + push + prova).")
     parser.add_argument("-m", "--mensagem", help="mensagem do commit")
-    parser.add_argument("--tudo", action="store_true", help="git add -A (árvore suja inteira)")
+    parser.add_argument("--tudo", action="store_true", help="retirado: informe caminhos exatos")
     parser.add_argument("--provar", action="store_true", help="só conferir se está sincronizado")
     parser.add_argument("caminhos", nargs="*", help="arquivos ou pastas a salvar")
     return parser
@@ -395,17 +407,38 @@ def principal(argv: list[str]) -> int:
     args = montar_parser().parse_args(argv)
     raiz = conferir_raiz()
     if args.provar:
-        if args.tudo or args.caminhos or args.mensagem:
-            falhar(5, "ERRO de uso: --provar não combina com -m, caminhos nem --tudo.")
-        return provar_e_sair(raiz)
+        if args.tudo or args.mensagem:
+            falhar(5, 'ERRO de uso: --provar não combina com -m nem --tudo.')
+        return provar_e_sair(raiz, caminhos=conferir_caminhos(raiz, args.caminhos))
     if not args.mensagem or not args.mensagem.strip():
         falhar(5, "ERRO de uso: falta -m \"<mensagem>\".")
     if args.tudo and args.caminhos:
         falhar(5, "ERRO de uso: use --tudo OU caminhos, não os dois.")
     if not args.tudo and not args.caminhos:
-        falhar(5, "ERRO de uso: informe os caminhos a salvar ou --tudo.")
+        falhar(5, "ERRO de uso: informe os caminhos deste objetivo.")
     caminhos = [] if args.tudo else conferir_caminhos(raiz, args.caminhos)
-    return salvar(raiz, args.mensagem, caminhos, args.tudo)
+    return salvar_exclusivo(raiz, args.mensagem, caminhos, args.tudo)
+
+
+def salvar_exclusivo(raiz: Path, mensagem: str, caminhos: list[str], tudo: bool) -> int:
+    """Serializa checkpoints da Casa; o SO libera o lock se o processo morrer."""
+    cache = raiz / 'operacao/tasks/.sessoes'
+    cache.mkdir(parents=True, exist_ok=True)
+    with (cache / 'salvamento.lock').open('a+b') as trava:
+        try:
+            if os.name == 'nt':
+                import msvcrt
+                trava.seek(0, 2)
+                if trava.tell() == 0:
+                    trava.write(b'0'); trava.flush()
+                trava.seek(0)
+                msvcrt.locking(trava.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(trava.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            falhar(2, 'Outro checkpoint está salvando esta Casa; tente depois.')
+        return salvar(raiz, mensagem, caminhos, tudo)
 
 
 def main(argv: list[str] | None = None) -> int:

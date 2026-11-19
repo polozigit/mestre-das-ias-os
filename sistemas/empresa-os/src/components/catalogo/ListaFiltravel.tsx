@@ -17,7 +17,7 @@ import {
 import type { ArtefatoCard } from "@/lib/catalogo/catalogo";
 
 const TITULO_DO_GRUPO = "text-[11px] font-bold uppercase tracking-widest text-fg-4";
-const GRADE = "grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3";
+const GRADE = "entrada grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3";
 
 /**
  * Caixa de busca + resultado. O filtro roda aqui no navegador sobre o que a página já trouxe (não vai

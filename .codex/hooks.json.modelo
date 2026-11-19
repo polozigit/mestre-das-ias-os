@@ -1,5 +1,5 @@
 {
-  "description": "Hooks da Casa: confere o estado ao abrir a sessão, guarda as ferramentas e salva o trabalho ao parar.",
+  "description": "Hooks da Casa: confere o estado ao abrir a sessão, guarda as ferramentas, registra o pedido na fila local e fecha o registro no fim do turno (salvar é da IA, por marco, com salvar.py).",
   "hooks": {
     "SessionStart": [
       {
@@ -61,18 +61,6 @@
             "command": "python3 \"{{CASA_ABS}}/.codex/hooks/registro_trabalho.py\" fim",
             "commandWindows": "py -3 \"{{CASA_ABS}}\\.codex\\hooks\\registro_trabalho.py\" fim",
             "timeout": 20
-          }
-        ]
-      },
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"{{CASA_ABS}}/.codex/hooks/autosave.py\"",
-            "commandWindows": "py -3 \"{{CASA_ABS}}\\.codex\\hooks\\autosave.py\"",
-            "timeout": 120,
-            "statusMessage": "Salvando o trabalho..."
           }
         ]
       }

@@ -1,5 +1,7 @@
 import {verifyMetaSignature,normalizeWebhook,dispatchMeta,privatePath,validateMedia,readLimited,META_CAPABILITIES} from './core.mjs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
+/** Mídia recebida que nunca vai passar (formato, tamanho, arquivo sumido): não vale reentrega. */
+class MidiaRecusada extends Error {}
 const safeFailure=(status=503)=>json({error:status===403?'Acesso negado.':'Operação indisponível. Tente novamente ou consulte o estado da conexão.'},status);
 export function createHandler({rpc,storage,serviceKey,fetchImpl=fetch}) {
   const service=(op,data={})=>rpc('mensageria_servico',{p_operacao:op,p_dados:data});
@@ -97,18 +99,33 @@ export function createHandler({rpc,storage,serviceKey,fetchImpl=fetch}) {
           if(prior.existe)continue;
           const {media,...entry}=message;
           if(media){
-            const meta=await fetchImpl(`https://graph.facebook.com/${account.graph_version}/${encodeURIComponent(media.id)}`,{headers:{Authorization:`Bearer ${account.access_token}`},signal:AbortSignal.timeout(15000)});
-            if(!meta.ok)throw new Error('Meta media indisponível.');
-            const info=await meta.json();const remote=new URL(info.url);
-            if(remote.protocol!=='https:'||!/(^|\.)(facebook\.com|fbcdn\.net|fbsbx\.com|whatsapp\.net)$/.test(remote.hostname))throw new Error('Origem de mídia inválida.');
-            const response=await fetchImpl(remote,{headers:{Authorization:`Bearer ${account.access_token}`},redirect:'error',signal:AbortSignal.timeout(60000)});
-            if(!response.ok)throw new Error('Download Meta indisponível.');
-            const content=await readLimited(response,100*1024*1024),mime=media.mime||info.mime_type||'application/octet-stream';validateMedia(mime,content.length);
-            const nome=String(media.nome).replace(/[^\p{L}\p{N}._ -]/gu,'_').slice(0,180);
-            const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(message.provedor_id))),b=>b.toString(16).padStart(2,'0')).join('');
-            const path=`${account.id}/${digest}/${nome}`;
-            await storage.upload(path,content,mime);entry.anexo={path,nome,mime,bytes:content.length};
-            await service('media_upload',{conta_id:account.id,...entry.anexo});
+            // Erro permanente (formato/tamanho recusado, mídia que a Meta não tem mais, origem estranha) NÃO
+            // pode derrubar o pacote: a Meta reenviaria sem fim e as mensagens e recibos seguintes se perderiam.
+            // A mensagem entra sem anexo e com aviso. Erro temporário (5xx, rede, Storage) segue para o 503 e a
+            // reentrega da Meta tenta de novo; o que já gravou é pulado pelo evento_existente.
+            try{
+              const meta=await fetchImpl(`https://graph.facebook.com/${account.graph_version}/${encodeURIComponent(media.id)}`,{headers:{Authorization:`Bearer ${account.access_token}`},signal:AbortSignal.timeout(15000)});
+              if(!meta.ok)throw meta.status>=400&&meta.status<500?new MidiaRecusada('a Meta não tem mais este arquivo'):new Error('Meta media indisponível.');
+              const info=await meta.json();let remote;
+              try{remote=new URL(info.url);}catch{throw new MidiaRecusada('endereço de arquivo inválido');}
+              if(remote.protocol!=='https:'||!/(^|\.)(facebook\.com|fbcdn\.net|fbsbx\.com|whatsapp\.net)$/.test(remote.hostname))throw new MidiaRecusada('origem de arquivo inválida');
+              const mime=media.mime||info.mime_type||'application/octet-stream';
+              try{validateMedia(mime,1);}catch(error){throw new MidiaRecusada(error.message);}
+              const response=await fetchImpl(remote,{headers:{Authorization:`Bearer ${account.access_token}`},redirect:'error',signal:AbortSignal.timeout(60000)});
+              if(!response.ok)throw response.status>=400&&response.status<500?new MidiaRecusada('a Meta não tem mais este arquivo'):new Error('Download Meta indisponível.');
+              let content;
+              try{content=await readLimited(response,100*1024*1024);validateMedia(mime,content.length);}
+              catch(error){if(/limite/.test(String(error.message)))throw new MidiaRecusada(error.message);throw error;}
+              const nome=String(media.nome).replace(/[^\p{L}\p{N}._ -]/gu,'_').slice(0,180);
+              const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(message.provedor_id))),b=>b.toString(16).padStart(2,'0')).join('');
+              const path=`${account.id}/${digest}/${nome}`;
+              await storage.upload(path,content,mime);entry.anexo={path,nome,mime,bytes:content.length};
+              await service('media_upload',{conta_id:account.id,...entry.anexo});
+            }catch(error){
+              if(!(error instanceof MidiaRecusada))throw error;
+              const aviso=`[Arquivo não recebido: ${String(error.message).replace(/\.$/,'')}]`;
+              entry.texto=entry.texto?`${entry.texto}\n${aviso}`:aviso;
+            }
           }
           await service('evento',{conta_id:account.id,evento_id:message.provedor_id,jid:message.jid,nome:message.nome,grupo:false,mensagens:[entry]});
         }

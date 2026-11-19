@@ -1,81 +1,97 @@
-# Cliente ideal e persona - <Nome da empresa>
+# Molde do estudo do cliente ideal
 
-- Estado: rascunho
-- Versão: 1.0 (<AAAA-MM-DD>)
-- Fonte: dossiê da empresa, registro <AAAA-MM-DD_HHMMSS> (contexto/dossie/dossie-completo.md)
-- Fontes usadas: dossiê; pesquisa pública (<N> fontes) ou "sem pesquisa pública"; dados de clientes (planilha de <AAAA-MM-DD>, <N> linhas) ou "sem dados de clientes"
-- Origem da persona: proto-persona, montada do relato do dono e do que foi pesquisado. Nenhum cliente real foi ouvido ainda; é uma hipótese bem fundamentada, não uma persona confirmada.
-- Como ler as marcas: (dossiê 2.4) é o que o dono respondeu na pergunta 2.4; (relato do dono, data) é o que ele disse na conversa da montagem e está no Anexo; (pesquisa [3]) é o que a página número 3 da lista "Fontes da pesquisa" mostra, com o trecho no Anexo; (dados de clientes, data) é o que a planilha de clientes daquele dia mostra, agregada e sem dado pessoal; (hipótese) é dedução do time que ainda precisa de confirmação; (não consta no dossiê) é o que o dossiê não responde.
-- Níveis de consciência: 1 não percebe o problema; 2 sente a dor, mas não sabe que existe solução; 3 conhece soluções, mas não escolheu; 4 conhece a empresa, mas ainda não se decidiu; 5 pronto para comprar.
+Você escreve `empresa/publico/estudo/6-estudo.json` neste molde (etapas 6 e 7). O `empresa/publico/persona.md` sai dele pelo script: `<PY> .agents/skills/marketing-persona/scripts/persona_estudo.py montar`. Nunca escreva o `persona.md` à mão.
 
-## 1. Cliente ideal
+O script preenche sozinho, e você NÃO escreve: `versao`, `documento`, `empresa`, `oferta`, `tipo_cliente`, `onde_atende`, `abertura.versao` e `fontes`.
 
-- <quem é o cliente ideal, nas palavras do dono> (dossiê 2.4)
-- <vende para pessoa, para empresa ou para os dois> (dossiê 2.3)
-- <quem decide a compra e quem mais participa: quem pede, quem aprova, quem paga> (relato do dono, <AAAA-MM-DD>)
-- <perfil das empresas clientes: setor, porte e região, só o que a planilha mostra> (dados de clientes, <AAAA-MM-DD>)
-- <com que frequência volta> (dossiê 2.5)
-- <onde compra e como chega até a empresa> (dossiê 2.6)
-- <cidade e estado onde a empresa atua> (dossiê 1.5)
-- <época do ano em que mais e em que menos vende> (dossiê 2.8)
+## Peças que se repetem
 
-## 2. Persona: <nome do arquétipo>
+- **Origem** (uma por afirmação): `{"tipo": "disse", "refs": ["B5a", "relato 2026-11-18"]}` (o que o dono disse: código do dossiê ou relato da etapa 5); `{"tipo": "pesquisa", "refs": ["[3]"]}` (o trecho n da pesquisa); `{"tipo": "leitura", "refs": ["C3", "[5]", "relato 2026-11-18"]}` (a sua conclusão, com TODAS as refs que você juntou); `{"tipo": "hipotese", "razao": "por que você aposta nisso, até 200 letras"}` (sem refs). De 1 a 8 refs.
+- **Afirmação**: `{"texto": "...", "origem": {...}}`.
+- **Evidência** (lista `evidencias`, o "De onde tirei"): `{"tipo": "disse" ou "pesquisa", "refs": [1 a 4 refs], "texto": "o que foi dito ou mostrado, até 240 letras"}`. Nunca conclusão.
+- **Recomendação** (`o_que_fazer`, `o_que_pede`, `como_chegar`, `o_que_dizer`, `como_confirmar`, `acao`...): o que fazer; não leva origem.
+- Todo texto: numa linha só, sem parênteses, sem `<` `>`, sem travessão. Idade só como faixa ("de 30 a 45 anos") e só com origem `disse` ou `pesquisa`. Frase entre aspas só se literal.
+- Chave que você não sabe preencher com evidência ou leitura: não escreva. Capítulo sem dado: não escreva a chave do capítulo.
 
-- Nome do arquétipo: <nome só para a equipe conversar sobre ela> (proposta do time: não é uma pessoa real).
-- Contexto: <onde, quando e com quem surge a necessidade> (dossiê 2.4)
-- O que quer alcançar: <funcional, social e emocional, uma frase para cada> (relato do dono, <AAAA-MM-DD>)
-- O que empurra (dores): <o que tornou o jeito atual inaceitável> (pesquisa [<n>])
-- O que puxa (resultado esperado): <como ela mede que deu certo> (hipótese)
-- Gatilho de compra: <o que acontece no dia em que ela decide procurar a empresa> (relato do dono, <AAAA-MM-DD>)
-- Objeções e ansiedades: <o que a faz hesitar e que dúvida a novidade traz> (dados de clientes, <AAAA-MM-DD>)
-- Hábito que segura: <o que a puxa de volta ao jeito antigo> (hipótese)
-- Alternativas reais: <o que ela faria se a empresa não existisse, inclusive planilha, processo manual ou nada> (pesquisa [<n>])
-- Critérios de decisão: <o que ela compara e o que palavras vagas como "fácil" querem dizer para ela> (hipótese)
-- Jornada e canais: <do primeiro pensamento à compra, e onde ela procura> (dossiê 2.6)
-- Linguagem do cliente: <só frase literal que está no Anexo, entre aspas> (pesquisa [<n>])
+## Molde (entre parênteses de ângulo, o que escrever; o número é o teto de letras)
 
-## 3. Nível de consciência por segmento
+```
+{
+  "abertura": {
+    "arquetipo": {"texto": "<nome do grupo como manchete, 90>", "enfase": "<trecho literal do arquétipo, 40>"},
+    "retrato": {"texto": "<o cliente em uma frase: momento, o que quer, o que faz escolher, 280>", "origem": <leitura>}
+  },
+  "descobertas": {
+    "itens": [{"titulo": "<200>", "corpo": "<a explicação da etapa 4, 800>", "por_que_importa": "<400>", "o_que_fazer": "<400>", "origem": <leitura>, "evidencias": [<1 a 6>]}],
+    "extra": {"texto": "<a linha Texto da seção Mais uma da etapa 4, só a descoberta, sem E mais uma nem o capítulo, 360>", "capitulo": "<quem | pensa | quer | forcas | decide | onde | sabe | mensagem | nao>", "origem": <origem>}
+  },
+  "quem": {
+    "momento": <afirmação, 280>,
+    "perfil": [<até 6 afirmações, 240: a família ou a empresa certa>],
+    "pessoa": [<até 6 afirmações, 240: quem decide>],
+    "grupo_compra": {"papeis": [{"papel": "<60>", "funcao": "<decide | influencia | usa>", "nivel": <0 a 3>, "texto": "<240>", "origem": <origem>}], "nota": <afirmação, 400>},
+    "evidencias": [<até 8>]
+  },
+  "pensa": {
+    "acredita": [<até 5 afirmações, 200>], "teme": [<até 5>], "deseja": [<até 5>],
+    "espelho": {"paragrafos": ["<600>"], "origem": <hipotese>, "evidencias": [<1 a 6>]},
+    "evidencias": [<até 8>]
+  },
+  "quer": {
+    "pratico": {"enunciado": "<240>", "origem": <origem>, "o_que_pede": "<240>"},
+    "ser_visto": {...}, "sentir": {...},
+    "evidencias": [<até 8>]
+  },
+  "forcas": {
+    "empurra": [{"texto": "<120>", "peso": <1 a 3>, "ausente": true, "origem": <origem>}],
+    "segura": [{"texto": "<120>", "peso": <1 a 3>, "origem": <origem>}],
+    "inclinacao": "<empurra | segura | equilibrio>",
+    "leitura": <afirmação, 400>,
+    "como_virar": [{"titulo": "<60>", "texto": "<300>"}],
+    "evidencias": [<até 8>]
+  },
+  "decide": {
+    "caminho": {"pontos": [{"etapa": "<40>", "texto": "<200>", "estado": "<atua | fora | vazamento>", "alerta": "<200, obrigatório no vazamento>", "origem": <origem>}]},
+    "posicao": {
+      "eixo_x": {"esq": "<30>", "dir": "<30>"}, "eixo_y": {"baixo": "<30>", "cima": "<30>"},
+      "pontos": [{"nome": "<40>", "x": <0 a 100>, "y": <0 a 100>, "nosso": true, "origem": <disse, pesquisa ou leitura>}],
+      "leitura": <afirmação, 700>, "ressalva": "<300>", "evidencias": [<até 8>]
+    },
+    "criterios": [{"termo": "<30>", "significado": "<200>", "origem": <origem>}],
+    "evidencias": [<até 8>]
+  },
+  "onde": {
+    "zonas": [{"tipo": "<cruza | informa | compara | escuta>", "lugares": [<1 a 5 afirmações, 220>], "como_chegar": "<300>"}],
+    "nao_alcancado": "<400>",
+    "evidencias": [<até 8>]
+  },
+  "sabe": {
+    "degraus": [{"nivel": <1 a 5>, "sinal": "<160>", "onde": "<140>", "o_que_dizer": "<260>"}],
+    "foco": <1 a 5>,
+    "leitura": {"paragrafos": ["<400>"], "origem": <leitura>},
+    "evidencias": [<até 8>]
+  },
+  "nao": {"perfis": [{"perfil": "<120>", "porque": "<300>", "origem": <origem>}]},
+  "apostas": {
+    "itens": [{"aposta": "<200>", "por_que": "<240>", "como_confirmar": "<240>", "tempo": "<1-hora | 1-dia | 1-semana | 2-semanas | 1-mes>"}],
+    "roteiro": {"conversas": <3 a 10>, "minutos": <10 a 60>, "com_quem": "<300>", "perguntas": ["<3 a 5, 200>"]}
+  },
+  "mensagem": {
+    "promessa_hoje": <afirmação disse, 280>,
+    "promessa_sugerida": {"texto": "<até 20 palavras, 160>", "motivos": ["<até 4, 200>"], "origem": <origem>, "evidencias": [<até 6>]},
+    "risco": {"titulo": "<160>", "texto": "<700>", "origem": <origem>, "teste": "<300>"},
+    "onde_quando": <afirmação, 300>,
+    "provas_tem": [<até 6 afirmações disse, 220>],
+    "provas_faltam": [{"texto": "<220>"}],
+    "duvidas": [{"duvida": "<160>", "origem_duvida": <disse ou pesquisa>, "resposta": "<400>", "origem_resposta": <nunca hipotese>, "pendencia": "<200>"}],
+    "evidencias": [<até 8>]
+  },
+  "semana": {"acoes": [{"acao": "<240>", "resolve": "<200>"}]}
+}
+```
 
-| Segmento | Nível | Sinal que mostra | O que a comunicação deve fazer |
-|---|---|---|---|
-| <segmento: quem, em que produto ou canal> | <um dos cinco níveis do cabeçalho> | <sinal que mostra o nível> (pesquisa [<n>]) | <o que a mensagem deve fazer nesse nível> (hipótese) |
-| <outro segmento> | <nível> | <sinal que mostra o nível> (dados de clientes, <AAAA-MM-DD>) | <o que a mensagem deve fazer> (hipótese) |
+`mensagem` e `semana` entram na etapa 7. Listas: `descobertas.itens` de 1 a 3; `grupo_compra.papeis` de 2 a 6, pelo menos um no nível 0 e no máximo 2 por nível; `caminho.pontos` de 3 a 8; `posicao.pontos` de 2 a 7, exatamente um com `"nosso": true`; `onde.zonas` de 1 a 4, sem repetir o tipo; `sabe.degraus` sempre os 5; `nao.perfis` de 1 a 6; `apostas.itens` de 1 a 10; `semana.acoes` de 3 a 5.
 
-## 4. Quem não é o cliente ideal
+## O documento que o script gera
 
-- <só com dado do dono ou da planilha, por exemplo cliente que compra uma vez e some> (relato do dono, <AAAA-MM-DD>)
-- Sem dado no dossiê para descrever a anti-persona (não consta no dossiê).
-
-## 5. O que ainda não sabemos
-
-| Lacuna | Pergunta para fechar | Quem responde |
-|---|---|---|
-| <o que falta> | <pergunta aberta, nas palavras do negócio> | dono |
-
-## 6. Como validar
-
-Converse com 6 a 10 compradores que decidiram nos últimos meses (a coluna aceita_conversa da planilha mostra quem topa). Cada conversa dura cerca de 30 minutos, com perguntas abertas, uma por vez, sem sugerir resposta, e quem conversa é o dono ou alguém da equipe; a IA prepara o roteiro e analisa as anotações. Roteiro:
-
-- O que aconteceu no dia em que você decidiu procurar uma solução como a nossa?
-- Como você achou as opções e como foi escolhendo entre elas?
-- Quem mais participou da decisão?
-- O que você fazia antes, e o que quase te fez desistir?
-- Conte a compra do começo ao fim, na ordem em que aconteceu.
-
-Anote a data e o que cada um disse, sem o nome do cliente, no Anexo. Cuidado: o que o cliente diz que faz nem sempre é o que ele faz. Enquanto isso não for feito, esta persona continua sendo proto-persona. Com 3 conversas ou mais registradas, o cabeçalho passa a dizer "validada com N conversas" e a data da última.
-
-## 7. Fontes da pesquisa
-
-- [<n>] <Título da página>. <https://endereço completo da página>. Acessado em <AAAA-MM-DD>.
-
-## Anexo: o que o dono disse na montagem
-
-- <AAAA-MM-DD> | Pergunta do time: <pergunta> | Resposta do dono: "<frase literal do dono>"
-
-### Trechos da pesquisa
-
-- [<n>] "<trecho literal da página, até 40 palavras>" (<https://endereço completo da página>)
-
-### Dados de clientes
-
-- <AAAA-MM-DD> | planilha <N> linhas | "<frase literal da coluna X>" (<N> clientes)
+`# Estudo do cliente ideal - <empresa>`, o cabeçalho (estado, versão, fonte, oferta em foco, tipo de cliente, fontes usadas, origem do estudo, como ler as marcas), uma seção por capítulo com conteúdo (Em uma frase, Descobertas, Quem é, Como pensa, O que quer resolver, O que empurra e o que segura, Como decide, Onde está, O quanto já sabe, O que dizer, Quem não é o cliente, O que ainda é aposta, O que fazer esta semana), as Fontes da pesquisa, o Anexo com as respostas do dono e os trechos, e no fim `## Dados para o sistema` com o bloco `persona-dados`. Cada linha de afirmação termina na marca de origem: `(dossiê B5a)`, `(relato do dono, 2026-11-18)`, `(pesquisa [3])`, `(análise: dossiê C3 + pesquisa [5])`, `(hipótese: razão)`.

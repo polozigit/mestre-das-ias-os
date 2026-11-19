@@ -44,7 +44,7 @@ export function Pill({
       )}
     >
       {dot && (
-        <span className={cn("size-1.5 rounded-full", styles.dot, pulsing && "animate-pulse")} />
+        <span className={cn("size-1.5 rounded-full", styles.dot, pulsing && "ponto-vivo")} />
       )}
       {children}
     </span>

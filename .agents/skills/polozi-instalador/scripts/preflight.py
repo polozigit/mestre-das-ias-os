@@ -335,6 +335,23 @@ def checar_raiz_da_casa(pasta: Path) -> dict:
     if not (pasta / ".codex" / "config.toml").exists():
         faltando.append(".codex/config.toml")
     if faltando:
+        if "AGENTS.md" in faltando:
+            # Zip descompactado dentro de outra pasta: a Casa ficou numa subpasta direta. Diz qual abrir.
+            try:
+                filhas = sorted(
+                    f for f in pasta.iterdir()
+                    if f.is_dir() and not f.name.startswith(".") and (f / "AGENTS.md").is_file()
+                )
+            except OSError:
+                filhas = []
+            if filhas:
+                alvo = filhas[0]
+                return item(
+                    "raiz_da_casa", "Pasta é a raiz da Casa", "bloqueio",
+                    f"faltando: {', '.join(faltando)}; a Casa está na subpasta '{alvo.name}' ({alvo})",
+                    f"Você abriu a pasta de fora. Abra no Codex a pasta '{alvo.name}' (caminho: {alvo}): "
+                    "é ESSA a pasta do projeto, a que tem o AGENTS.md dentro, não a de fora.",
+                )
         return item(
             "raiz_da_casa", "Pasta é a raiz da Casa", "bloqueio",
             f"faltando: {', '.join(faltando)}",

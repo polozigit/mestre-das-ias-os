@@ -93,7 +93,7 @@ export function validarAlternarAtivo(dados: {
 export type StatusMembro = { label: string; tone: PillTone };
 
 /**
- * Status exibido na lista: Inativo ganha de tudo. "Aguardando convite" não
+ * Status exibido na lista: Inativo ganha de tudo. "Ainda não entrou" não
  * se deriva só de `usuarios` (o convite já grava auth_user_id): o sinal real
  * (`aceitou_convite`) vem do Auth Admin API na página (last_sign_in_at).
  * auth_user_id NULL também é pendente: sem conta, ninguém entra.
@@ -105,6 +105,6 @@ export function statusDoMembro(membro: {
 }): StatusMembro {
   if (!membro.ativo) return { label: "Inativo", tone: "neutral" };
   const podeLogar = membro.auth_user_id !== null && membro.aceitou_convite;
-  if (!podeLogar) return { label: "Aguardando convite", tone: "warning" };
+  if (!podeLogar) return { label: "Ainda não entrou", tone: "warning" };
   return { label: "Ativo", tone: "success" };
 }
