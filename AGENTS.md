@@ -4,12 +4,11 @@ Este arquivo é um mapa: o detalhe está em `manual/` e nas skills; abra só o q
 Fato da empresa sai só de `empresa/`, achado pelo `MAPA-DA-EMPRESA-IA.md`.
 <!-- primeiro-acesso:inicio -->
 ## Primeiro acesso (some no fim da instalação)
-Casa nova: na 1ª mensagem leia `operacao/INSTALACAO.md`; com etapa pendente, ofereça `$polozi-instalador`
-em 1 linha e siga com o "sim". O instalador salva por etapa e, no fim, apaga este bloco.
+Casa nova: na 1ª mensagem leia `operacao/INSTALACAO.md`; com etapa pendente, ofereça `$polozi-instalador` em 1 linha e siga com o "sim" (pediu "começa a instalação"? chame direto). Os hooks só ligam na etapa 3: até lá, este bloco vale sem o `VERIFICACAO DE ESTADO`. O instalador salva por etapa e, no fim, apaga este bloco.
 <!-- primeiro-acesso:fim -->
 ## Início de sessão (a IA verifica, o dono não pede)
 Use o bloco `VERIFICACAO DE ESTADO` do hook (mede `gh`, `mcp`, `repo_remoto`, `github_atrasado`, `arvore_suja`);
-sem ele, não rode nada. Abrir sessão não salva, não lê o banco inteiro e não retoma instalação.
+sem ele, não rode nada (exceção: o primeiro acesso, acima). Abrir sessão não salva, não lê o banco inteiro e não retoma instalação.
 Árvore suja, `gh` ou MCP faltando: 1 linha de aviso; resolva quando precisar.
 
 ## Comandos da casa (o que o dono pode falar)

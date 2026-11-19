@@ -1,7 +1,7 @@
 {
   "kit": "mestre-das-ias-os",
-  "gerado_em": "2026-11-19T07:57:23Z",
-  "origem_git_sha": "b4c85e940",
+  "gerado_em": "2026-11-19T08:35:18Z",
+  "origem_git_sha": "33f711fab",
   "fundacao_skills": [
     "polozi-aplicar-regra",
     "polozi-arrumar-a-casa",
@@ -642,7 +642,7 @@
     },
     {
       "caminho": "AGENTS.md",
-      "sha256": "33f4ab295cab616ca6424fe2203f7d94a0d4e4a0d692c9b583012ad2dee1b604"
+      "sha256": "c210e4c5ca02649b24200e88aa6c4cfc2941faebf5fd2b4508a8ba2df96574eb"
     },
     {
       "caminho": "CLAUDE.md",
@@ -786,11 +786,11 @@
     },
     {
       "caminho": "sistemas/empresa-os/config/planos/mestre.json",
-      "sha256": "2b21ad48f440e16aa95c64a43f316473e1d17d78840277f99c90c84f411ebff6"
+      "sha256": "036acb55476832ae1812ad5590152d47f19a2437d1cae17a19e666185cc03c82"
     },
     {
       "caminho": "sistemas/empresa-os/config/planos.test.ts",
-      "sha256": "9704d7985ca301781e8e147378b5064bfdaea407dac8aa23cc3f2c1f1c10db08"
+      "sha256": "756de44bb7122f0ec595c3aa90981e8c769676c2377bec3789c4b15f3adfe5e4"
     },
     {
       "caminho": "sistemas/empresa-os/config/senha-dono.mjs",

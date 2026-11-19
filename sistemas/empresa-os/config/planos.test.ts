@@ -66,7 +66,8 @@ test("a versão do modelo subiu: a 1, a 2 e a 3 já foram carregadas com outro h
   // agentes" a partir de um processo que se repete, sai "Times nas áreas" e o plano de 90 dias fecha o dia.
   // 17 = auditoria do kit montado (19/11/2026): "Ensinar o cérebro" passa pela skill de regra, que é o único caminho
   // para mudar o AGENTS.md, e o passo do instalador não manda mais esperar um "pode criar" que ninguém pede.
-  assert.ok(m.versao >= 17);
+  // 18 = o aluno baixa o zip no app do aluno, na aba Curso (decisão de 19/11/2026), não mais pela mão do professor.
+  assert.ok(m.versao >= 18);
 });
 
 test("o Dia 1 são os 9 passos da instalação, na ordem do manual, e nada mais: o gate saiu (decisão de 19/11/2026)", () => {
@@ -349,6 +350,12 @@ test("baixar o zip: a pasta recebe o nome do sistema (primeiro nome da empresa m
   assert.match(c.instrucao, /primeiro nome da sua empresa mais -os/);
   assert.ok(c.passos!.some((p) => /mais -os/.test(p)), "nenhum passo diz o nome da pasta");
   assert.doesNotMatch(textoDoAluno(c), /com o nome d[ao] (sua|minha) empresa[,.]/, "a pasta não se chama só pelo nome da empresa");
+});
+
+test("baixar o zip: o arquivo nome-empresa-os.zip vem do app do aluno, na aba Curso", () => {
+  const z = atividade("clonar-repo");
+  assert.match(z.passos![0], /nome-empresa-os\.zip\) no app do aluno, na aba Curso/);
+  assert.doesNotMatch(textoDoAluno(z), /professor passa/);
 });
 
 test("baixar o zip: instrução manda baixar o zip, descompactar e abrir no Codex a pasta que tem o AGENTS.md", () => {

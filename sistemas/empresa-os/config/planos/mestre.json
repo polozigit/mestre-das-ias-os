@@ -1,6 +1,6 @@
 {
   "chave": "mestre",
-  "versao": 17,
+  "versao": 18,
   "titulo": "Mestre das IAs: 3 dias de curso e 90 dias de trilha",
   "descricao": "O curso monta; a trilha prova. Dia 0 da trilha = fim do D3.",
   "caminho_origem": "config/planos/mestre.json",
@@ -81,10 +81,10 @@
           "ordem": 4,
           "titulo": "Baixar o zip e abrir a pasta no Codex",
           "objetivo": "A base do sistema da empresa no seu computador, aberta no Codex.",
-          "instrucao": "Baixe o zip do sistema do curso (o professor passa o arquivo na aula), descompacte e dê à pasta o nome do sistema: o primeiro nome da sua empresa mais -os (por exemplo, clima-os). Depois abra no Codex ESSA pasta, a que tem o arquivo AGENTS.md logo dentro dela, não a pasta de fora.",
+          "instrucao": "Baixe o zip do sistema no app do aluno, na aba Curso, descompacte e dê à pasta o nome do sistema: o primeiro nome da sua empresa mais -os (por exemplo, clima-os). Depois abra no Codex ESSA pasta, a que tem o arquivo AGENTS.md logo dentro dela, não a pasta de fora.",
           "por_que": "Sem a pasta da empresa aberta no Codex, a que tem o AGENTS.md dentro, a IA não tem onde trabalhar nem as regras do sistema para seguir.",
           "passos": [
-            "Baixe o zip do sistema no seu computador (o professor passa o arquivo na aula).",
+            "Baixe o zip do sistema (nome-empresa-os.zip) no app do aluno, na aba Curso, e salve no seu computador.",
             "Descompacte o zip numa pasta local, nunca dentro de OneDrive, iCloud ou Google Drive (no Windows, Extrair tudo; no Mac, dois cliques no zip).",
             "Dê à pasta que tem o AGENTS.md dentro o nome do sistema: o primeiro nome da sua empresa, em minúsculas e sem acento, mais -os (por exemplo, clima-os). O instalador confere esse nome depois.",
             "Abra essa pasta como projeto no Codex e confie nela quando ele perguntar.",
